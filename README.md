@@ -109,7 +109,7 @@ See `bdsp/README.md`. **Does not** remove the BDSP species/item clause yet.
 unnerf.py, gametext.py, 1..6_*.bat, PATCHES.md   # Gen 7 (USUM)
 gen3_emerald/   Emerald_NoBanList.ips, README.md
 gen4_platinum/  platinum_nobanlist.py, apply_*.bat, PLATINUM_FORMS.md
-gen5_bw2/    bw2_nobanlist.py, apply_*.bat
+gen5_bw2/       bw2_nobanlist.py, apply_*.bat
 gen6_oras/      oras_nobanlist.py, apply_*.bat
 bdsp/           bdsp_nobanlist.py, apply_*.bat, README.md
 ```
