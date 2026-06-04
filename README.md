@@ -66,11 +66,31 @@ python3 unnerf.py --cia game.cia --mode all --verify    # dry-run, no writes
 every Gen-7 patch are in `PATCHES.md`.
 
 ## Gen 6 — Omega Ruby / Alpha Sapphire  (`gen6_oras/`)
+**All restrictions in one tool — `oras_no_restrictions.py` (recommended):**
 ```
-python3 gen6_oras/oras_nobanlist.py "Pokemon Alpha Sapphire.3ds"
+python3 gen6_oras/oras_no_restrictions.py "Pokemon Alpha Sapphire.3ds"
+python3 gen6_oras/oras_no_restrictions.py game.cia --verify   # dry-run, report current state
 ```
-Works on a decrypted **`.cia` or `.3ds`**, for **both** OR and AS. Zeroes the Battle Maison ban
-records in the rule GARC and rebuilds the RomFS IVFC + NCCH hashes. (Windows: `apply_oras_nobanlist.bat`.)
+Removes **every** Battle Maison entry restriction in a single pass, for **both** OR and AS, on a
+decrypted **`.cia` or `.3ds`**:
+
+- **Ban list** (legendaries, Soul Dew / item bans),
+- **Species Clause** (no duplicate species/formes),
+- **Item Clause** (no duplicate held items),
+- **Team-size limit** and the other entry rules,
+- **510 EV-total cap** (maxed-EV mons become eligible).
+
+It zeroes the Maison rule-config records in the RomFS rule GARC (file `"0"`) — which clears the
+rule-flags word at GARC offset `0x26` (`0xFFFF`→0) that gates the clauses/limits — **and** raises the
+EV-cap literal(s) in the executable (ExeFS `.code`: eligibility cap `0x1E9734`, plus the online
+Battle-Spot cap, picked by Title ID — AS `0x4474B8`, OR `0x4474C0`). All the hashes a loader/installer
+checks are recomputed (RomFS IVFC + NCCH RomFS/ExeFS superblocks, ExeFS `.code`, and the CIA TMD). The
+`.3ds` output loads via *File → Load File* with **no install and no re-encryption**, and your save
+carries over (saves are keyed by Title ID). Technical details: `PATCHES.md` (Gen 6 section).
+(Windows: `apply_oras_no_restrictions.bat`.)
+
+**Granular tools** (if you only want one thing): `oras_evcap.py` does just the 510 EV cap;
+`oras_nobanlist.py` does just the RomFS rule-config (ban list + clauses + team-size).
 
 ## Gen 5 — Black 2 / White 2  (`gen5_black2/`)
 ```
