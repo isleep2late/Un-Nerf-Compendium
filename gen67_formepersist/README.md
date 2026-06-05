@@ -34,10 +34,10 @@ python formepersist.py  YourGame.cia --verify
 ```
 
 - Works on a **decrypted** `.cia` or `.3ds` dump (Citra/Azahar/Lime3DS don't check signatures).
-- The **Mega/Primal** fix is fully **auto-located** by instruction signature, so it works on
+- The **Mega/Primal** fix is fully **auto-located** by instruction signature, so in theory it should work on
   X/Y, OR/AS, S/M, US/UM, any region/version.
 - `--full` adds the complete forme set; verified address tables ship for **US/UM** and **OR/AS**.
-  X/Y and S/M get the auto-located subset (Mega/Primal + the clean condition-reverts); their
+  X/Y and S/M should get the auto-located subset (Mega/Primal + the clean condition-reverts); their
   full tables can be generated the same way (find `ChangeFormNo`, NOP its out-of-battle
   revert callers).
 - The script re-fixes the ExeFS `.code` hash, ExeFS superblock hash, and (for `.cia`) the TMD
