@@ -1,7 +1,7 @@
 # Gen 6/7 Forme Persistence
 
 Makes battle-only / restricted **formes persist through a save + reload** in Pokémon
-**X/Y, Omega Ruby/Alpha Sapphire, Sun/Moon, Ultra Sun/Ultra Moon**. Set a forme with
+**Omega Ruby/Alpha Sapphire and Ultra Sun/Ultra Moon (NOT tested on X/Y/S/M**. Set a forme with
 PKHeX and it no longer snaps back to base when you boot the game — on your party, and (with
 `--full`) in the PC and other contexts.
 
