@@ -17,12 +17,12 @@ across **Generations 3 through 7 and BDSP**.*
 | 4 | Platinum | Battle Frontier **ban list** (banned legendaries can enter) | Python patcher (`.nds`) |
 | 4 | Platinum | Battle Frontier **form restrictions** (Origin Giratina, Rotom/Shaymin forms) | **manual** DSPRE steps (see `gen4_platinum/PLATINUM_FORMS.md`) |
 | 5 | Black 2 / White 2 | Battle Subway + PWT **ban list, Soul Dew ban, item clause, species clause, 3-Pokémon cap [please note the 3-P cap may break the game]** | Python patcher (`.nds`) |
-| 6 | Omega Ruby / Alpha Sapphire | Battle Maison **ban list** | Python patcher (`.cia` or `.3ds`) |
+| 6 | Omega Ruby / Alpha Sapphire | Battle Maison **ALL entry restrictions** — ban list, **Species Clause**, **Item Clause**, **team-size limit**, **and the 510 EV-total cap** | Python patcher (`.cia` or `.3ds`) |
 | 7 | Ultra Sun / Ultra Moon | Battle Tree **ban list + Species Clause + Item Clause**; **Prankster**, **Gale Wings**, **Parental Bond**, **Soul Dew** un-nerfs; matching in-game text | Python patcher (`.cia`) |
 | Switch | Brilliant Diamond / Shining Pearl | Battle Tower **ban list** | LayeredFS mod builder + installer |
+| 8 (Switch) | Sword / Shield | **Crowned Zacian/Zamazenta + Eternamax persistence** AND **Battle Tower species + item clause removal** — both **CONFIRMED WORKING** (Sword & Shield) | LayeredFS `.pchtxt` (`gen8_swsh/`) |
 
-**Still in progress** (not yet done): the **510-EV limit** removal (all gens) and the **BDSP
-species/item clause**. Those are flagged where relevant and remain on the to-do list.
+**BDSP species/item clause**. Those are flagged where relevant and remain on the to-do list.
 
 ---
 
@@ -122,6 +122,15 @@ This builds a LayeredFS mod folder you drop into your emulator's mod directory (
 `mods\contents\<TitleID>\`, Yuzu `load\<TitleID>\`; BD `0100000011D90000`, SP `010018E011D92000`).
 See `bdsp/README.md`. **Does not** remove the BDSP species/item clause yet.
 
+## Switch — Brilliant Diamond / Shining Pearl  (`bdsp/`)
+BDSP's Battle Tower ban list is the same Gen-7 ban bit-string, stored in `global-metadata.dat`.
+```
+python3 bdsp/bdsp_nobanlist.py global-metadata.dat
+```
+This builds a LayeredFS mod folder you drop into your emulator's mod directory (Ryujinx
+`mods\contents\<TitleID>\`, Yuzu `load\<TitleID>\`; BD `0100000011D90000`, SP `010018E011D92000`).
+See `bdsp/README.md`. **Does not** remove the BDSP species/item clause yet.
+
 ---
 
 ## Repo layout
@@ -129,8 +138,9 @@ See `bdsp/README.md`. **Does not** remove the BDSP species/item clause yet.
 unnerf.py, gametext.py, 1..6_*.bat, PATCHES.md   # Gen 7 (USUM)
 gen3_emerald/   Emerald_NoBanList.ips, README.md
 gen4_platinum/  platinum_nobanlist.py, apply_*.bat, PLATINUM_FORMS.md
-gen5_bw2/       bw2_nobanlist.py, apply_*.bat
-gen6_oras/      oras_nobanlist.py, apply_*.bat
+gen5_black2/    black2_nobanlist.py, apply_*.bat
+gen6_oras/      oras_no_restrictions.py (all-in-one), oras_evcap.py, oras_nobanlist.py, apply_*.bat
+gen67_formepersist/  formepersist.py, apply_*.bat, README.md, FORUM_POST_*.md   # forme persistence (Gen 6/7)
 bdsp/           bdsp_nobanlist.py, apply_*.bat, README.md
 ```
 
