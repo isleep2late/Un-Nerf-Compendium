@@ -70,7 +70,7 @@ above (each is a `b` to that game's item-block-start / loop-tail respectively).
 
 Offsets are version-specific (v1.3.1 build ids above). A different update needs re-derived offsets.
 
-## `swsh_dynamax_unlock.py` — let Zacian / Zamazenta (etc.) Dynamax
+## `swsh_dynamax_unlock.py` — let Zacian / Zamazenta / Eternatus Dynamax
 
 The "this species can't Dynamax" restriction in Sword/Shield is **not code** — it's a
 per-species flag in the personal table (`CanNotDynamax`, byte `0x5A` bit 2 of each `0xB0`
