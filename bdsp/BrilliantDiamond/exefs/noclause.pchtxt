@@ -1,0 +1,13 @@
+@nsobid-94CEAE325C205C4B9D6F7235552F28FD
+// Brilliant Diamond v393216 (1.3.0) build 94CEAE325C205C4B9D6F7235552F28FD
+// Battle Tower: remove SPECIES + ITEM clause + LEGENDARY ban
+@flag offset_shift 0x100
+@enabled
+01BF220C 00008052 // legendary ban
+01BF2298 00008052 // species clause
+01BF2324 00008052 // item clause
+01BF2538 00008052 // species clause
+01BF2580 00008052 // item clause
+01BF2B8C 00008052 // legendary ban
+01BF2BE8 00008052 // species clause
+01BF2C4C 00008052 // item clause
