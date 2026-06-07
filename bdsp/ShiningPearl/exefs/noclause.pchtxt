@@ -1,0 +1,13 @@
+@nsobid-38F59CBDA2EB9C44B72F94C4D25935A2
+// Shining Pearl v393216 (1.3.0) build 38F59CBDA2EB9C44B72F94C4D25935A2
+// Battle Tower: remove SPECIES + ITEM clause + LEGENDARY ban
+@flag offset_shift 0x100
+@enabled
+0205AB8C 00008052 // legendary ban (CheckLegend)
+0205AC18 00008052 // species clause
+0205ACA4 00008052 // item clause
+0205AEB8 00008052 // species clause
+0205AF00 00008052 // item clause
+0205B50C 00008052 // legendary ban (CheckLegend)
+0205B568 00008052 // species clause
+0205B5CC 00008052 // item clause
