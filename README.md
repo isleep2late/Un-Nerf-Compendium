@@ -13,16 +13,15 @@ across **Generations 3 through 7 and BDSP**.*
 
 | Gen | Game(s) | What it removes / restores | How it's delivered |
 |-----|---------|----------------------------|--------------------|
-| 3 | Emerald | Battle Frontier/Tower **ban list** | `.ips` patch |
+| 3 | Emerald | Battle Frontier **ban list, level cap, Species Clause, Item Clause**; **Soul Dew un-nerf** (works in-Frontier); **ANY ability on ANY Pokémon** | `.ips` patches + patched PKHeX |
 | 4 | Platinum | Battle Frontier **ban list** (banned legendaries can enter) | Python patcher (`.nds`) |
 | 4 | Platinum | Battle Frontier **form restrictions** (Origin Giratina, Rotom/Shaymin forms) | **manual** DSPRE steps (see `gen4_platinum/PLATINUM_FORMS.md`) |
 | 5 | Black 2 / White 2 | Battle Subway + PWT **ban list, Soul Dew ban, item clause, species clause, 3-Pokémon cap [please note the 3-P cap may break the game]** | Python patcher (`.nds`) |
 | 6 | Omega Ruby / Alpha Sapphire | Battle Maison **ALL entry restrictions** — ban list, **Species Clause**, **Item Clause**, **team-size limit**, **and the 510 EV-total cap** | Python patcher (`.cia` or `.3ds`) |
 | 7 | Ultra Sun / Ultra Moon | Battle Tree **ban list + Species Clause + Item Clause**; **Prankster**, **Gale Wings**, **Parental Bond**, **Soul Dew** un-nerfs; matching in-game text | Python patcher (`.cia`) |
-| Switch | Brilliant Diamond / Shining Pearl | Battle Tower **ban list** | LayeredFS mod builder + installer |
+| Switch | Brilliant Diamond / Shining Pearl | Battle Tower **ban list, now including species/item clause lifted** | exefs mod |
 | 8 (Switch) | Sword / Shield | **Crowned Zacian/Zamazenta + Eternamax persistence** AND **Battle Tower species + item clause removal** — both **CONFIRMED WORKING** (Sword & Shield) | LayeredFS `.pchtxt` (`gen8_swsh/`) |
 
-**BDSP species/item clause**. Those are flagged where relevant and remain on the to-do list.
 
 ---
 
@@ -110,17 +109,27 @@ The **form-restriction** removal is a separate, manual DSPRE procedure — see
 auto-patch blindly). *Shoutout to SmolJoltik for discovering how to do this - please see References.*
 
 ## Gen 3 — Emerald  (`gen3_emerald/`)
-Apply `gen3_emerald/Emerald_NoBanList.ips` to a clean Emerald `.gba` with any IPS patcher
-(Lunar IPS / Flips / MultiPatch). See `gen3_emerald/README.md`.
+Three **IPS** patches for a clean Emerald `.gba` (apply with Lunar IPS / Flips / MultiPatch),
+plus a patched **PKHeX** for setting abilities. Saves are cross-compatible.
+
+- `patches/1_Emerald_FrontierUnlock_SoulDew.ips` — removes **all** Battle Frontier entry
+  restrictions (ban list, **level cap, Species Clause, Item Clause**) and **un-nerfs Soul Dew**
+  inside the Frontier. Covers Singles/Doubles/Multi/Link + all facilities.
+- `patches/2_Emerald_AnyAbility.ips` — **any ability on any Pokémon**. Gen 3 has no per-mon
+  ability ID (just a 1-bit slot), so this adds one in the unused PK3 byte `0x1E` and patches
+  every engine site that sets a battler's ability to read it.
+- `patches/3_Emerald_Full_Hackmons_v3.ips` — **everything** (1 + 2 + a flash-save fix). The full build.
+
+Set abilities with PKHaX.exe located in the Release page (Gen-3 Ability dropdown now lists all 78 — pick
+one, save; needs the .NET 10 Desktop Runtime). Source changes in `PKHeX/PKHeX_CHANGES.md`. Full
+details + offsets in `gen3_emerald/README.md`; forum write-ups in `gen3_emerald/forum_posts/`.
+
 
 ## Switch — Brilliant Diamond / Shining Pearl  (`bdsp/`)
-BDSP's Battle Tower ban list is the same Gen-7 ban bit-string, stored in `global-metadata.dat`.
-```
-python3 bdsp/bdsp_nobanlist.py global-metadata.dat
-```
-This builds a LayeredFS mod folder you drop into your emulator's mod directory (Ryujinx
+BDSP's Battle Tower ban list now including species and item clause removal in addition to legendary Pokemon legality.
+This builds an exefs mod folder you drop into your emulator's mod directory (Ryujinx
 `mods\contents\<TitleID>\`, Yuzu `load\<TitleID>\`; BD `0100000011D90000`, SP `010018E011D92000`).
-See `bdsp/README.md`. **Does not** remove the BDSP species/item clause yet.
+See `bdsp/README.md`. 
 
 ## Switch — Brilliant Diamond / Shining Pearl  (`bdsp/`)
 BDSP's Battle Tower ban list is the same Gen-7 ban bit-string, stored in `global-metadata.dat`.
