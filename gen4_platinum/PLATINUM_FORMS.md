@@ -1,4 +1,16 @@
-# Platinum: removing Battle Frontier FORM restrictions (manual, via DSPRE)
+# Platinum: removing Battle Frontier FORM restrictions
+
+> **This is now automated** — run `platinum_forms.py` (or `apply_platinum_forms.bat`, or apply
+> `platinum_forms.ups`) and you're done; you do **not** need DSPRE. The script reproduces exactly
+> the edits below via a length-preserving byte change: it rewrites each check's `CompareVarValue
+> 32780 255` constant to `0xFFFF`, so the `JumpIf EQUAL` to the revert handler can never fire —
+> equivalent to deleting the run, but without shifting any script jump targets. It patches the 13
+> checks in scripts 367/377/378/379 and leaves identical-looking checks elsewhere untouched. The
+> manual DSPRE walkthrough below is preserved as reference.
+
+---
+
+## Manual walkthrough (original, via DSPRE)
 
 The banlist patch (`platinum_nobanlist.py`) lets banned **species** enter the Frontier. A
 *separate* restriction makes alternate **forms** (Origin Giratina, Rotom forms, Sky Shaymin)
