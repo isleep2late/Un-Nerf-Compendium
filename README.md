@@ -256,7 +256,6 @@ Gen 5: https://projectpokemon.org/home/forums/topic/39257-gen-5-remove-all-battl
 https://projectpokemon.org/home/forums/topic/36108-gen-v-edit-the-banlist-of-battle-subway-and-pwt/
 
 Gen 4: https://projectpokemon.org/home/forums/topic/67882-dspre-removing-form-restrictions-in-pok%C3%A9mon-platinums-battle-frontier-solved/
-https://projectpokemon.org/home/forums/topic/67882-dspre-removing-form-restrictions-in-pok%C3%A9mon-platinums-battle-frontier-solved/
 
 Please do NOT hestitate to contact me on Discord ( @tirelessgolem ), or YouTube ( https://www.youtube.com/@isleep2late ) if you need help with anything.
 
