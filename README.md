@@ -15,7 +15,7 @@ across **Generations 3 through 7 and BDSP**.*
 |-----|---------|----------------------------|--------------------|
 | 3 | Emerald | Battle Frontier **ban list, level cap, Species Clause, Item Clause**; **Soul Dew un-nerf** (works in-Frontier); **ANY ability on ANY Pokémon** | `.ips` patches + patched PKHeX |
 | 4 | Platinum | Battle Frontier **ban list** (banned legendaries can enter) | Python patcher (`.nds`) |
-| 4 | Platinum | Battle Frontier **form restrictions** (Origin Giratina, Rotom/Shaymin forms) | **manual** DSPRE steps (see `gen4_platinum/PLATINUM_FORMS.md`) |
+| 4 | Platinum | Battle Frontier **form restrictions** (Origin Giratina, Rotom/Shaymin forms stop reverting) | Python patcher (`.nds`) + `.ups` |
 | 5 | Black 2 / White 2 | Battle Subway + PWT **ban list, Soul Dew ban, item clause, species clause, 3-Pokémon cap [please note the 3-P cap may break the game]** | Python patcher (`.nds`) |
 | 6 | Omega Ruby / Alpha Sapphire | Battle Maison **ALL entry restrictions** — ban list, **Species Clause**, **Item Clause**, **team-size limit**, **and the 510 EV-total cap** | Python patcher (`.cia` or `.3ds`) |
 | 7 | Ultra Sun / Ultra Moon | Battle Tree **ban list + Species Clause + Item Clause**; **Prankster**, **Gale Wings**, **Parental Bond**, **Soul Dew** un-nerfs; matching in-game text | Python patcher (`.cia`) |
@@ -101,12 +101,24 @@ species clause, and the 3-Pokémon cap, for both Battle Subway and PWT. (Windows
 
 ## Gen 4 — Platinum  (`gen4_platinum/`)
 ```
-python3 gen4_platinum/platinum_nobanlist.py "Pokemon Platinum.nds"
+python3 gen4_platinum/platinum_nobanlist.py "Pokemon Platinum.nds"   # banned species can enter
+python3 gen4_platinum/platinum_forms.py     "Pokemon Platinum.nds"   # alt forms stop reverting
 ```
-Zeroes the banned-species list in `arm9` so banned legendaries can enter the Frontier.
-The **form-restriction** removal is a separate, manual DSPRE procedure — see
-`gen4_platinum/PLATINUM_FORMS.md` (it edits compiled field-script bytecode, which isn't safe to
-auto-patch blindly). *Shoutout to SmolJoltik for discovering how to do this - please see References.*
+The first zeroes the banned-species list in `arm9` so banned legendaries can enter the Frontier.
+The second removes the Battle Frontier **form restriction** so Origin Giratina, the Rotom
+appliance forms and Sky Shaymin no longer revert to their base form on entry. Both edits are
+length-preserving (no NARC repack) so they **compose in any order**; run one or both. The form
+patcher needs `ndspy` (`pip install ndspy`).
+
+The form patch automates SmolJoltik's DSPRE discovery (PP topic 67882): in each Frontier facility
+script the game runs a per-Pokemon "form check" — `CompareVarValue 32780 255` / `JumpIf EQUAL` to a
+revert handler. Rather than deleting the run (which would shift every following script jump target),
+the patcher rewrites the compare constant `255 → 0xFFFF`; the sentinel is a byte so the equality —
+and the revert jump — can never fire. It edits exactly the 13 checks across scripts 367 (Battle
+Tower), 377 (Hall), 378 (Castle) and 379 (Arcade), leaving the 14 identical-looking checks elsewhere
+untouched. A CRC-verified **`platinum_forms.ups`** binary patch (clean Platinum USA, src CRC32
+`1D8A5220`) is included for users without Python. The original manual DSPRE walkthrough is preserved
+in `gen4_platinum/PLATINUM_FORMS.md`. *Shoutout to SmolJoltik for discovering this — see References.*
 
 ## Gen 3 — Emerald  (`gen3_emerald/`)
 Three **IPS** patches for a clean Emerald `.gba` (apply with Lunar IPS / Flips / MultiPatch),
@@ -146,7 +158,7 @@ See `bdsp/README.md`. **Does not** remove the BDSP species/item clause yet.
 ```
 unnerf.py, gametext.py, 1..6_*.bat, PATCHES.md   # Gen 7 (USUM)
 gen3_emerald/   Emerald_NoBanList.ips, README.md
-gen4_platinum/  platinum_nobanlist.py, apply_*.bat, PLATINUM_FORMS.md
+gen4_platinum/  platinum_nobanlist.py, platinum_forms.py (+.ups), apply_*.bat, PLATINUM_FORMS.md
 gen5_black2/    black2_nobanlist.py, apply_*.bat
 gen6_oras/      oras_no_restrictions.py (all-in-one), oras_evcap.py, oras_nobanlist.py, apply_*.bat
 gen67_formepersist/  formepersist.py, apply_*.bat, README.md, FORUM_POST_*.md   # forme persistence (Gen 6/7)
@@ -176,6 +188,7 @@ Gen 5: https://projectpokemon.org/home/forums/topic/39257-gen-5-remove-all-battl
 https://projectpokemon.org/home/forums/topic/36108-gen-v-edit-the-banlist-of-battle-subway-and-pwt/
 
 Gen 4: https://projectpokemon.org/home/forums/topic/67882-dspre-removing-form-restrictions-in-pok%C3%A9mon-platinums-battle-frontier-solved/
+https://projectpokemon.org/home/forums/topic/67882-dspre-removing-form-restrictions-in-pok%C3%A9mon-platinums-battle-frontier-solved/
 
 Please do NOT hestitate to contact me on Discord ( @tirelessgolem ), or YouTube ( https://www.youtube.com/@isleep2late ) if you need help with anything.
 
