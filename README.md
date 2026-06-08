@@ -138,19 +138,10 @@ details + offsets in `gen3_emerald/README.md`; forum write-ups in `gen3_emerald/
 
 
 ## Switch — Brilliant Diamond / Shining Pearl  (`bdsp/`)
-BDSP's Battle Tower ban list now including species and item clause removal in addition to legendary Pokemon legality.
-This builds an exefs mod folder you drop into your emulator's mod directory (Ryujinx
-`mods\contents\<TitleID>\`, Yuzu `load\<TitleID>\`; BD `0100000011D90000`, SP `010018E011D92000`).
-See `bdsp/README.md`. 
 
-## Switch — Brilliant Diamond / Shining Pearl  (`bdsp/`)
-BDSP's Battle Tower ban list is the same Gen-7 ban bit-string, stored in `global-metadata.dat`.
-```
-python3 bdsp/bdsp_nobanlist.py global-metadata.dat
-```
 This builds a LayeredFS mod folder you drop into your emulator's mod directory (Ryujinx
 `mods\contents\<TitleID>\`, Yuzu `load\<TitleID>\`; BD `0100000011D90000`, SP `010018E011D92000`).
-See `bdsp/README.md`. **Does not** remove the BDSP species/item clause yet.
+See `bdsp/README.md`. **This can now remove the BDSP species/item clause.**
 
 ---
 
