@@ -145,6 +145,81 @@ See `bdsp/README.md`. **This can now remove the BDSP species/item clause.**
 
 ---
 
+## PKHaX — patched PKHeX save editor (`PKHaX/`)
+
+A full copy of [PKHeX](https://github.com/kwsch/PKHeX) (kwsch/PKHeX), pulled from upstream and
+rebuilt as **PKHaX**, lives in `PKHaX/`. It carries **two hackmons features** on top of stock
+PKHeX. Every line I changed is tagged with a `// PKHaX` comment so future upstream rebases are easy
+to locate (re-clone upstream, re-apply the tagged hunks). It is a standard framework-dependent
+build and needs the **.NET 10 Desktop Runtime**.
+
+### Feature 1 — Gen 1 (RBY): PikaSav-style sprite desync + arbitrary typing
+In Gen 1 the species is stored **twice**: once in the box/party **list header** (one byte per slot —
+this drives the on-screen **sprite**) and once inside the **data structure** (the "real" species used
+for stats/battle). This feature lets the two desync and lets the per-Pokémon **Type 1 / Type 2** bytes
+(data offsets `0x05`/`0x06`) be set freely, so you can have a Mewtwo that *shows the Gyarados sprite*
+and is *typed Water/Ghost*. Stock PKHeX keeps the two species bytes equal and derives types from the
+species, so it can't represent this — and saving such a file in stock PKHeX would overwrite the desync.
+
+Files changed (all under `PKHaX/`, same relative paths as upstream):
+- **`PKHeX.Core/PKM/PK1.cs`** — new `HeaderSpeciesInternal` field (the raw Gen-1 list/sprite index;
+  `0` = synced to the data species), `SpriteSpeciesInternal`/`IsSpriteDesynced` helpers, and a
+  `Clone()` line that carries the desynced sprite across box-to-box moves.
+- **`PKHeX.Core/PKM/Shared/PokeList1.cs`** — `ReadFromList` captures the header byte into
+  `HeaderSpeciesInternal` when it differs from the data species (this is what makes PKHeX *accept and
+  retain* PikaSav-edited saves), and `GetHeaderIdentifierMark` emits `SpriteSpeciesInternal` on write
+  so the desync round-trips byte-for-byte.
+- **`PKHeX.WinForms/Controls/PKM Editor/G1Editor.cs`** (NEW) — a code-built control with **Sprite**
+  (all 256 Gen-1 indices, glitch sprites included) and **Type 1 / Type 2** drop-downs (the 15 Gen-1
+  types by their *Gen-1 byte values*, which differ from PKHeX's modern type indices; unknown/glitch
+  bytes are preserved).
+- **`PKHeX.WinForms/Controls/PKM Editor/PKMEditor.cs`** — constructs the `G1Editor`, places it on the
+  main editor tab (row 17, mirroring Catch Rate) and shows it only when `format == 1`.
+- **`PKHeX.WinForms/Controls/PKM Editor/EditPK1.cs`** — loads the control on populate and, on save,
+  writes the sprite + types **last** (after the species field, which otherwise resets types to the
+  species default — writing last is what makes custom types stick).
+- **`PKHeX.WinForms/Controls/Slots/SummaryPreviewer.cs`** + **`PokePreview.cs`** — the box **hover
+  preview** (the panel showing the moves/set) gets a Gen-1 block at the top: **Data species**,
+  **Sprite** (with `[desynced]` when applicable), and the exact **Type 1 / Type 2** (mono/dual),
+  rendered *inside* the preview box (no separate text tooltip, matching stock preview behavior).
+
+**Limitation:** the sprite override lives in the save's **list header**, which is *not* part of the
+single-`.pk1` export format. So the desync persists inside a save (and box-to-box within PKHaX) but
+resets if you export a single Pokémon to `.pk1` and re-import it — the same limitation PikaSav has.
+
+**Credit:** the Gen-1 idea and data layout are credited to **PikaSav**.
+
+### Feature 2 — Gen 3 (RSE/FRLG): any ability on any Pokémon
+Gen 3 has no per-Pokémon ability ID (just a 1-bit slot), so this stores an arbitrary ability in the
+unused PK3 **Sanity low byte `0x1E`** (outside the checksum): `0` = no override (use the slot bit),
+`>= 2` = force that ability ID. This pairs with the Emerald `AnyAbility`/`Full` ROM patch (PKHaX
+writes `0x1E`, the patched ROM reads it).
+
+Files changed:
+- **`PKHeX.Core/PKM/PK3.cs`** — `AbilityOverride` property at byte `0x1E`.
+- **`PKHeX.Core/PKM/Shared/G3PKM.cs`** — the `Ability` getter returns the override for PK3 so
+  tooltips / summary / Showdown export all show the real ability.
+- **`PKHeX.WinForms/Controls/PKM Editor/EditPK3.cs`** + **`PKMEditor.cs`** — the Gen-3 Ability
+  drop-down lists **all** abilities (not just the species' two slots); selecting one writes the slot
+  bit when it matches a slot ability, otherwise the `AbilityOverride` byte.
+
+### Enabling HaX (illegal-edit) mode
+HaX mode turns on when the executable's filename **ends with `HaX`** (PKHeX checks
+`Environment.ProcessPath`), so the shipped build is named **`PKHaX.exe`** — the title bar then reads
+"PKHaX". The apphost still loads `PKHeX.dll`, so **do not rename the DLLs**.
+
+### Building
+On a machine with the **.NET 10 SDK** (Windows recommended):
+```
+cd PKHaX
+dotnet publish PKHeX.WinForms -c Release -r win-x64 -p:PublishSingleFile=true --self-contained false
+# on Linux add: -p:EnableWindowsTargeting=true
+```
+Then rename the output `PKHeX.exe` → **`PKHaX.exe`**. Full write-ups: `PKHaX/PKHEX_PIKASAV_CHANGES.md`
+and `PKHaX/PKHaX_README.md`.
+
+---
+
 ## Repo layout
 ```
 unnerf.py, gametext.py, 1..6_*.bat, PATCHES.md   # Gen 7 (USUM)
@@ -154,6 +229,8 @@ gen5_black2/    black2_nobanlist.py, apply_*.bat
 gen6_oras/      oras_no_restrictions.py (all-in-one), oras_evcap.py, oras_nobanlist.py, apply_*.bat
 gen67_formepersist/  formepersist.py, apply_*.bat, README.md, FORUM_POST_*.md   # forme persistence (Gen 6/7)
 bdsp/           bdsp_nobanlist.py, apply_*.bat, README.md
+PKHaX/          full PKHeX source (kwsch/PKHeX) rebuilt as PKHaX: Gen-1 sprite/typing + Gen-3 any-ability
+                (every change tagged // PKHaX); PKHEX_PIKASAV_CHANGES.md, PKHaX_README.md
 ```
 
 ## Safety & scope
