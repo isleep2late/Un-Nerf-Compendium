@@ -218,9 +218,9 @@ PKHaX/           full PKHeX source rebuilt as PKHaX (Gen-1 sprite/typing + Gen-3
 
 ## Credits and references
 
-Community research that made these possible: **MeroMero, ABZB, SmolJoltik, isleep2late**, and
-others on the Project Pokemon forums; **kwsch (Kurt)** for PKHeX; **PikaSav** for the Gen-1 layout;
-**Nifyr** for Imposter's Ordeal (used in the BDSP work); **SciresM** and **Ritchie** for tooling.
+Community research that made these possible: *MeroMero, ABZB, SmolJoltik, and
+others on the Project Pokemon forums; kwsch (Kurt) for PKHeX; PikaSav by Ritchie for the Gen-1 layout;
+Nifyr for Imposter's Ordeal (used in the BDSP work). pret for RE Emerald and Platinum.
 Reverse-engineering and patch authoring by the author, parts assisted by an AI coding assistant,
 with findings verified by hand against known-working data where possible.
 
