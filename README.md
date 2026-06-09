@@ -240,6 +240,11 @@ PKHaX/          full PKHeX source (kwsch/PKHeX) rebuilt as PKHaX: Gen-1 sprite/t
   edits byte-for-byte where a reference was available, but always test before relying on them.
 
 ## Credits / References
+
+People who have contributed greatly to this project (not necessarily directly, but as part of the Project Pokemon forums or through programs that were directly utilized and deserve mention in this section):
+
+MeroMero, ABZB, SmolJoltik, Kurt / kwsch, Nifyr, SciresM, Ritchie
+
 Reverse-engineering and tooling by the author, with parts assisted by an AI coding assistant and
 all findings verified by hand against known-working data where possible. Community research that
 made the multi-gen patches possible: MeroMero, isleep2late, ABZB, SmolJoltik and others on the
