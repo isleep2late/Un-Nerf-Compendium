@@ -423,6 +423,8 @@ public static class FormInfo
     /// <returns>True if it has forms that can be provided by <see cref="FormConverter"/>, otherwise false for none.</returns>
     public static bool HasFormSelection(IPersonalFormInfo pi, ushort species, byte format)
     {
+        if (species == (int)Deoxys)
+            return true; // PKHaX: enable Gen-3 Deoxys form editing (form stored in PK3 0x1F)
         if (format <= 3 && species != (int)Unown)
             return false;
 

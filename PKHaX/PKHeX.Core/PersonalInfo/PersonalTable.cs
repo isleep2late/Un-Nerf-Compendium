@@ -141,6 +141,11 @@ public static class PersonalTable
         E.LoadTables(machine, tutors);
         FR.CopyTables(E);
         LG.CopyTables(E);
+        // PKHaX: allow Gen-3 Deoxys to use all 4 forms (Normal/Attack/Defense/Speed)
+        RS[(int)Species.Deoxys].FormCount = 4;
+        E[(int)Species.Deoxys].FormCount = 4;
+        FR[(int)Species.Deoxys].FormCount = 4;
+        LG[(int)Species.Deoxys].FormCount = 4;
         RS.CopyTables(E);
     }
 

@@ -12,7 +12,23 @@ public sealed class PK3 : G3PKM, ISanityChecksum
     public override int SIZE_PARTY => PokeCrypto.SIZE_3PARTY;
     public override int SIZE_STORED => PokeCrypto.SIZE_3STORED;
     public override EntityContext Context => EntityContext.Gen3;
-    public override PersonalInfo3 PersonalInfo => PersonalTable.RS[Species];
+    private static PersonalInfo3? s_deoxysAtk, s_deoxysDef, s_deoxysSpe;
+    private static PersonalInfo3 MakeDeoxysPI(int hp, int atk, int def, int spe, int spa, int spd)
+    {
+        var b = PersonalTable.RS[(int)Core.Species.Deoxys].Write(); // clone the Normal-form Gen-3 entry
+        var pi = new PersonalInfo3(b.AsMemory());
+        pi.HP = hp; pi.ATK = atk; pi.DEF = def; pi.SPE = spe; pi.SPA = spa; pi.SPD = spd;
+        pi.FormCount = 4;
+        return pi;
+    }
+    // PKHaX: show correct per-form base stats for Gen-3 Deoxys (form from 0x1F). RS table = Normal.
+    public override PersonalInfo3 PersonalInfo => Species != (int)Core.Species.Deoxys ? PersonalTable.RS[Species] : Form switch
+    {
+        1 => s_deoxysAtk ??= MakeDeoxysPI(50, 180, 20, 150, 180, 20), // Attack
+        2 => s_deoxysDef ??= MakeDeoxysPI(50, 70, 160, 90, 70, 160),  // Defense
+        3 => s_deoxysSpe ??= MakeDeoxysPI(50, 95, 90, 180, 95, 90),   // Speed
+        _ => PersonalTable.RS[Species],                               // Normal (50/150/50/150/150/50)
+    };
 
     public PK3() : base(PokeCrypto.SIZE_3PARTY) { }
     public PK3(Memory<byte> data) : base(DecryptParty(data)) { }
@@ -163,6 +179,21 @@ public sealed class PK3 : G3PKM, ISanityChecksum
     // PKHaX: arbitrary Gen-3 ability stored in the unused Sanity low byte (0x1E, outside the checksum).
     // 0 = no override (use the slot bit); >=2 = force that ability ID. Paired with the Emerald engine patch.
     public int AbilityOverride { get => Data[0x1E]; set => Data[0x1E] = (byte)value; }
+    // PKHaX: arbitrary Gen-3 Deoxys form stored in the unused Sanity high byte (0x1F, outside the checksum).
+    // 0=Normal 1=Attack 2=Defense 3=Speed. Paired with the Emerald engine patch.
+    public int DeoxysFormOverride { get => Data[0x1F]; set => Data[0x1F] = (byte)value; }
+    public override byte Form
+    {
+        // PKHaX: byte 0 = Speed (matches game default & existing Deoxys); 1=Normal 2=Attack 3=Defense
+        get => Species == (int)Core.Species.Deoxys ? (byte)((Data[0x1F] + 3) & 3) : base.Form;
+        set
+        {
+            if (Species == (int)Core.Species.Deoxys)
+                Data[0x1F] = (byte)((value + 1) & 3);
+            else
+                base.Form = value;
+        }
+    }
 
     private uint RIB0 { get => ReadUInt32LittleEndian(Data[0x4C..]); set => WriteUInt32LittleEndian(Data[0x4C..], value); }
     public override byte RibbonCountG3Cool        { get => (byte)((RIB0 >> 00) & 7); set => RIB0 = ((RIB0 & ~(7u << 00)) | ((uint)(value & 7) << 00)); }
