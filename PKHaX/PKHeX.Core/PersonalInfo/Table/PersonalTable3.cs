@@ -25,8 +25,39 @@ public sealed class PersonalTable3 : IPersonalTable, IPersonalTable<PersonalInfo
     }
 
     public PersonalInfo3 this[int index] => Table[(uint)index < Table.Length ? index : 0];
-    public PersonalInfo3 this[ushort species, byte form] => Table[GetFormIndex(species, form)];
-    public PersonalInfo3 GetFormEntry(ushort species, byte form) => Table[GetFormIndex(species, form)];
+    public PersonalInfo3 this[ushort species, byte form] => GetFormEntry(species, form);
+    public PersonalInfo3 GetFormEntry(ushort species, byte form)
+    {
+        // PKHaX: Gen-3 personal data has only one Deoxys entry, so GetFormIndex(Deoxys, f) returns the
+        // same slot for every form. Return real per-form stat entries so the editor (which reads
+        // GetFormEntry(Species, Form) for base stats), sprite, and form-name all reflect the chosen form.
+        if (species == (int)Species.Deoxys && form < 4)
+            return (_deoxysForms ??= BuildDeoxysForms())[form];
+        return Table[GetFormIndex(species, form)];
+    }
+
+    private PersonalInfo3[]? _deoxysForms;
+    private PersonalInfo3[] BuildDeoxysForms()
+    {
+        // HP, ATK, DEF, SPE, SPA, SPD  (form order: 0 Normal, 1 Attack, 2 Defense, 3 Speed)
+        ReadOnlySpan<byte> n = [50, 150, 50, 150, 150, 50];
+        ReadOnlySpan<byte> a = [50, 180, 20, 150, 180, 20];
+        ReadOnlySpan<byte> d = [50, 70, 160, 90, 70, 160];
+        ReadOnlySpan<byte> s = [50, 95, 90, 180, 95, 90];
+        var forms = new[] { n.ToArray(), a.ToArray(), d.ToArray(), s.ToArray() };
+        var basePI = Table[(int)Species.Deoxys];
+        var arr = new PersonalInfo3[4];
+        for (int f = 0; f < 4; f++)
+        {
+            var clone = new PersonalInfo3(basePI.Write().AsMemory());
+            var st = forms[f];
+            clone.HP = st[0]; clone.ATK = st[1]; clone.DEF = st[2];
+            clone.SPE = st[3]; clone.SPA = st[4]; clone.SPD = st[5];
+            clone.FormCount = 4;
+            arr[f] = clone;
+        }
+        return arr;
+    }
 
     public int GetFormIndex(ushort species, byte form) => IsSpeciesInGame(species) ? species : 0;
     public bool IsSpeciesInGame(ushort species) => species <= MaxSpecies;

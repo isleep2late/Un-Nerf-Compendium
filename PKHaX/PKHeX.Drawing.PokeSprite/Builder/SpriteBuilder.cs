@@ -110,9 +110,10 @@ public abstract class SpriteBuilder : ISpriteBuilder<Bitmap>
         if (species == 0)
             return None;
 
-        if (context == EntityContext.Gen3 && species == (int)Species.Deoxys) // Depends on Gen3 save file version
-            form = GetDeoxysForm(Version);
-        else if (context == EntityContext.Gen4 && species == (int)Species.Arceus) // Curse type's existence in Gen4
+        // PKHaX: Gen-3 Deoxys now carries a real stored form (PK3 0x1F), so use the passed-in form for
+        // the icon instead of the version-locked default. Only fall back to the version form when none
+        // is meaningfully set is unnecessary here since the form is always valid (0-3).
+        if (context == EntityContext.Gen4 && species == (int)Species.Arceus) // Curse type's existence in Gen4
             form = GetArceusForm4(form);
 
         var baseImage = GetBaseImage(species, form, gender, formarg, shiny.IsShiny(), context);

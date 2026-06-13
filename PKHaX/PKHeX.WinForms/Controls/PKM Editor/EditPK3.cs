@@ -29,6 +29,11 @@ public partial class PKMEditor
         if (pk3 is IShadowCapture s)
             LoadShadow3(s);
 
+        // PKHaX: Gen-3 Deoxys -- load the stored form (0x1F) into the dropdown so it displays correctly
+        // (byte 0 => Speed by our encoding). The form value already drives PersonalInfo/sprite via Entity.Form.
+        if (pk3.Species == (int)Species.Deoxys && CB_Form.Enabled && CB_Form.Items.Count > pk3.Form)
+            CB_Form.SelectedIndex = pk3.Form;
+
         LoadPartyStats(pk3);
         UpdateStats();
     }

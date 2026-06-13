@@ -1080,6 +1080,7 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
             Entity.Form = (byte)CB_Form.SelectedIndex;
             uint exp = Experience.GetEXP(Entity.CurrentLevel, Entity.PersonalInfo.EXPGrowth);
             TB_EXP.Text = exp.ToString();
+            UpdatePreviewSprite?.Invoke(this, EventArgs.Empty); // PKHaX: refresh sprite when form changes (Gen-3 Deoxys)
         }
 
         UpdateStats();

@@ -1,0 +1,8 @@
+# Built PKHaX binary is 156 MB - exceeds GitHub's 100 MB limit. Ship it as a Release, not in git.
+PKHeX.exe
+PKHaX/PKHeX.exe
+PKHaX/_pub/
+# .NET build intermediates (in case the source is built locally)
+**/bin/
+**/obj/
+**/__pycache__/

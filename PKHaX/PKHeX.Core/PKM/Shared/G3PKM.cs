@@ -62,7 +62,7 @@ public abstract class G3PKM : PKM, IRibbonSetEvent3, IRibbonSetCommon3, IRibbonS
 
     public abstract ushort SpeciesInternal { get; set; } // raw access
 
-    public sealed override byte Form
+    public override byte Form
     {
         get => Species == (int)Core.Species.Unown ? EntityPID.GetUnownForm3(PID) : (byte)0;
         set

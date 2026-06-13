@@ -1,0 +1,426 @@
+--- a/include/constants/global.h
++++ b/include/constants/global.h
+@@ -35,6 +35,7 @@
+ #define FRONTIER_PARTY_SIZE         3
+ #define FRONTIER_DOUBLES_PARTY_SIZE 4
+ #define FRONTIER_MULTI_PARTY_SIZE   2
++#define FRONTIER_SELECT_SIZE        6  // player singles team (6-mon)
+ #define MAX_FRONTIER_PARTY_SIZE    (max(FRONTIER_PARTY_SIZE,        \
+                                     max(FRONTIER_DOUBLES_PARTY_SIZE,\
+                                         FRONTIER_MULTI_PARTY_SIZE)))
+--- a/include/global.h
++++ b/include/global.h
+@@ -386,7 +386,7 @@
+               u8 challengePaused:1;
+               u8 disableRecordBattle:1;
+               //u8 padding1:4;
+-    /*0xCAA*/ u16 selectedPartyMons[MAX_FRONTIER_PARTY_SIZE];
++    /*0xCAA*/ u16 selectedPartyMons[FRONTIER_SELECT_SIZE];
+     /*0xCB2*/ u16 curChallengeBattleNum; // Battle number / room number (Pike) / floor number (Pyramid)
+     /*0xCB4*/ u16 trainerIds[20];
+     /*0xCDC*/ u32 winStreakActiveFlags;
+--- a/include/pokemon.h
++++ b/include/pokemon.h
+@@ -458,6 +458,7 @@
+ u8 GetMonsStateToDoubles_2(void);
+ u8 GetAbilityBySpecies(u16 species, u8 abilityNum);
+ u8 GetMonAbility(struct Pokemon *mon);
++u8 GetBattlerStoredOrSpeciesAbility(u8 battler);
+ void CreateSecretBaseEnemyParty(struct SecretBase *secretBaseRecord);
+ u8 GetSecretBaseTrainerPicIndex(void);
+ u8 GetSecretBaseTrainerClass(void);
+--- a/include/party_menu.h
++++ b/include/party_menu.h
+@@ -24,7 +24,7 @@
+ extern bool8 gPartyMenuUseExitCallback;
+ extern u8 gSelectedMonPartyId;
+ extern MainCallback gPostMenuFieldCallback;
+-extern u8 gSelectedOrderFromParty[MAX_FRONTIER_PARTY_SIZE];
++extern u8 gSelectedOrderFromParty[FRONTIER_SELECT_SIZE];
+ extern u8 gBattlePartyCurrentOrder[PARTY_SIZE / 2];
+ 
+ extern void (*gItemUseCB)(u8, TaskFunc);
+--- a/include/constants/party_menu.h
++++ b/include/constants/party_menu.h
+@@ -118,13 +118,15 @@
+ #define PARTYBOX_DESC_SECOND      3
+ #define PARTYBOX_DESC_THIRD       4
+ #define PARTYBOX_DESC_FOURTH      5
+-#define PARTYBOX_DESC_ABLE        6
+-#define PARTYBOX_DESC_NOT_ABLE    7
+-#define PARTYBOX_DESC_ABLE_2      8
+-#define PARTYBOX_DESC_NOT_ABLE_2  9
+-#define PARTYBOX_DESC_LEARNED     10
+-#define PARTYBOX_DESC_HAVE        11
+-#define PARTYBOX_DESC_DONT_HAVE   12
++#define PARTYBOX_DESC_FIFTH       6
++#define PARTYBOX_DESC_SIXTH       7
++#define PARTYBOX_DESC_ABLE        8
++#define PARTYBOX_DESC_NOT_ABLE    9
++#define PARTYBOX_DESC_ABLE_2      10
++#define PARTYBOX_DESC_NOT_ABLE_2  11
++#define PARTYBOX_DESC_LEARNED     12
++#define PARTYBOX_DESC_HAVE        13
++#define PARTYBOX_DESC_DONT_HAVE   14
+ 
+ #define SELECTWINDOW_ACTIONS  0
+ #define SELECTWINDOW_ITEM     1
+--- a/include/strings.h
++++ b/include/strings.h
+@@ -2125,6 +2125,8 @@
+ extern const u8 gText_NoUse[];
+ extern const u8 gText_Able[];
+ extern const u8 gText_First_PM[];
++extern const u8 gText_Fifth_PM[];
++extern const u8 gText_Sixth_PM[];
+ extern const u8 gText_Second_PM[];
+ extern const u8 gText_Third_PM[];
+ extern const u8 gText_Fourth[];
+--- a/src/party_menu.c
++++ b/src/party_menu.c
+@@ -225,7 +225,7 @@
+ EWRAM_DATA MainCallback gPostMenuFieldCallback = NULL;
+ static EWRAM_DATA u16 *sSlot1TilemapBuffer = 0; // for switching party slots
+ static EWRAM_DATA u16 *sSlot2TilemapBuffer = 0; //
+-EWRAM_DATA u8 gSelectedOrderFromParty[MAX_FRONTIER_PARTY_SIZE] = {0};
++EWRAM_DATA u8 gSelectedOrderFromParty[FRONTIER_SELECT_SIZE] = {0};
+ static EWRAM_DATA u16 sPartyMenuItemId = 0;
+ static EWRAM_DATA u16 sUnused = 0;
+ EWRAM_DATA u8 gBattlePartyCurrentOrder[PARTY_SIZE / 2] = {0}; // bits 0-3 are the current pos of Slot 1, 4-7 are Slot 2, and so on
+@@ -5598,6 +5598,8 @@
+         return FALSE;
+     }
+ 
++    species = GetMonData(mon, MON_DATA_SPECIES);
++    (void)species; (void)i;
+     switch (VarGet(VAR_FRONTIER_FACILITY))
+     {
+     case FACILITY_MULTI_OR_EREADER:
+@@ -5606,13 +5608,7 @@
+         return FALSE;
+     case FACILITY_UNION_ROOM:
+         return TRUE;
+-    default: // Battle Frontier
+-        species = GetMonData(mon, MON_DATA_SPECIES);
+-        for (; gFrontierBannedSpecies[i] != 0xFFFF; i++)
+-        {
+-            if (gFrontierBannedSpecies[i] == species)
+-                return FALSE;
+-        }
++    default: // Battle Frontier - no-ban-list: every species eligible
+         return TRUE;
+     }
+ }
+@@ -5646,9 +5642,9 @@
+         for (j = i + 1; j < maxBattlers; j++)
+         {
+             if (species == GetMonData(&party[order[j] - 1], MON_DATA_SPECIES))
+-                return PARTY_MSG_MONS_CANT_BE_SAME;
++                (void)0; // clause off (unnerf)
+             if (item != ITEM_NONE && item == GetMonData(&party[order[j] - 1], MON_DATA_HELD_ITEM))
+-                return PARTY_MSG_NO_SAME_HOLD_ITEMS;
++                (void)0; // clause off (unnerf)
+         }
+     }
+ 
+@@ -5703,6 +5699,13 @@
+     case FACILITY_UNION_ROOM:
+         return UNION_ROOM_PARTY_SIZE;
+     default: // Battle Frontier
++        if (VarGet(VAR_FRONTIER_FACILITY) == FRONTIER_FACILITY_TOWER)
++        {
++            if (VarGet(VAR_FRONTIER_BATTLE_MODE) == FRONTIER_MODE_SINGLES)
++                return 6; // up to 6 in singles
++            if (VarGet(VAR_FRONTIER_BATTLE_MODE) == FRONTIER_MODE_DOUBLES)
++                return 4; // up to 4 in doubles (matches the 4-mon opponent)
++        }
+         return gSpecialVar_0x8005;
+     }
+ }
+@@ -5716,6 +5719,8 @@
+     case FACILITY_UNION_ROOM:
+         return UNION_ROOM_PARTY_SIZE;
+     default: // Battle Frontier
++        if (VarGet(VAR_FRONTIER_FACILITY) == FRONTIER_FACILITY_TOWER)
++            return 1; // any Tower mode (incl. multi/link): allow as few as 1
+         return gSpecialVar_0x8005;
+     }
+ }
+@@ -5728,10 +5733,8 @@
+         return MAX_LEVEL;
+     case FACILITY_UNION_ROOM:
+         return UNION_ROOM_MAX_LEVEL;
+-    default: // Battle Frontier
+-        if (gSpecialVar_0x8004 == FRONTIER_LVL_50)
+-            return FRONTIER_MAX_LEVEL_50;
+-        return FRONTIER_MAX_LEVEL_OPEN;
++    default: // Battle Frontier - no level cap (unnerf)
++        return MAX_LEVEL;
+     }
+ }
+ 
+--- a/src/script_pokemon_util.c
++++ b/src/script_pokemon_util.c
+@@ -208,20 +208,20 @@
+ 
+ void ReducePlayerPartyToSelectedMons(void)
+ {
+-    struct Pokemon party[MAX_FRONTIER_PARTY_SIZE];
++    struct Pokemon party[FRONTIER_SELECT_SIZE];
+     int i;
+ 
+     CpuFill32(0, party, sizeof party);
+ 
+     // copy the selected Pokémon according to the order.
+-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
++    for (i = 0; i < FRONTIER_SELECT_SIZE; i++)
+         if (gSelectedOrderFromParty[i]) // as long as the order keeps going (did the player select 1 mon? 2? 3?), do not stop
+             party[i] = gPlayerParty[gSelectedOrderFromParty[i] - 1]; // index is 0 based, not literal
+ 
+     CpuFill32(0, gPlayerParty, sizeof gPlayerParty);
+ 
+     // overwrite the first 4 with the order copied to.
+-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
++    for (i = 0; i < FRONTIER_SELECT_SIZE; i++)
+         gPlayerParty[i] = party[i];
+ 
+     CalculatePlayerPartyCount();
+--- a/src/frontier_util.c
++++ b/src/frontier_util.c
+@@ -678,8 +678,7 @@
+ 
+ const u16 gFrontierBannedSpecies[] =
+ {
+-    SPECIES_MEW, SPECIES_MEWTWO, SPECIES_HO_OH, SPECIES_LUGIA, SPECIES_CELEBI,
+-    SPECIES_KYOGRE, SPECIES_GROUDON, SPECIES_RAYQUAZA, SPECIES_JIRACHI, SPECIES_DEOXYS, 0xFFFF
++    0xFFFF // no-ban-list: empty banlist, nothing is banned in any facility/mode
+ };
+ 
+ static const u8 *const sRecordsWindowChallengeTexts[][2] =
+@@ -872,7 +871,7 @@
+         gSaveBlock2Ptr->frontier.challengePaused = gSpecialVar_0x8006;
+         break;
+     case FRONTIER_DATA_SELECTED_MON_ORDER:
+-        for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
++        for (i = 0; i < FRONTIER_SELECT_SIZE; i++)
+             gSaveBlock2Ptr->frontier.selectedPartyMons[i] = gSelectedOrderFromParty[i];
+         break;
+     case FRONTIER_DATA_RECORD_DISABLED:
+@@ -889,7 +888,7 @@
+     s32 i;
+ 
+     ClearSelectedPartyOrder();
+-    for (i = 0; i < gSpecialVar_0x8005; i++)
++    for (i = 0; i < FRONTIER_SELECT_SIZE; i++) // restore all selected mons (up to 6), not gSpecialVar_0x8005
+         gSelectedOrderFromParty[i] = gSaveBlock2Ptr->frontier.selectedPartyMons[i];
+     ReducePlayerPartyToSelectedMons();
+ }
+@@ -908,7 +907,7 @@
+ {
+     u8 i;
+ 
+-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
++    for (i = 0; i < FRONTIER_SELECT_SIZE; i++)
+     {
+         u16 monId = gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1;
+         if (monId < PARTY_SIZE)
+@@ -1981,21 +1980,20 @@
+     for (i = 0; gFrontierBannedSpecies[i] != 0xFFFF && gFrontierBannedSpecies[i] != species; i++)
+         ;
+ 
+-    if (gFrontierBannedSpecies[i] != 0xFFFF)
+-        return;
+-    if (lvlMode == FRONTIER_LVL_50 && monLevel > FRONTIER_MAX_LEVEL_50)
++    if (0) // no-ban-list: banned species still count
+         return;
++    (void)lvlMode; (void)monLevel; // no level cap (unnerf)
+ 
+     for (i = 0; i < *count && speciesArray[i] != species; i++)
+         ;
+-    if (i != *count)
++    if (0) // duplicate species allowed (no species clause)
+         return;
+ 
+     if (heldItem != 0)
+     {
+         for (i = 0; i < *count && itemsArray[i] != heldItem; i++)
+             ;
+-        if (i != *count)
++        if (0) // duplicate item allowed (no item clause)
+             return;
+     }
+ 
+@@ -2023,7 +2021,7 @@
+     switch (battleMode)
+     {
+     case FRONTIER_MODE_SINGLES:
+-        toChoose = FRONTIER_PARTY_SIZE;
++        toChoose = 1; // flexible entry (1-6)
+         break;
+     case FRONTIER_MODE_MULTIS:
+     case FRONTIER_MODE_LINK_MULTIS:
+@@ -2160,7 +2158,7 @@
+ {
+     u8 i;
+ 
+-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
++    for (i = 0; i < FRONTIER_SELECT_SIZE; i++)
+     {
+         if (gSaveBlock2Ptr->frontier.selectedPartyMons[i] != 0)
+         {
+@@ -2193,7 +2191,7 @@
+ {
+     u8 i, j, k;
+ 
+-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
++    for (i = 0; i < FRONTIER_SELECT_SIZE; i++)
+     {
+         u16 monId = gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1;
+         if (monId < PARTY_SIZE)
+--- a/src/strings.c
++++ b/src/strings.c
+@@ -455,6 +455,8 @@
+ const u8 gText_NoUse[] = _("No use.");
+ const u8 gText_Able[] = _("ABLE");
+ const u8 gText_First_PM[] = _("FIRST");
++const u8 gText_Fifth_PM[] = _("FIFTH");
++const u8 gText_Sixth_PM[] = _("SIXTH");
+ const u8 gText_Second_PM[] = _("SECOND");
+ const u8 gText_Third_PM[] = _("THIRD");
+ const u8 gText_Able2[] = _("ABLE");
+--- a/src/data/party_menu.h
++++ b/src/data/party_menu.h
+@@ -634,6 +634,8 @@
+     [PARTYBOX_DESC_SECOND]     = gText_Second_PM,
+     [PARTYBOX_DESC_THIRD]      = gText_Third_PM,
+     [PARTYBOX_DESC_FOURTH]     = gText_Fourth,
++    [PARTYBOX_DESC_FIFTH]      = gText_Fifth_PM,
++    [PARTYBOX_DESC_SIXTH]      = gText_Sixth_PM,
+     [PARTYBOX_DESC_ABLE]       = gText_Able2,
+     [PARTYBOX_DESC_NOT_ABLE]   = gText_NotAble,
+     [PARTYBOX_DESC_ABLE_2]     = gText_Able3,
+--- a/src/pokemon.c
++++ b/src/pokemon.c
+@@ -3184,9 +3184,9 @@
+     // Apply boosts from hold items
+     if (attackerHoldEffect == HOLD_EFFECT_CHOICE_BAND)
+         attack = (150 * attack) / 100;
+-    if (attackerHoldEffect == HOLD_EFFECT_SOUL_DEW && !(gBattleTypeFlags & (BATTLE_TYPE_FRONTIER)) && (attacker->species == SPECIES_LATIAS || attacker->species == SPECIES_LATIOS))
++    if (attackerHoldEffect == HOLD_EFFECT_SOUL_DEW && (attacker->species == SPECIES_LATIAS || attacker->species == SPECIES_LATIOS))
+         spAttack = (150 * spAttack) / 100;
+-    if (defenderHoldEffect == HOLD_EFFECT_SOUL_DEW && !(gBattleTypeFlags & (BATTLE_TYPE_FRONTIER)) && (defender->species == SPECIES_LATIAS || defender->species == SPECIES_LATIOS))
++    if (defenderHoldEffect == HOLD_EFFECT_SOUL_DEW && (defender->species == SPECIES_LATIAS || defender->species == SPECIES_LATIOS))
+         spDefense = (150 * spDefense) / 100;
+     if (attackerHoldEffect == HOLD_EFFECT_DEEP_SEA_TOOTH && attacker->species == SPECIES_CLAMPERL)
+         spAttack *= 2;
+@@ -4543,9 +4543,30 @@
+ {
+     u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+     u8 abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
++    u8 storedAbility = mon->box.unknown & 0xFF; // any-ability: PK3 0x1E custom ability
++    if (storedAbility != ABILITY_NONE)
++    {
++        gLastUsedAbility = storedAbility;
++        return storedAbility;
++    }
+     return GetAbilityBySpecies(species, abilityNum);
+ }
+ 
++// any-ability: returns the custom ability stored at PK3 0x1E (mon->box.unknown), else species default
++u8 GetBattlerStoredOrSpeciesAbility(u8 battler)
++{
++    struct Pokemon *mon = (GetBattlerSide(battler) == B_SIDE_PLAYER)
++        ? &gPlayerParty[gBattlerPartyIndexes[battler]]
++        : &gEnemyParty[gBattlerPartyIndexes[battler]];
++    u8 storedAbility = mon->box.unknown & 0xFF;
++    if (storedAbility != ABILITY_NONE)
++    {
++        gLastUsedAbility = storedAbility;
++        return storedAbility;
++    }
++    return GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum);
++}
++
+ void CreateSecretBaseEnemyParty(struct SecretBase *secretBaseRecord)
+ {
+     s32 i, j;
+@@ -4690,7 +4711,11 @@
+     gBattleMons[battler].otId = GetMonData(&gPlayerParty[partyIndex], MON_DATA_OT_ID, NULL);
+     gBattleMons[battler].types[0] = gSpeciesInfo[gBattleMons[battler].species].types[0];
+     gBattleMons[battler].types[1] = gSpeciesInfo[gBattleMons[battler].species].types[1];
+-    gBattleMons[battler].ability = GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum);
++    {
++        u8 storedAbility = gPlayerParty[partyIndex].box.unknown & 0xFF; // any-ability
++        gBattleMons[battler].ability = storedAbility ? storedAbility
++            : GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum);
++    }
+     GetMonData(&gPlayerParty[partyIndex], MON_DATA_NICKNAME, nickname);
+     StringCopy_Nickname(gBattleMons[battler].nickname, nickname);
+     GetMonData(&gPlayerParty[partyIndex], MON_DATA_OT_NAME, gBattleMons[battler].otName);
+--- a/src/battle_main.c
++++ b/src/battle_main.c
+@@ -3417,7 +3417,7 @@
+ 
+             gBattleMons[gActiveBattler].types[0] = gSpeciesInfo[gBattleMons[gActiveBattler].species].types[0];
+             gBattleMons[gActiveBattler].types[1] = gSpeciesInfo[gBattleMons[gActiveBattler].species].types[1];
+-            gBattleMons[gActiveBattler].ability = GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].abilityNum);
++            gBattleMons[gActiveBattler].ability = GetBattlerStoredOrSpeciesAbility(gActiveBattler); // any-ability
+             hpOnSwitchout = &gBattleStruct->hpOnSwitchout[GetBattlerSide(gActiveBattler)];
+             *hpOnSwitchout = gBattleMons[gActiveBattler].hp;
+             for (i = 0; i < NUM_BATTLE_STATS; i++)
+--- a/src/battle_script_commands.c
++++ b/src/battle_script_commands.c
+@@ -4636,7 +4636,7 @@
+ 
+     gBattleMons[gActiveBattler].types[0] = gSpeciesInfo[gBattleMons[gActiveBattler].species].types[0];
+     gBattleMons[gActiveBattler].types[1] = gSpeciesInfo[gBattleMons[gActiveBattler].species].types[1];
+-    gBattleMons[gActiveBattler].ability = GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].abilityNum);
++    gBattleMons[gActiveBattler].ability = GetBattlerStoredOrSpeciesAbility(gActiveBattler); // any-ability
+ 
+     // check knocked off item
+     i = GetBattlerSide(gActiveBattler);
+@@ -8430,7 +8430,10 @@
+                          && !(gAbsentBattlerFlags & gBitTable[gActiveBattler]))
+                     ability = gBattleMons[gActiveBattler].ability;
+                 else
+-                    ability = GetAbilityBySpecies(species, abilityNum);
++                {
++                    u8 sa = party[i].box.unknown & 0xFF; // any-ability
++                    ability = sa ? sa : GetAbilityBySpecies(species, abilityNum);
++                }
+ 
+                 if (ability != ABILITY_SOUNDPROOF)
+                     toHeal |= (1 << i);
+--- a/src/pokemon_summary_screen.c
++++ b/src/pokemon_summary_screen.c
+@@ -3103,13 +3103,17 @@
+ 
+ static void PrintMonAbilityName(void)
+ {
+-    u8 ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
++    u8 ability = sMonSummaryScreen->currentMon.box.unknown & 0xFF; // any-ability
++    if (ability == 0)
++        ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+     PrintTextOnWindow(AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ABILITY), gAbilityNames[ability], 0, 1, 0, 1);
+ }
+ 
+ static void PrintMonAbilityDescription(void)
+ {
+-    u8 ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
++    u8 ability = sMonSummaryScreen->currentMon.box.unknown & 0xFF; // any-ability
++    if (ability == 0)
++        ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+     PrintTextOnWindow(AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ABILITY), gAbilityDescriptionPointers[ability], 0, 17, 0, 0);
+ }
+ 
+--- a/data/maps/BattleFrontier_BattleTowerLobby/scripts.inc
++++ b/data/maps/BattleFrontier_BattleTowerLobby/scripts.inc
+@@ -195,7 +195,7 @@
+ 	fadescreen FADE_TO_BLACK
+ 	call BattleFrontier_EventScript_GetLvlMode
+ 	copyvar VAR_0x8004, VAR_RESULT
+-	setvar VAR_0x8005, FRONTIER_PARTY_SIZE
++	setvar VAR_0x8005, 6
+ 	special ChoosePartyForBattleFrontier
+ 	goto_if_eq VAR_RESULT, 0, BattleFrontier_BattleTowerLobby_EventScript_LoadPartyCancelChallenge
+ 	msgbox BattleFrontier_BattleTowerLobby_Text_OkayToSaveBeforeEntering, MSGBOX_YESNO
