@@ -13,6 +13,8 @@ public sealed class PersonalInfo3(Memory<byte> Raw) : PersonalInfo, IPersonalAbi
     private Span<byte> Data => Raw.Span;
     public override byte[] Write() => Raw.ToArray();
 
+    private byte FormCountValue = 1;
+    public override byte FormCount { get => FormCountValue; set => FormCountValue = value; } // PKHaX: settable (Gen-3 Deoxys forms)
     public override int HP { get => Data[0x00]; set => Data[0x00] = (byte)value; }
     public override int ATK { get => Data[0x01]; set => Data[0x01] = (byte)value; }
     public override int DEF { get => Data[0x02]; set => Data[0x02] = (byte)value; }

@@ -1,5 +1,11 @@
 PKHeX
 =====
+
+> **This is PKHaX** — a modified PKHeX with three hackmons add-ons (Gen 1 sprite/type desync,
+> Gen 3 any-ability, Gen 3 Deoxys forms). Built on upstream PKHeX `master` @ `452ddcb`
+> (version 26.05.05). See [`PKHaX_README.md`](PKHaX_README.md) for details; every edit is tagged
+> `// PKHaX`. The upstream PKHeX readme follows.
+
 <div>
   <span>English</span> / <a href=".github/README-es.md">Español</a> / <a href=".github/README-fr.md">Français</a> / <a href=".github/README-de.md">Deutsch</a> / <a href=".github/README-it.md">Italiano</a> / <a href=".github/README-ko.md">한국어</a> / <a href=".github/README-zh-Hant.md">繁體中文</a> / <a href=".github/README-zh-Hans.md">简体中文</a>
 </div>

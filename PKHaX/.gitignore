@@ -232,3 +232,16 @@ pingme.txt
 #################
 
 *.userprefs
+
+#################
+## PKHaX (local build + Claude workflow — not pushed upstream)
+#################
+# Claude Code prompt / workflow files
+CLAUDE_CODE_PROMPT.md
+# .NET build artifacts (robust patterns)
+[Bb]in/
+[Oo]bj/
+# Published output
+_pub/
+PKHeX.exe
+PKHaX.exe
