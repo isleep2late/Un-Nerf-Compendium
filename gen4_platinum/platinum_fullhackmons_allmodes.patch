@@ -1,0 +1,342 @@
+--- a/src/pokemon.c
++++ b/src/pokemon.c
+@@ -1219,7 +1219,7 @@
+     case MON_DATA_TYPE_1:
+     case MON_DATA_TYPE_2:
+         if (monDataBlockA->species == SPECIES_ARCEUS && monDataBlockA->ability == ABILITY_MULTITYPE) {
+-            result = Pokemon_GetArceusTypeOf(Item_LoadParam(monDataBlockA->heldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_SYSTEM));
++            result = monDataBlockB->form; // Arceus permanent form-type: type follows the stored form (form id == type id), not the held item
+         } else {
+             result = SpeciesData_GetFormValue(monDataBlockA->species, monDataBlockB->form, SPECIES_DATA_TYPE_1 + (param - MON_DATA_TYPE_1));
+         }
+@@ -4311,8 +4311,14 @@
+     int monHeldItem = BoxPokemon_GetValue(boxMon, MON_DATA_HELD_ITEM, NULL);
+ 
+     if (monSpecies == SPECIES_ARCEUS && monAbility == ABILITY_MULTITYPE) {
+-        int monForm = Pokemon_GetArceusTypeOf(Item_LoadParam(monHeldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_SYSTEM));
+-        BoxPokemon_SetValue(boxMon, MON_DATA_FORM, &monForm);
++        u16 monHoldEffect = Item_LoadParam(monHeldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_SYSTEM);
++
++        // Arceus permanent form-type: only a held Plate may overwrite the form. With no plate, leave
++        // the stored form (e.g. a PKHeX-set Ghost form) intact instead of resetting it to Normal.
++        if (monHoldEffect >= HOLD_EFFECT_ARCEUS_FIRE && monHoldEffect <= HOLD_EFFECT_ARCEUS_STEEL) {
++            int monForm = Pokemon_GetArceusTypeOf(monHoldEffect);
++            BoxPokemon_SetValue(boxMon, MON_DATA_FORM, &monForm);
++        }
+     }
+ }
+ 
+@@ -4993,28 +4999,16 @@
+ }
+ 
+ static const u16 sBattleFrontierBanlist[BATTLE_FRONTIER_BANLIST_SIZE] = {
+-    SPECIES_MEWTWO,
+-    SPECIES_MEW,
+-    SPECIES_LUGIA,
+-    SPECIES_HO_OH,
+-    SPECIES_CELEBI,
+-    SPECIES_KYOGRE,
+-    SPECIES_GROUDON,
+-    SPECIES_RAYQUAZA,
+-    SPECIES_JIRACHI,
+-    SPECIES_DEOXYS,
+-    SPECIES_DIALGA,
+-    SPECIES_PALKIA,
+-    SPECIES_GIRATINA,
+-    SPECIES_PHIONE,
+-    SPECIES_MANAPHY,
+-    SPECIES_DARKRAI,
+-    SPECIES_SHAYMIN,
+-    SPECIES_ARCEUS
++    // UN-NERF: banlist emptied (every entry SPECIES_NONE) so nothing is ever banned,
++    // matching the proven compendium xdelta that zeroes this table.
++    SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE,
++    SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE,
++    SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE, SPECIES_NONE
+ };
+ 
+ BOOL Pokemon_IsOnBattleFrontierBanlist(u16 species)
+ {
++    return FALSE; // UN-NERF: no Battle Frontier banlist
+     for (u32 i = 0; i < BATTLE_FRONTIER_BANLIST_SIZE; i++) {
+         if (species == sBattleFrontierBanlist[i]) {
+             return TRUE;
+--- a/src/battle/battle_lib.c
++++ b/src/battle/battle_lib.c
+@@ -6400,9 +6400,13 @@
+         if (battleCtx->battleMons[battleCtx->msgBattlerTemp].species == SPECIES_ARCEUS
+             && battleCtx->battleMons[battleCtx->msgBattlerTemp].curHP
+             && Battler_Ability(battleCtx, battleCtx->msgBattlerTemp) == ABILITY_MULTITYPE) {
+-            arceusForm = Pokemon_GetArceusTypeOf(Item_LoadParam(battleCtx->battleMons[battleCtx->msgBattlerTemp].heldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_BATTLE));
++            u16 arceusHoldEffect = Item_LoadParam(battleCtx->battleMons[battleCtx->msgBattlerTemp].heldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_BATTLE);
++            arceusForm = Pokemon_GetArceusTypeOf(arceusHoldEffect);
+ 
+-            if (battleCtx->battleMons[battleCtx->msgBattlerTemp].formNum != arceusForm) {
++            // Arceus permanent form-type: only re-derive the form from a held Plate. With no plate,
++            // leave the battler's form (and thus its form-type) untouched.
++            if (arceusHoldEffect >= HOLD_EFFECT_ARCEUS_FIRE && arceusHoldEffect <= HOLD_EFFECT_ARCEUS_STEEL
++                && battleCtx->battleMons[battleCtx->msgBattlerTemp].formNum != arceusForm) {
+                 battleCtx->battleMons[battleCtx->msgBattlerTemp].formNum = arceusForm;
+                 *subscript = subscript_form_change;
+                 result = TRUE;
+@@ -6729,13 +6733,11 @@
+         spAttackStat = spAttackStat * 150 / 100;
+     }
+     if (attackerParams.heldItemEffect == HOLD_EFFECT_LATI_SPECIAL
+-        && (battleType & BATTLE_TYPE_FRONTIER) == FALSE
+-        && (attackerParams.species == SPECIES_LATIOS || attackerParams.species == SPECIES_LATIAS)) {
++        && (attackerParams.species == SPECIES_LATIOS || attackerParams.species == SPECIES_LATIAS)) { // UN-NERF Soul Dew
+         spAttackStat = spAttackStat * 150 / 100;
+     }
+     if (defenderParams.heldItemEffect == HOLD_EFFECT_LATI_SPECIAL
+-        && (battleType & BATTLE_TYPE_FRONTIER) == FALSE
+-        && (defenderParams.species == SPECIES_LATIOS || defenderParams.species == SPECIES_LATIAS)) {
++        && (defenderParams.species == SPECIES_LATIOS || defenderParams.species == SPECIES_LATIAS)) { // UN-NERF Soul Dew
+         spDefenseStat = spDefenseStat * 150 / 100;
+     }
+     if (attackerParams.heldItemEffect == HOLD_EFFECT_CLAMPERL_SPATK
+@@ -7695,7 +7697,9 @@
+             break;
+ 
+         default:
+-            type = TYPE_NORMAL;
++            // Arceus permanent form-type: with no plate held, use the form's type (for Arceus the
++            // form id equals the type id) instead of forcing Normal.
++            type = battleCtx->battleMons[battler].formNum;
+             break;
+         }
+     }
+--- a/src/battle_regulation_validation.c
++++ b/src/battle_regulation_validation.c
+@@ -100,7 +100,7 @@
+ 
+     ruleValue = BattleRegulation_GetRuleValue(regulation, BATTLE_REGULATION_RULE_TEAM_SIZE);
+ 
+-    if (selectedCount != ruleValue) {
++    if (selectedCount < 1 || selectedCount > MAX_PARTY_SIZE) { // UN-NERF: any 1..6 team size
+         return BATTLE_REGULATION_VALIDATION_RESULT_INVALID_TEAM_SIZE;
+     }
+ 
+@@ -122,12 +122,14 @@
+     }
+ 
+     ruleValue = BattleRegulation_GetRuleValue(regulation, BATTLE_REGULATION_RULE_MAX_TOTAL_LEVEL);
++    ruleValue = 0; // UN-NERF: no total-level cap
+ 
+     if (totalLevel > ruleValue && ruleValue != 0) {
+         return BATTLE_REGULATION_VALIDATION_RESULT_TOTAL_LEVEL_EXCEEDED;
+     }
+ 
+     ruleValue = BattleRegulation_GetRuleValue(regulation, BATTLE_REGULATION_RULE_SPECIES_UNIQUE);
++    ruleValue = 1; // UN-NERF: allow duplicate species
+ 
+     // Check for duplicate species if species uniqueness is required
+     if (ruleValue == 0 && selectedCount > 1) {
+@@ -144,6 +146,7 @@
+     }
+ 
+     ruleValue = BattleRegulation_GetRuleValue(regulation, BATTLE_REGULATION_RULE_ITEM_UNIQUE);
++    ruleValue = 1; // UN-NERF: allow duplicate items
+ 
+     // Check for duplicate held items if item uniqueness is required
+     if (ruleValue == 0 && selectedCount > 1) {
+--- a/src/applications/party_menu/main.c
++++ b/src/applications/party_menu/main.c
+@@ -2229,8 +2229,9 @@
+ static u8 CheckDuplicateValues(PartyMenuApplication *application)
+ {
+     u8 v0, v1;
++    int unnerf = 1; // UN-NERF clause off
+ 
+-    for (v0 = 0; v0 < 5; v0++) {
++    for (v0 = 0; unnerf == 0 && v0 < 5; v0++) {
+         if (application->partyMenu->selectionOrder[v0] == 0) {
+             break;
+         }
+@@ -2256,8 +2257,9 @@
+ static u8 CheckUniqueValues(PartyMenuApplication *application)
+ {
+     u8 v0, v1;
++    int unnerf = 1; // UN-NERF: Battle Hall same-species rule off
+ 
+-    for (v0 = 0; v0 < 5; v0++) {
++    for (v0 = 0; unnerf == 0 && v0 < 5; v0++) {
+         if (application->partyMenu->selectionOrder[v0] == 0) {
+             break;
+         }
+@@ -2279,8 +2281,9 @@
+ static u8 CheckEqualityInArray(PartyMenuApplication *application)
+ {
+     u8 v0, v1;
++    int unnerf = 1; // UN-NERF: Battle Castle species clause off
+ 
+-    for (v0 = 0; v0 < 5; v0++) {
++    for (v0 = 0; unnerf == 0 && v0 < 5; v0++) {
+         if (application->partyMenu->selectionOrder[v0] == 0) {
+             break;
+         }
+--- a/src/unk_02049D08.c
++++ b/src/unk_02049D08.c
+@@ -60,11 +60,12 @@
+     case BATTLE_TOWER_MODE_SINGLE:
+     case BATTLE_TOWER_MODE_WIFI:
+     case BATTLE_TOWER_MODE_5:
+-        return 3;
++        return 6;  // 6-mon singles
+     case BATTLE_TOWER_MODE_DOUBLE:
+-        return 4;
++        return 6; // UN-NERF 6-mon doubles
+     case BATTLE_TOWER_MODE_MULTI:
+     case BATTLE_TOWER_MODE_LINK_MULTI:
++        return 3; // UN-NERF: up to 3 = your half of the multi party
+     case BATTLE_TOWER_MODE_6:
+         return 2;
+     }
+@@ -339,7 +340,7 @@
+         battleTower->nextOpponentNum = 1;
+         battleTower->unk_0D = 0;
+ 
+-        for (v1 = 0; v1 < 4; v1++) {
++        for (v1 = 0; v1 < 6; v1++) {
+             battleTower->unk_2A[v1] = 0xFF;
+         }
+ 
+@@ -438,11 +439,13 @@
+     v2 = SaveData_GetParty(saveData);
+ 
+     for (v0 = 0; v0 < battleTower->partySize; v0++) {
++        if (partyMenu->selectionOrder[v0] == 0) break; // UN-NERF flexible count
+         battleTower->unk_2A[v0] = partyMenu->selectionOrder[v0] - 1;
+         v3 = Party_GetPokemonBySlotIndex(v2, battleTower->unk_2A[v0]);
+         battleTower->unk_2E[v0] = Pokemon_GetValue(v3, MON_DATA_SPECIES, NULL);
+         battleTower->unk_36[v0] = Pokemon_GetValue(v3, MON_DATA_HELD_ITEM, NULL);
+     }
++    battleTower->partySize = v0; // UN-NERF actual count
+ 
+     Heap_Free(*param1);
+     *param1 = NULL;
+@@ -452,10 +455,11 @@
+ int BattleTower_CheckDuplicateSpeciesAndHeldItems(BattleTower *battleTower, SaveData *saveData)
+ {
+     u16 i = 0, j = 0;
+-    u16 species[4], heldItems[4];
++    u16 species[6], heldItems[6];
+     Party *party = SaveData_GetParty(saveData);
++    int unnerf = 1; // UN-NERF clause off; arrays widened
+ 
+-    for (i = 0; i < battleTower->partySize; i++) {
++    for (i = 0; unnerf == 0 && i < battleTower->partySize; i++) {
+         Pokemon *mon = Party_GetPokemonBySlotIndex(party, battleTower->unk_2A[i]);
+         species[i] = Pokemon_GetValue(mon, MON_DATA_SPECIES, NULL);
+         heldItems[i] = Pokemon_GetValue(mon, MON_DATA_HELD_ITEM, NULL);
+--- a/src/unk_0205003C.c
++++ b/src/unk_0205003C.c
+@@ -239,17 +239,17 @@
+     partyMenu->fieldSystem = fieldSystem;
+     partyMenu->selectedMonSlot = param0->unk_05;
+ 
+-    for (v0 = 0; v0 < 3; v0++) {
++    for (v0 = 0; v0 < 6; v0++) {
+         partyMenu->selectionOrder[v0] = param0->unk_06[v0];
+     }
+ 
+     partyMenu->reqLevel = 100;
+-    partyMenu->minSelectionSlots = 3;
+-    partyMenu->maxSelectionSlots = 3;
++    partyMenu->minSelectionSlots = 1; // UN-NERF flexible
++    partyMenu->maxSelectionSlots = 6;
+ 
+     if (param0->unk_04 == 2) {
+-        partyMenu->minSelectionSlots = 2;
+-        partyMenu->maxSelectionSlots = 2;
++        partyMenu->minSelectionSlots = 1; // UN-NERF flexible
++        partyMenu->maxSelectionSlots = 3; // UN-NERF multi up to 3
+     }
+ 
+     FieldSystem_StartChildProcess(fieldSystem, &gPokemonPartyAppTemplate, partyMenu);
+--- a/src/unk_0204FAB4.c
++++ b/src/unk_0204FAB4.c
+@@ -252,12 +252,12 @@
+     }
+ 
+     partyMenu->reqLevel = 100;
+-    partyMenu->minSelectionSlots = 3;
++    partyMenu->minSelectionSlots = 1; // UN-NERF flexible
+     partyMenu->maxSelectionSlots = 3;
+ 
+     if (param0->unk_04 == 2) {
+-        partyMenu->minSelectionSlots = 2;
+-        partyMenu->maxSelectionSlots = 2;
++        partyMenu->minSelectionSlots = 1; // UN-NERF flexible
++        partyMenu->maxSelectionSlots = 3; // UN-NERF multi up to 3
+     }
+ 
+     FieldSystem_StartChildProcess(fieldSystem, &gPokemonPartyAppTemplate, partyMenu);
+--- a/src/unk_0203D1B8.c
++++ b/src/unk_0203D1B8.c
+@@ -481,8 +481,8 @@
+     v0->heapID = heapID;
+ 
+     PartyMenu *partyMenu = PartyMenu_New(heapID, fieldSystem, PARTY_MENU_TYPE_BASIC, PARTY_MENU_MODE_SELECT_CONFIRM);
+-    partyMenu->minSelectionSlots = 2;
+-    partyMenu->maxSelectionSlots = 2;
++    partyMenu->minSelectionSlots = 1; // UN-NERF flexible
++    partyMenu->maxSelectionSlots = 3; // UN-NERF multi up to 3
+     partyMenu->reqLevel = 30;
+     partyMenu->battleRegulation = NULL;
+     v0->partyMenu = partyMenu;
+--- a/src/unk_0205A0D8.c
++++ b/src/unk_0205A0D8.c
+@@ -165,11 +165,11 @@
+     partyMenu->mode = PARTY_MENU_MODE_SELECT_CONFIRM;
+ 
+     if (param0->fieldSystem->battleRegulation) {
+-        partyMenu->minSelectionSlots = BattleRegulation_GetRuleValue(param0->fieldSystem->battleRegulation, BATTLE_REGULATION_RULE_TEAM_SIZE);
+-        partyMenu->maxSelectionSlots = partyMenu->minSelectionSlots;
++        partyMenu->minSelectionSlots = 1; // UN-NERF flexible (regulation/doubles path)
++        partyMenu->maxSelectionSlots = 6; // UN-NERF up to 6
+     } else {
+-        partyMenu->minSelectionSlots = 3;
+-        partyMenu->maxSelectionSlots = 3;
++        partyMenu->minSelectionSlots = 1;
++        partyMenu->maxSelectionSlots = 6;
+     }
+ 
+     partyMenu->reqLevel = 100;
+--- a/src/overlay104/ov104_0223A0C4.c
++++ b/src/overlay104/ov104_0223A0C4.c
+@@ -666,7 +666,7 @@
+     BattleFrontierPokemonData monDataPrev;
+     BattleFrontierPokemonData monDataCurr;
+ 
+-    GF_ASSERT(partySize <= BT_DOUBLES_PARTY_SIZE);
++    if (partySize > BT_DOUBLES_PARTY_SIZE) partySize = BT_DOUBLES_PARTY_SIZE;  // opponent stays <=4
+ 
+     partyIndex = 0;
+     dupeItemFailsafeCount = 0;
+--- a/src/overlay104/ov104_0223B6F4.c
++++ b/src/overlay104/ov104_0223B6F4.c
+@@ -120,7 +120,7 @@
+     switch (challengeType) {
+     case FRONTIER_CHALLENGE_SINGLE:
+     case FRONTIER_CHALLENGE_DOUBLE:
+-        return 3;
++        return 6; // UN-NERF: 6-mon Battle Castle (player only; opponent size unchanged)
+     case FRONTIER_CHALLENGE_MULTI:
+     case FRONTIER_CHALLENGE_MULTI_WFC:
+         if (includePartnersMons == FALSE) {
+--- a/include/struct_defs/battle_tower.h
++++ b/include/struct_defs/battle_tower.h
+@@ -35,9 +35,9 @@
+     u16 unk_24;
+     u16 unk_26;
+     u16 unk_28;
+-    u8 unk_2A[4];
+-    u16 unk_2E[4];
+-    u16 unk_36[4];
++    u8 unk_2A[6];  // 6-mon singles (was [4])
++    u16 unk_2E[6];
++    u16 unk_36[6];
+     u16 trainerIDs[BT_OPPONENTS_COUNT * 2];
+     Location unk_5C;
+     UnkStruct_0202D060 *unk_70;

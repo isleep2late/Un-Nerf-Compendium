@@ -1,0 +1,65 @@
+--- a/include/struct_defs/battle_tower.h
++++ b/include/struct_defs/battle_tower.h
+@@ -35,9 +35,9 @@
+     u16 unk_24;
+     u16 unk_26;
+     u16 unk_28;
+-    u8 unk_2A[4];
+-    u16 unk_2E[4];
+-    u16 unk_36[4];
++    u8 unk_2A[6];  // 6-mon singles (was [4])
++    u16 unk_2E[6];
++    u16 unk_36[6];
+     u16 trainerIDs[BT_OPPONENTS_COUNT * 2];
+     Location unk_5C;
+     UnkStruct_0202D060 *unk_70;
+--- a/src/unk_02049D08.c
++++ b/src/unk_02049D08.c
+@@ -60,7 +60,7 @@
+     case BATTLE_TOWER_MODE_SINGLE:
+     case BATTLE_TOWER_MODE_WIFI:
+     case BATTLE_TOWER_MODE_5:
+-        return 3;
++        return 6;  // 6-mon singles
+     case BATTLE_TOWER_MODE_DOUBLE:
+         return 4;
+     case BATTLE_TOWER_MODE_MULTI:
+@@ -339,7 +339,7 @@
+         battleTower->nextOpponentNum = 1;
+         battleTower->unk_0D = 0;
+ 
+-        for (v1 = 0; v1 < 4; v1++) {
++        for (v1 = 0; v1 < 6; v1++) {
+             battleTower->unk_2A[v1] = 0xFF;
+         }
+ 
+--- a/src/overlay104/ov104_0223A0C4.c
++++ b/src/overlay104/ov104_0223A0C4.c
+@@ -666,7 +666,7 @@
+     BattleFrontierPokemonData monDataPrev;
+     BattleFrontierPokemonData monDataCurr;
+ 
+-    GF_ASSERT(partySize <= BT_DOUBLES_PARTY_SIZE);
++    if (partySize > BT_DOUBLES_PARTY_SIZE) partySize = BT_DOUBLES_PARTY_SIZE;  // opponent stays <=4
+ 
+     partyIndex = 0;
+     dupeItemFailsafeCount = 0;
+--- a/src/unk_0205003C.c
++++ b/src/unk_0205003C.c
+@@ -239,13 +239,13 @@
+     partyMenu->fieldSystem = fieldSystem;
+     partyMenu->selectedMonSlot = param0->unk_05;
+ 
+-    for (v0 = 0; v0 < 3; v0++) {
++    for (v0 = 0; v0 < 6; v0++) {
+         partyMenu->selectionOrder[v0] = param0->unk_06[v0];
+     }
+ 
+     partyMenu->reqLevel = 100;
+-    partyMenu->minSelectionSlots = 3;
+-    partyMenu->maxSelectionSlots = 3;
++    partyMenu->minSelectionSlots = 6;  // 6-mon singles
++    partyMenu->maxSelectionSlots = 6;
+ 
+     if (param0->unk_04 == 2) {
+         partyMenu->minSelectionSlots = 2;
