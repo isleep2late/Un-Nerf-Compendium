@@ -94,8 +94,7 @@ it. Three small source changes implement this — see `PKHaX/LEVEL255_CHANGES.md
 
 Caveats: the 8-bit stat formula overflows at very high levels, so stats may look wrapped rather than
 cleanly huge (the level itself stays 255); legality will flag the mon (expected for a HaX feature); and
-a >100 mon cannot be traded Gen-1 -> Gen-2 over the Time Capsule (`ValidateOTTrademon` rejects level
->100), so edit each game's save directly.
+a >100 mon cannot be traded Gen-1 -> Gen-2 over the Time Capsule (`ValidateOTTrademon` rejects level>100), so edit each game's save directly.
 
 ---
 
