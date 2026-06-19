@@ -1,0 +1,48 @@
+--- a/src/pokemon.c
++++ b/src/pokemon.c
+@@ -4311,8 +4311,14 @@
+     int monHeldItem = BoxPokemon_GetValue(boxMon, MON_DATA_HELD_ITEM, NULL);
+ 
+     if (monSpecies == SPECIES_ARCEUS && monAbility == ABILITY_MULTITYPE) {
+-        int monForm = Pokemon_GetArceusTypeOf(Item_LoadParam(monHeldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_SYSTEM));
+-        BoxPokemon_SetValue(boxMon, MON_DATA_FORM, &monForm);
++        u16 monHoldEffect = Item_LoadParam(monHeldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_SYSTEM);
++
++        // Arceus permanent form-type: only a held Plate may overwrite the form. With no plate, leave
++        // the stored form (e.g. a PKHeX-set Ghost form) intact instead of resetting it to Normal.
++        if (monHoldEffect >= HOLD_EFFECT_ARCEUS_FIRE && monHoldEffect <= HOLD_EFFECT_ARCEUS_STEEL) {
++            int monForm = Pokemon_GetArceusTypeOf(monHoldEffect);
++            BoxPokemon_SetValue(boxMon, MON_DATA_FORM, &monForm);
++        }
+     }
+ }
+ 
+--- a/src/battle/battle_lib.c
++++ b/src/battle/battle_lib.c
+@@ -6400,9 +6400,13 @@
+         if (battleCtx->battleMons[battleCtx->msgBattlerTemp].species == SPECIES_ARCEUS
+             && battleCtx->battleMons[battleCtx->msgBattlerTemp].curHP
+             && Battler_Ability(battleCtx, battleCtx->msgBattlerTemp) == ABILITY_MULTITYPE) {
+-            arceusForm = Pokemon_GetArceusTypeOf(Item_LoadParam(battleCtx->battleMons[battleCtx->msgBattlerTemp].heldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_BATTLE));
++            u16 arceusHoldEffect = Item_LoadParam(battleCtx->battleMons[battleCtx->msgBattlerTemp].heldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_BATTLE);
++            arceusForm = Pokemon_GetArceusTypeOf(arceusHoldEffect);
+ 
+-            if (battleCtx->battleMons[battleCtx->msgBattlerTemp].formNum != arceusForm) {
++            // Arceus permanent form-type: only re-derive the form from a held Plate. With no plate,
++            // leave the battler's form (and thus its form-type) untouched.
++            if (arceusHoldEffect >= HOLD_EFFECT_ARCEUS_FIRE && arceusHoldEffect <= HOLD_EFFECT_ARCEUS_STEEL
++                && battleCtx->battleMons[battleCtx->msgBattlerTemp].formNum != arceusForm) {
+                 battleCtx->battleMons[battleCtx->msgBattlerTemp].formNum = arceusForm;
+                 *subscript = subscript_form_change;
+                 result = TRUE;
+@@ -7695,7 +7699,9 @@
+             break;
+ 
+         default:
+-            type = TYPE_NORMAL;
++            // Arceus permanent form-type: with no plate held, use the form's type (for Arceus the
++            // form id equals the type id) instead of forcing Normal.
++            type = battleCtx->battleMons[battler].formNum;
+             break;
+         }
+     }
