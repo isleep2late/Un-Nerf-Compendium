@@ -19,7 +19,7 @@ public partial class PKMEditor
         CB_Language.SelectedValue = pk1.IsSpeciesNameMatch(language) ? language : pk1.GuessedLanguage(language);
 
         LoadPartyStats(pk1);
-        G1_Editor.LoadPK1(pk1); // PKHaX: sprite desync + Type1/Type2
+        G1_Editor.LoadEntity(pk1); // PKHaX: sprite desync + Type1/Type2 + status
         UpdateStats();
     }
 
@@ -31,7 +31,7 @@ public partial class PKMEditor
         SaveMisc1(pk1);
 
         SavePartyStats(pk1);
-        G1_Editor.SavePK1(pk1); // PKHaX: write sprite desync + Type1/Type2 last (after any species reset)
+        G1_Editor.SaveEntity(pk1); // PKHaX: write sprite desync + Type1/Type2 + status last (after any species/stat reset)
         pk1.FixMoves();
         pk1.RefreshChecksum();
         return pk1;

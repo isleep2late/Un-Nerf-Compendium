@@ -2099,7 +2099,8 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
         Contest.ToggleInterface(Entity, Entity.Context);
         if (t is not IFormArgument)
             L_FormArgument.Visible = false;
-        StatusView.Visible = Main.Settings.EntityEditor.ShowStatusCondition;
+        // PKHaX: Gen 1/2 use the Status dropdown in the GB editor instead, so hide the icon there to avoid duplication.
+        StatusView.Visible = Main.Settings.EntityEditor.ShowStatusCondition && Entity is not GBPKM;
 
         DEV_Ability.Enabled = DEV_Ability.Visible = DEV_Ability.TabStop = (format > 3 && HaX) || t is PA9;
         ToggleInterface(Entity.Format);
@@ -2147,7 +2148,13 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
         UC_OTGender.Visible = UC_OTGender.TabStop = format >= 2;
         UC_Gender.Visible = format >= 2 || (format == 1 && Main.Settings.EntityEditor.ShowGenderGen1);
         L_CatchRate.Visible = CR_PK1.Visible = format == 1;
-        L_G1.Visible = G1_Editor.Visible = format == 1; // PKHaX Gen-1 sprite/type editor
+        // PKHaX: Gen-1 sprite/type/status editor; Gen-2 shows only the status dropdown.
+        L_G1.Visible = G1_Editor.Visible = format is 1 or 2;
+        if (format is 1 or 2)
+        {
+            G1_Editor.SetGen1Mode(format == 1);
+            L_G1.Text = format == 1 ? "Gen-1:" : "Gen-2:";
+        }
 
         // HaX override, needs to be after DEV_Ability enabled assignment.
         TB_AbilityNumber.Visible = format >= 6 && DEV_Ability.Enabled;

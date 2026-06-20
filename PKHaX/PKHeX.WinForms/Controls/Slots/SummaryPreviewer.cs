@@ -149,10 +149,10 @@ public sealed class SummaryPreviewer
         return nat is >= 1 and <= 151 && nat < names.Length ? names[nat] : "(glitch)";
     }
 
-    // PKHaX: build the Gen-1 hackmons info block (data species, desynced sprite, exact typing).
+    // PKHaX: build the Gen-1 hackmons info block (data species, desynced sprite, exact typing, status).
     public static string BuildG1HaxBlock(PK1 pk1)
     {
-        var sb = new List<string>(3)
+        var sb = new List<string>(4)
         {
             $"Data species: {G1SpeciesName(pk1.SpeciesInternal)} (0x{pk1.SpeciesInternal:X2})",
             $"Sprite: {G1SpeciesName(pk1.SpriteSpeciesInternal)} (0x{pk1.SpriteSpeciesInternal:X2}){(pk1.IsSpriteDesynced ? " [desynced]" : string.Empty)}",
@@ -160,14 +160,30 @@ public sealed class SummaryPreviewer
                 ? $"Type: {G1TypeName(pk1.Type1)} (mono)"
                 : $"Type: {G1TypeName(pk1.Type1)} / {G1TypeName(pk1.Type2)} (dual)",
         };
+        var status = GBHaxFormat.GetStatusWord(pk1.Status_Condition);
+        if (status.Length != 0)
+            sb.Add($"Status: {status}");
         return string.Join(Environment.NewLine, sb);
+    }
+
+    // PKHaX: Gen-2 has no disguise/custom typing ("no desync"); show the status condition.
+    // (Level — including 255 — is shown via the normal "Level:" line of the preview.)
+    public static string BuildG2HaxBlock(PK2 pk2)
+    {
+        var status = GBHaxFormat.GetStatusWord(pk2.Status_Condition);
+        return status.Length == 0 ? string.Empty : $"Status: {status}";
     }
 
     private static string AppendG1HaxInfo(PKM pk, string text)
     {
-        if (pk is not PK1 pk1)
+        var block = pk switch
+        {
+            PK1 pk1 => BuildG1HaxBlock(pk1),
+            PK2 pk2 => BuildG2HaxBlock(pk2),
+            _ => string.Empty,
+        };
+        if (block.Length == 0)
             return text;
-        var block = BuildG1HaxBlock(pk1);
         return string.IsNullOrEmpty(text) ? block : block + Environment.NewLine + Environment.NewLine + text;
     }
 

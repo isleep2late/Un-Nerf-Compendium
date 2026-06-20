@@ -45,6 +45,12 @@ public sealed class ShowdownSet : IBattleTemplate
     public bool CanGigantamax { get; private set; }
     public byte DynamaxLevel { get; private set; } = 10;
 
+    // PKHaX: Gen 1/2 "desync" hackmons fields (see DESYNC-FORMAT.md / GBHaxFormat). Unset sentinels below.
+    public ushort PhSpriteSpecies { get; private set; }    // national species of the Gen-1 disguise sprite (0 = none)
+    public int PhType1 { get; private set; } = -1;         // Gen-1 internal type byte (-1 = unset)
+    public int PhType2 { get; private set; } = -1;
+    public int PhStatusByte { get; private set; } = -1;    // Gen 1-4 status byte (-1 = unset)
+
     /// <summary>
     /// Any lines that failed to be parsed.
     /// </summary>
@@ -216,6 +222,10 @@ public sealed class ShowdownSet : IBattleTemplate
             return;
         }
 
+        // PKHaX: Gen 1/2 desync hackmons lines (Sprite:/Types:/Status:).
+        if (TryParseGBHaxLine(line, localization))
+            return;
+
         // Otherwise, tokenized input line.
         var token = localization.Config.TryParse(line, out var value);
         if (token == BattleTemplateToken.None)
@@ -385,7 +395,8 @@ public sealed class ShowdownSet : IBattleTemplate
     {
         if (!byte.TryParse(input.Trim(), out var value))
             return false;
-        if ((uint)value is 0 or > Experience.MaxLevel)
+        // PKHaX: allow up to 255 so Gen 1/2 "Level: 255" round-trips. ApplySetDetails clamps EXP for non-GB.
+        if (value == 0)
             return false;
         Level = value;
         return true;
@@ -468,6 +479,7 @@ public sealed class ShowdownSet : IBattleTemplate
         var tokens = settings.Order;
         foreach (var token in tokens)
             PushToken(token, result, settings);
+        InsertGBHaxLines(result, settings); // PKHaX: add Gen 1/2 Sprite:/Types:/Status: lines on full exports
     }
 
     private string GetStringFirstLine(string form, in BattleTemplateExportSettings settings)
@@ -809,8 +821,13 @@ public sealed class ShowdownSet : IBattleTemplate
         Nature = pk.StatNature;
         Gender = pk.Gender < 2 ? pk.Gender : (byte)2;
         Friendship = pk.CurrentFriendship;
-        Level = pk.CurrentLevel;
+        // PKHaX: Gen 1/2 store level as a raw byte the game reads directly (supports >100); export it so 255 round-trips.
+        // Use the larger of the stored byte and the EXP-derived level so a normal box mon (whose party-level byte
+        // may be 0/stale) still exports its true level, while an over-leveled mon exports up to 255.
+        Level = pk is GBPKM gbLevel ? (byte)Math.Max((int)gbLevel.Stat_Level, pk.CurrentLevel) : pk.CurrentLevel;
         Shiny = pk.IsShiny;
+
+        CaptureGBHax(pk); // PKHaX: capture Gen 1/2 desync hackmons fields (sprite/types/status)
 
         if (pk is PK8 g) // Only set Gigantamax if it is a PK8
         {
@@ -830,6 +847,120 @@ public sealed class ShowdownSet : IBattleTemplate
         }
 
         FormName = ShowdownParsing.GetStringFromForm(Form = pk.Form, localization.Strings, Species, Context);
+    }
+
+    // PKHaX: capture the Gen 1/2 desync hackmons fields from the entity for export.
+    private void CaptureGBHax(PKM pk)
+    {
+        if (pk is PK1 p1)
+        {
+            if (p1.IsSpriteDesynced)
+                PhSpriteSpecies = SpeciesConverter.GetNational1(p1.SpriteSpeciesInternal);
+            var pi = p1.PersonalInfo;
+            if (p1.Type1 != pi.Type1 || p1.Type2 != pi.Type2) // only export typing when it differs from the species default
+            {
+                PhType1 = p1.Type1;
+                PhType2 = p1.Type2;
+            }
+            if (p1.Status_Condition != 0)
+                PhStatusByte = p1.Status_Condition;
+        }
+        else if (pk is PK2 p2)
+        {
+            // Gen 2 has no disguise/custom typing ("no desync"); only status is carried.
+            if (p2.Status_Condition != 0)
+                PhStatusByte = p2.Status_Condition;
+        }
+    }
+
+    // PKHaX: parse the optional Sprite:/Types:/Status: lines (see DESYNC-FORMAT.md). Returns true if handled.
+    private bool TryParseGBHaxLine(ReadOnlySpan<char> line, BattleTemplateLocalization localization)
+    {
+        if (StartsWithLabel(line, "Sprite:", out var val))
+        {
+            var list = localization.Strings.specieslist;
+            int idx = StringUtil.FindIndexIgnoreCase(list, val.Trim());
+            if (idx > 0)
+                PhSpriteSpecies = (ushort)idx;
+            return true;
+        }
+        if (StartsWithLabel(line, "Types:", out val))
+        {
+            int slash = val.IndexOf('/');
+            var t1 = slash < 0 ? val : val[..slash];
+            var t2 = slash < 0 ? default : val[(slash + 1)..];
+            if (GBHaxFormat.TryGetG1TypeByte(t1, out var b1))
+                PhType1 = b1;
+            if (t2.Length != 0 && GBHaxFormat.TryGetG1TypeByte(t2, out var b2))
+                PhType2 = b2;
+            else if (PhType1 >= 0)
+                PhType2 = PhType1; // mono-type
+            return true;
+        }
+        if (StartsWithLabel(line, "Status:", out val))
+        {
+            if (GBHaxFormat.TryGetStatusByte(val, out var status))
+                PhStatusByte = status;
+            return true;
+        }
+        return false;
+
+        static bool StartsWithLabel(ReadOnlySpan<char> line, ReadOnlySpan<char> label, out ReadOnlySpan<char> value)
+        {
+            if (line.StartsWith(label, StringComparison.OrdinalIgnoreCase))
+            {
+                value = line[label.Length..].Trim();
+                return true;
+            }
+            value = default;
+            return false;
+        }
+    }
+
+    // PKHaX: inject the Sprite:/Types:/Status: lines into a full set render (export/copy only, not the hover).
+    private void InsertGBHaxLines(List<string> result, in BattleTemplateExportSettings settings)
+    {
+        // The hover Order omits FirstLine (handled manually); restricting to full sets keeps these lines
+        // out of the hover (which shows the same info via its own block) and avoids duplication.
+        if (!settings.Order.Contains(BattleTemplateToken.FirstLine))
+            return;
+        if (PhSpriteSpecies == 0 && PhType1 < 0 && PhStatusByte < 0)
+            return;
+
+        var strings = settings.Localization.Strings;
+        var lines = new List<string>(3);
+        if (PhSpriteSpecies != 0 && PhSpriteSpecies < strings.specieslist.Length)
+            lines.Add($"Sprite: {strings.specieslist[PhSpriteSpecies]}");
+        if (PhType1 >= 0)
+        {
+            var t1 = GBHaxFormat.GetG1TypeName((byte)PhType1);
+            if (t1.Length != 0)
+            {
+                var t2 = PhType2 >= 0 ? GBHaxFormat.GetG1TypeName((byte)PhType2) : string.Empty;
+                var typeText = (t2.Length != 0 && PhType2 != PhType1) ? $"{t1} / {t2}" : t1;
+                lines.Add($"Types: {typeText}");
+            }
+        }
+        if (PhStatusByte >= 0)
+        {
+            var word = GBHaxFormat.GetStatusWord(PhStatusByte);
+            if (word.Length != 0)
+                lines.Add($"Status: {word}");
+        }
+        if (lines.Count == 0)
+            return;
+
+        // Place after the Ability line if present, else right after the first line.
+        int idx = 0;
+        for (int i = 0; i < result.Count; i++)
+        {
+            if (result[i].StartsWith("Ability:", StringComparison.OrdinalIgnoreCase))
+            {
+                idx = i;
+                break;
+            }
+        }
+        result.InsertRange(idx + 1, lines);
     }
 
     private void ParseFirstLine(ReadOnlySpan<char> first, GameStrings strings)
