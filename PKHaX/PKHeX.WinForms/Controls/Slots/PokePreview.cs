@@ -81,8 +81,10 @@ public sealed partial class PokePreview : Form
         var hover = Main.Settings.Hover;
         var (before, mid, after) = GetBeforeAndAfter(pk, ctx, settings);
 
-        if (pk is PK1 g1) // PKHaX: show Gen-1 data species / sprite / exact typing at the top of the preview box
+        if (pk is PK1 g1) // PKHaX: show Gen-1 data species / sprite / exact typing / status at the top of the preview box
             AppendTextSection(TextLinesPre, SummaryPreviewer.BuildG1HaxBlock(g1), true, ForeColor);
+        else if (pk is PK2 g2) // PKHaX: show Gen-2 status (level appears via the normal Level line)
+            AppendTextSection(TextLinesPre, SummaryPreviewer.BuildG2HaxBlock(g2), true, ForeColor);
         AppendTextSection(TextLinesPre, before, hover.PreviewShowPaste, ForeColor);
         BuildMoves(pk, ctx.Analysis, settings);
         AppendTextSection(TextLinesHint, mid, hover.HoverSlotShowLegalityHint, IllegalTextColor);
