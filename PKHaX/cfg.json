@@ -1,0 +1,351 @@
+{
+  "Startup": {
+    "Version": "26.5.5",
+    "DarkMode": false,
+    "ForceHaXOnLaunch": false,
+    "HighDpiText": false,
+    "SkipSplashScreen": false,
+    "TryDetectRecentSave": true,
+    "AutoLoadSaveOnStartup": 1,
+    "ShowChangelogOnUpdate": true,
+    "PluginLoadEnable": true,
+    "PluginLoadMerged": false,
+    "RecentlyLoaded": [
+      "\\\\Mac\\Home\\Desktop\\ROM_Hack\\Pokemon Untouched ROMs\\isleep2late\u0027s 8 Gen Gem\\Mainstream Media\\Chris Talker",
+      "\\\\Mac\\Home\\Desktop\\ROM_Hack\\Pokemon Untouched ROMs\\isleep2late\u0027s 8 Gen Gem\\Mainstream Media\\CarYellow Anthony",
+      ""
+    ],
+    "RecentlyLoadedMaxCount": 10,
+    "Language": "en",
+    "DefaultSaveVersion": 52
+  },
+  "Backup": {
+    "BAKEnabled": true,
+    "BAKPrompt": true,
+    "OtherBackupPaths": [],
+    "OtherSaveFileExtensions": []
+  },
+  "LocalResources": {
+    "DatabasePath": "pkmdb",
+    "MGDatabasePath": "mgdb",
+    "BackupPath": "bak",
+    "SoundPath": "sounds",
+    "TemplatePath": "template",
+    "TrainerPath": "trainers",
+    "PluginPath": "plugins"
+  },
+  "Legality": {
+    "Bulk": {
+      "CheckActiveHandler": true
+    },
+    "FramePattern": {
+      "RNGFrameNotFound3": 0,
+      "RNGFrameNotFound4": -1,
+      "EggRandomAnyType3": false,
+      "EggRandomAnyType4": false
+    },
+    "Game": {
+      "Gen7": {
+        "Gen7TransferStarPID": 0
+      },
+      "Gen8": {
+        "Gen8MemoryMissingHT": 0
+      }
+    },
+    "Handler": {
+      "CurrentHandlerMismatch": -1,
+      "CheckActiveHandler": true,
+      "Restrictions": {
+        "AllowHandleOTGen6": false,
+        "AllowHandleOTGen7": false,
+        "AllowHandleOTGen7b": false,
+        "AllowHandleOTGen8": false,
+        "AllowHandleOTGen8a": false,
+        "AllowHandleOTGen8b": false,
+        "AllowHandleOTGen9": false,
+        "AllowHandleOTGen9a": false
+      }
+    },
+    "HOMETransfer": {
+      "HOMETransferTrackerNotPresent": -1,
+      "ZeroHeightWeight": 0
+    },
+    "Nickname": {
+      "NicknamedAnotherSpecies": 0,
+      "Nickname12": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname3": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname4": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname5": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname6": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname7": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname7b": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname8": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname8a": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname8b": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname9": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      },
+      "Nickname9a": {
+        "NicknamedTrade": -1,
+        "NicknamedMysteryGift": -1
+      }
+    },
+    "Tradeback": {
+      "AllowGen1Tradeback": true
+    },
+    "WordFilter": {
+      "CheckWordFilter": true,
+      "DisableWordFilterPastGen": false
+    }
+  },
+  "Converter": {
+    "AllowIncompatibleConversion": 0,
+    "AllowGuessRejuvenateHOME": 1,
+    "VirtualConsoleSourceGen1": 35,
+    "VirtualConsoleSourceGen2": 40,
+    "RetainMetDateTransfer45": false
+  },
+  "Import": {
+    "ApplyNature": true,
+    "ApplyMarkings": true
+  },
+  "SlotWrite": {
+    "SetUpdateDex": true,
+    "SetUpdatePKM": true,
+    "SetUpdateRecords": true,
+    "ModifyUnset": true
+  },
+  "Privacy": {
+    "HideSAVDetails": false,
+    "HideSecretDetails": false
+  },
+  "SaveLanguage": {
+    "OverrideGen1": {
+      "Language": 2,
+      "Version": 0
+    },
+    "OverrideGen2": {
+      "Language": 2,
+      "Version": 0
+    },
+    "OverrideGen3RS": {
+      "Language": 2,
+      "Version": 0
+    },
+    "OverrideGen3FRLG": {
+      "Language": 2,
+      "Version": 0
+    }
+  },
+  "Display": {
+    "Unicode": true,
+    "IgnoreLegalPopup": false,
+    "ExportLegalityVerboseProperties": false,
+    "ExportLegalityAlwaysVerbose": false,
+    "ExportLegalityNeverClipboard": false,
+    "FlagIllegal": true,
+    "FocusBorderDeflate": 1,
+    "DisableScalingDpi": false,
+    "SlotLegalityAlwaysVisible": false
+  },
+  "Sprite": {
+    "SpritePreference": 0,
+    "ShinySprites": true,
+    "ShowEggSpriteAsHeldItem": true,
+    "ShowEncounterBall": true,
+    "ShowEncounterColor": 2,
+    "ShowEncounterColorPKM": 0,
+    "ShowEncounterOpacityBackground": 63,
+    "ShowEncounterOpacityStripe": 95,
+    "ShowEncounterThicknessStripe": 4,
+    "ShowExperiencePercent": false,
+    "ShowTeraType": 1,
+    "ShowTeraThicknessStripe": 4,
+    "ShowTeraOpacityBackground": 255,
+    "ShowTeraOpacityStripe": 175,
+    "FilterMismatchOpacity": 0.4,
+    "FilterMismatchGrayscale": 0.7
+  },
+  "Sounds": {
+    "PlaySoundSAVLoad": true,
+    "PlaySoundLegalityCheck": true,
+    "PlaySoundOther": true
+  },
+  "Hover": {
+    "HoverSlotShowPreview": true,
+    "HoverSlotShowEncounter": true,
+    "HoverSlotShowEncounterVerbose": false,
+    "HoverSlotShowLegalityHint": true,
+    "HoverSlotShowText": true,
+    "HoverSlotPlayCry": true,
+    "HoverSlotGlowEdges": true,
+    "PreviewShowPaste": true,
+    "PreviewCursorShift": {
+      "IsEmpty": false,
+      "X": 16,
+      "Y": 8
+    }
+  },
+  "BattleTemplate": {
+    "Hover": {
+      "Language": 0,
+      "StyleStatEVs": 0,
+      "StyleStatIVs": 0,
+      "StyleStatOther": 0,
+      "StyleMove": 1,
+      "StatsCustom": {
+        "Names": [
+          "H",
+          "A",
+          "B",
+          "C",
+          "D",
+          "S"
+        ],
+        "Separator": " ",
+        "ValueGap": ":",
+        "IsLeft": true,
+        "AlwaysShow": true,
+        "MinimumDigits": 0
+      },
+      "TokenOrder": 2,
+      "TokenOrderCustom": [
+        "FirstLine",
+        "Ability",
+        "Level",
+        "Shiny",
+        "Friendship",
+        "DynamaxLevel",
+        "Gigantamax",
+        "TeraType",
+        "EVs",
+        "Nature",
+        "IVs",
+        "Moves"
+      ]
+    },
+    "Export": {
+      "Language": 2,
+      "StyleStatEVs": 0,
+      "StyleStatIVs": 0,
+      "StyleStatOther": 0,
+      "StyleMove": 0,
+      "StatsCustom": {
+        "Names": [
+          "H",
+          "A",
+          "B",
+          "C",
+          "D",
+          "S"
+        ],
+        "Separator": " ",
+        "ValueGap": ":",
+        "IsLeft": true,
+        "AlwaysShow": true,
+        "MinimumDigits": 0
+      },
+      "TokenOrder": 0,
+      "TokenOrderCustom": [
+        "FirstLine",
+        "Ability",
+        "Level",
+        "Shiny",
+        "Friendship",
+        "DynamaxLevel",
+        "Gigantamax",
+        "TeraType",
+        "EVs",
+        "Nature",
+        "IVs",
+        "Moves"
+      ]
+    }
+  },
+  "Draw": {
+    "InvalidSelection": "#e9967a",
+    "MarkBlue": "#00bfff",
+    "MarkPink": "#ff75b3",
+    "ShinyUnicode": "\u2606",
+    "ShinyDefault": "*"
+  },
+  "Advanced": {
+    "SaveExportForceSaveAs": false,
+    "SaveExportCheckUnsavedEntity": true,
+    "PathBlockKeyList": "",
+    "HideEvent8Contains": "",
+    "DragStartThreshold": 0
+  },
+  "EntityEditor": {
+    "HiddenPowerOnChangeMaxPower": true,
+    "ShowLegalBallsFirst": true,
+    "ShowGenderGen1": false,
+    "ShowStatusCondition": true
+  },
+  "EntityDb": {
+    "SearchBackups": true,
+    "SearchExtraSaves": true,
+    "SearchExtraSavesDeep": true,
+    "InitialSortMode": 0,
+    "FilterUnavailableSpecies": true,
+    "ResultsGridRowCount": 9
+  },
+  "EncounterDb": {
+    "ReturnNoneIfEmptySearch": true,
+    "FilterUnavailableSpecies": true,
+    "UseTabsAsCriteria": true,
+    "UseTabsAsCriteriaAnySpecies": true,
+    "ResultsGridRowCount": 9
+  },
+  "MysteryDb": {
+    "FilterUnavailableSpecies": true,
+    "ResultsGridRowCount": 9
+  },
+  "Report": {
+    "ExtraProperties": [],
+    "HiddenProperties": []
+  },
+  "SlotExport": {
+    "BoxExport": {
+      "Scope": 0,
+      "FolderCreation": 0,
+      "FolderPrefix": 0,
+      "EmptySlots": 0,
+      "FileIndexPrefix": 0,
+      "Notify": 0
+    },
+    "DefaultBoxExportNamer": "",
+    "AllowBoxDataDrop": false
+  }
+}

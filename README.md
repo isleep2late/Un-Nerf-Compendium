@@ -79,8 +79,9 @@ exactly which patch / tagged block / byte to omit for each feature.
 A patched PKHeX. On top of stock it adds: Gen-1 RBY sprite/type desync combos; a **Gen-1/2 level-255
 cap** (HaX mode lets you set any RBY/GSC Pokemon's stored level up to 255 and it persists in-game — see
 "Level 255 (Gen 1/2)" below); a Gen-3 any-ability dropdown (all 78, written to PK3 0x1E for the patched
-Emerald); Deoxys form box icons; and loosened legality where the un-nerf ROMs make otherwise-"illegal"
-mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
+Emerald); Deoxys form box icons; status-condition editing in every generation (a dropdown for Gen 1/2,
+a lower-left clickable icon for Gen 3+ — see "Status condition editing" below); and loosened legality
+where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
 
 ### Level 255 (Gen 1/2)
@@ -94,7 +95,22 @@ it. Three small source changes implement this — see `PKHaX/LEVEL255_CHANGES.md
 
 Caveats: the 8-bit stat formula overflows at very high levels, so stats may look wrapped rather than
 cleanly huge (the level itself stays 255); legality will flag the mon (expected for a HaX feature); and
-a >100 mon cannot be traded Gen-1 -> Gen-2 over the Time Capsule (`ValidateOTTrademon` rejects level>100), so edit each game's save directly.
+a >100 mon cannot be traded Gen-1 -> Gen-2 over the Time Capsule (`ValidateOTTrademon` rejects level
+>100), so edit each game's save directly.
+
+### Status condition editing (all generations)
+
+You can now set a Pokemon's status condition (Sleep / Poison / Burn / Freeze / Paralysis) in every
+generation:
+
+- **Gen 1 and Gen 2:** an explicit **Status dropdown** in the editor's "Gen-1:" / "Gen-2:" panel
+  (the same panel that holds the Gen-1 sprite/type controls). For Gen 1/2 the chosen status is also
+  carried in the Showdown set export/import and shown when you hover a Pokemon's sprite (see "Gen 1/2
+  Showdown desync export/import" / `PKHaX/GEN12_DESYNC_CHANGES.md`).
+- **All other generations (3+):** a clickable status icon in the **lower-left corner** of the entity
+  editor. It is blank (effectively invisible) until a status is set — just click that lower-left area to
+  open the picker and choose a status; once set, the matching status sprite appears there. (Visibility is
+  controlled by the existing "Show Status Condition" setting, which is on by default.)
 
 ---
 
