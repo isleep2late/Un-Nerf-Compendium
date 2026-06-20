@@ -28,6 +28,7 @@ public partial class PKMEditor
         CB_Language.SelectedValue = pk2.IsSpeciesNameMatch(language) ? language : pk2.GuessedLanguage(language);
 
         LoadPartyStats(pk2);
+        G1_Editor.LoadEntity(pk2); // PKHaX: Gen-2 status dropdown
         UpdateStats();
     }
 
@@ -67,6 +68,7 @@ public partial class PKMEditor
         c2.MetTimeOfDay = CB_MetTimeOfDay.SelectedIndex;
 
         SavePartyStats(pk2);
+        G1_Editor.SaveEntity(pk2); // PKHaX: write Gen-2 status last (after any party-stat reset)
         pk2.FixMoves();
         return pk2;
     }

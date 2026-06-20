@@ -34,6 +34,7 @@ public partial class StatusConditionView : UserControl
         if (pk is null || Loading)
             return;
         Loading = true;
+        // PKHaX: Gen 1/2 status is handled by the GB editor's Status dropdown; this icon is only used for Gen 3+.
         if (!pk.PartyStatsPresent)
             ClearStatus();
         else if (pk.Stat_HPCurrent == 0)
@@ -63,7 +64,7 @@ public partial class StatusConditionView : UserControl
             PB_Status.Image = status.GetStatusSprite();
 
             var text = WinFormsTranslator.TranslateEnum(status, Main.CurrentLanguage);
-            Hover.SetToolTip(PB_Status, $"Status Condition: {text}");
+            Hover.SetToolTip(PB_Status, $"Status Condition: {text} (click to change)");
         }
         else
         {
@@ -71,7 +72,7 @@ public partial class StatusConditionView : UserControl
             PB_Status.Image = status.GetStatusSprite();
 
             var text = WinFormsTranslator.TranslateEnum(status, Main.CurrentLanguage);
-            Hover.SetToolTip(PB_Status, $"Status Condition: {text}");
+            Hover.SetToolTip(PB_Status, $"Status Condition: {text} (click to change)");
         }
     }
 
