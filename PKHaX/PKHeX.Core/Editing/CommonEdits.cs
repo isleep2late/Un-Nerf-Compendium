@@ -167,7 +167,10 @@ public static class CommonEdits
                 pk.SetMaximumPPUps(moves);
 
             pk.ApplyHeldItem(set.HeldItem, set.Context);
-            pk.CurrentLevel = set.Level;
+            // PKHaX: EXP tables cap at L100; for Gen 1/2 also stamp the raw stored level byte (supports up to 255).
+            pk.CurrentLevel = (byte)Math.Min((int)set.Level, Experience.MaxLevel);
+            if (pk is GBPKM gbLevel)
+                gbLevel.Stat_Level = set.Level;
             pk.CurrentFriendship = set.Friendship;
 
             ReadOnlySpan<int> ivs = set.IVs;
@@ -268,6 +271,26 @@ public static class CommonEdits
             if (legal.Parsed && !MoveResult.AllValid(legal.Info.Relearn))
                 pk.SetRelearnMoves(legal);
             pk.ResetPartyStats();
+            // PKHaX: apply Gen 1/2 desync hackmons fields AFTER ResetPartyStats (which clears Status_Condition).
+            if (set is ShowdownSet ss)
+            {
+                if (pk is PK1 p1)
+                {
+                    if (ss.PhType1 >= 0)
+                        p1.Type1 = (byte)ss.PhType1;
+                    if (ss.PhType2 >= 0)
+                        p1.Type2 = (byte)ss.PhType2;
+                    if (ss.PhSpriteSpecies != 0)
+                        p1.HeaderSpeciesInternal = SpeciesConverter.GetInternal1(ss.PhSpriteSpecies);
+                    if (ss.PhStatusByte >= 0)
+                        p1.Status_Condition = (byte)ss.PhStatusByte;
+                }
+                else if (pk is PK2 p2)
+                {
+                    if (ss.PhStatusByte >= 0)
+                        p2.Status_Condition = (byte)ss.PhStatusByte;
+                }
+            }
             pk.RefreshChecksum();
         }
 
