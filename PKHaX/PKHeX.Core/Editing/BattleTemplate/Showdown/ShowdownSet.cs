@@ -489,7 +489,9 @@ public sealed class ShowdownSet : IBattleTemplate
         if (Species >= speciesList.Length)
             return string.Empty; // invalid species
 
-        string specForm = speciesList[Species];
+        string specForm = (Context == EntityContext.Gen5 && PokestarSpecies.TryGetName(Species, out var pkstName))
+            ? pkstName // PKHaX Pokestar: export BW2 prop names exactly as Showdown does
+            : speciesList[Species];
         var gender = Gender;
         if (form.Length != 0)
         {
@@ -589,6 +591,10 @@ public sealed class ShowdownSet : IBattleTemplate
                 AddEVs(result, settings, token);
                 break;
 
+            case BattleTemplateToken.SPs:
+                AddSPs(result, settings, token);
+                break;
+
             // Boolean
             case BattleTemplateToken.Shiny when Shiny:
                 result.Add(cfg.Push(token));
@@ -642,6 +648,21 @@ public sealed class ShowdownSet : IBattleTemplate
         if (token is BattleTemplateToken.EVsAppendNature && Nature.IsFixed)
             line += $" ({settings.Localization.Strings.natures[(int)Nature]})";
         result.Add(cfg.Push(BattleTemplateToken.EVs, line));
+    }
+
+    private void AddSPs(List<string> result, in BattleTemplateExportSettings settings, BattleTemplateToken token)
+    {
+        var cfg = settings.Localization.Config;
+        var nameSPs = cfg.GetStatDisplay(settings.StatsSPs);
+        Span<int> SPs = stackalloc int[6];
+        EffortValues.ConvertToChampions(EVs, SPs);
+        var sum = 0;
+        foreach (var value in SPs)
+            sum += value;
+
+        var line = GetStringStats(SPs, 0, nameSPs);
+        line += $" ({sum})";
+        result.Add(cfg.Push(BattleTemplateToken.SPs, line));
     }
 
     private static string GetAbilityHeldItem(GameStrings strings, int ability, int item, EntityContext context)
@@ -1043,6 +1064,12 @@ public sealed class ShowdownSet : IBattleTemplate
         speciesLine = speciesLine.Trim();
         if (speciesLine.Length == 0)
             return false;
+
+        if (PokestarSpecies.TryGetSpecies(speciesLine, out var pkstSpecies)) // PKHaX Pokestar: match full "Pokestar X" names (incl. dashes) before form-splitting
+        {
+            Species = pkstSpecies;
+            return true;
+        }
 
         if (speciesLine.EndsWith(Gmax, StringComparison.Ordinal))
         {

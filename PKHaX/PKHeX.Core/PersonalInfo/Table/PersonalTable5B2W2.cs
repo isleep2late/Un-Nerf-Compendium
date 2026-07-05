@@ -33,6 +33,8 @@ public sealed class PersonalTable5B2W2 : IPersonalTable, IPersonalTable<Personal
     {
         if (species <= MaxSpecies)
             return Table[species].FormIndex(species, form);
+        if (PokestarSpecies.IsPokestar(species) && species < Table.Length) // PKHaX Pokestar: BW2 props index directly (BST 100 data lives at 652-684)
+            return species;
         return 0;
     }
 
