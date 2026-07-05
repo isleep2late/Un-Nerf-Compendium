@@ -29,4 +29,11 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <!-- PKHaX Pokestar: embed the extracted BW2 prop preview sprites as "Pokestar.pokestar_<id>.png". -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\img\pokestar\*.png">
+      <LogicalName>Pokestar.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
