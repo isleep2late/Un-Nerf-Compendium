@@ -114,6 +114,7 @@ public static class SpeciesName
     public static string GetSpeciesNameGeneration(ushort species, int language, byte generation) => generation switch
     {
         <= 4 => GetSpeciesName1234(species, language, generation),
+        5 when PokestarSpecies.TryGetName(species, out var pkst) => pkst, // PKHaX Pokestar: BW2 prop names (652-684)
         5 when species is (int)Species.Farfetchd && IsApostropheFarfetchdLanguage(language) => "Farfetch'd", // Gen5 does not have slanted apostrophes.
         7 when language == (int) LanguageID.ChineseS => GetSpeciesName7ZH(species, language),
         _ => GetSpeciesName(species, language),
