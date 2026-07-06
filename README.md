@@ -170,13 +170,18 @@ feature below you get the exact thing to remove. Two patch kinds:
   drop a feature, use the per-feature **single-purpose patch** instead of the all-in-one, or skip the
   listed byte edit. The per-feature breakdown below lets you rebuild a custom binary.
 
-**Gen 3 - Emerald (`gen3_emerald/`).** The all-in-one is `3_Emerald_Full_Hackmons_v3.ips` = patch 1 +
-patch 2 + flash-save fix. To keep only some features, apply the **single-purpose** IPS files instead:
+**Gen 3 - Emerald (`gen3_emerald/`).** For **everything in one file** (Frontier unban + clauses + Soul
+Dew + any-ability + **Deoxys forms**), apply the prebuilt **`Emerald_UnNerf_Full.xdelta`** to a clean
+Emerald — it reproduces the finished decomp build (`Emerald_UNBANNED_..._DEOXYS.gba`). The `.ips` files
+below are a lighter, retail-native subset (they do **not** include Deoxys forms or 6-mon, which are
+decomp-source changes):
+- **All-in-one IPS** `3_Emerald_Full_Hackmons_v3.ips` = patch 1 + patch 2 + flash-save fix (Frontier
+  unban + clauses + Soul Dew + any-ability). **No Deoxys / 6-mon** — use the full xdelta for those.
 - **Frontier unban + clauses + Soul Dew un-nerf** -> apply only `1_Emerald_FrontierUnlock_SoulDew.ips`
   (decomp tags `// UN-NERF Frontier`, `// UN-NERF SoulDew`).
 - **Any-ability (PK3 0x1E)** -> apply only `2_Emerald_AnyAbility.ips` (decomp tag `// PKHaX AnyAbility`).
 - **Deoxys forms** -> in the decomp `.patch`, delete the `// UN-NERF Deoxys*` blocks (stats / sprites /
-  icons / summary / default-form / trade); each sub-feature is its own tag.
+  icons / summary / default-form / trade); each sub-feature is its own tag. (Already in the full xdelta.)
 - **6-Pokemon party** -> `emerald_6pokemon_full.patch`; omit (or delete `// UN-NERF PartySize`) for legal sizes.
 
 **Gen 4 - Platinum (`gen4_platinum/`).** The prebuilt **`Platinum_UnNerf_Full.xdelta`** is the full
