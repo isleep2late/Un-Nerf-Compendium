@@ -179,8 +179,11 @@ patch 2 + flash-save fix. To keep only some features, apply the **single-purpose
   icons / summary / default-form / trade); each sub-feature is its own tag.
 - **6-Pokemon party** -> `emerald_6pokemon_full.patch`; omit (or delete `// UN-NERF PartySize`) for legal sizes.
 
-**Gen 4 - Platinum (`gen4_platinum/`).** All-in-one binary
-`Platinum_unbanned_species_item_clause_formefix.xdelta`; source `.patch` files tag each feature.
+**Gen 4 - Platinum (`gen4_platinum/`).** The prebuilt **`Platinum_UnNerf_Full.xdelta`** is the full
+build — it includes **every** feature below (ban list + clauses + Soul Dew + Giratina-O/Rotom/Shaymin
+persistence + Arceus form-typing + Arceus doubles + 6-Pokemon + AbilityLock). Apply it to a clean
+Platinum for the complete un-nerf. The source `.patch` files below tag each feature so you can build a
+custom subset instead.
 - **Ban list** -> arm9 banned-species zero (tag `// UN-NERF BanList`).
 - **Species + Item Clause** -> two arm9 gates (tag `// UN-NERF Clauses`).
 - **Forme persistence (Giratina-O/Rotom/Shaymin-Sky)** -> overlay 5 `0x021F6DC2: C0 46 -> 01 D1` to
@@ -191,7 +194,9 @@ patch 2 + flash-save fix. To keep only some features, apply the **single-purpose
 - **Arceus doubles typing** -> the doubles eligibility/distinctness neutralization (tag `// UN-NERF ArceusDoubles`).
 - **6-Pokemon** -> `platinum_6pokemon_singles.patch`; omit for legal sizes (tag `// UN-NERF PartySize`).
 - **AbilityLock** -> `Platinum_AbilityLock_pokemon_c.patch`; omit to recompute default ability (tag `// PKHaX AbilityLock`).
-- **Arceus form-typing** -> `platinum_arceus_formtype.patch`; omit for stock plate-only typing (tag `// UN-NERF ArceusFormType`).
+- **Arceus form-typing (incl. the ??? form!)** -> `platinum_arceus_formtype.patch`; makes a no-plate
+  Arceus keep its PKHeX-set form's type (form id == type id, so the Gen-4-only **???** form = type 9
+  works and is Battle-Tower-legal). Omit for stock plate-only typing (tag `// UN-NERF ArceusFormType`).
 
 **Gen 5 - Black 2 / White 2 (`gen5_bw2/`, `gen45_nds_arceus_typefix/`).** One patch, one script - both do
 everything (ban list + clauses + Arceus form-typing + Pokéstar props usable + prop back-sprites):
