@@ -105,7 +105,7 @@ public sealed record EncounterStatic5(GameVersion Version)
 
     public bool IsMatchExact(PKM pk, EvoCriteria evo)
     {
-        if (!IsMatchEggLocationInternal(pk))
+        if (!IsMatchEggLocation(pk))
             return false;
         if (!IsMatchLocation(pk))
             return false;
@@ -134,26 +134,30 @@ public sealed record EncounterStatic5(GameVersion Version)
     {
         var met = pk.MetLocation;
         if (IsEgg)
-            return !pk.IsEgg || IsLocationAsEgg(met, Location);
+            return true;
         if (!IsRoaming)
             return met == Location;
         return IsRoamerMet(met);
     }
 
-    // spin trade sets another trade location ID
-    private static bool IsLocationAsEgg(ushort loc, ushort expect) => loc == expect || loc is (Locations.LinkTrade5 or Locations.LinkTrade5NPC);
-
-    private bool IsMatchEggLocationInternal(PKM pk)
+    private bool IsMatchEggLocation(PKM pk)
     {
         if (!IsEgg)
-            return this.IsMatchEggLocation(pk);
+        {
+            var expect = pk is PB8 ? Locations.Default8bNone : EggLocation;
+            return pk.EggLocation == expect;
+        }
 
         var eggLoc = pk.EggLocation;
         if (!pk.IsEgg) // hatched
-            return IsLocationAsEgg(eggLoc, EggLocation);
+            return eggLoc == EggLocation || eggLoc is (Locations.LinkTrade5 or Locations.LinkTrade5NPC);
 
         // Unhatched:
-        return eggLoc == EggLocation;
+        if (eggLoc != EggLocation)
+            return false;
+        if (pk.MetLocation is not (0 or Locations.LinkTrade5 or Locations.LinkTrade5NPC))
+            return false;
+        return true;
     }
 
     // 25,26,27,28, // Route 12, 13, 14, 15 Night latter half

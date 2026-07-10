@@ -15,7 +15,7 @@ public sealed record EncounterTrade9 : IEncounterable, IEncounterMatch, IEncount
     public bool IsEgg => false;
     public Ball FixedBall { get; init; }
     public bool IsShiny => false;
-    ushort ILocation.EggLocation => 0;
+    public ushort EggLocation => 0;
     public bool IsFixedTrainer => true;
     public bool IsFixedNickname => Nicknames.Length != 0;
     public GameVersion Version { get; }
@@ -186,7 +186,7 @@ public sealed record EncounterTrade9 : IEncounterable, IEncounterMatch, IEncount
             return false;
         if (pk.OriginalTrainerGender != OTGender)
             return false;
-        if (!IsMatchEggLocationInternal(pk))
+        if (!IsMatchEggLocation(pk))
             return false;
         if (EvolveOnTrade && pk.Species == Species)
             return false;
@@ -207,18 +207,19 @@ public sealed record EncounterTrade9 : IEncounterable, IEncounterMatch, IEncount
         return type.IsWithinRange(value);
     }
 
-    private bool IsMatchEggLocationInternal(PKM pk)
+    private bool IsMatchEggLocation(PKM pk)
     {
         var metState = LocationsHOME.GetRemapState(Context, pk.Context);
         if (metState == LocationRemapState.Original)
-            return this.IsMatchEggLocation(pk);
+            return IsMatchEggLocationExact(pk);
         if (metState == LocationRemapState.Remapped)
             return IsMatchEggLocationRemapped(pk);
         // Either
-        return this.IsMatchEggLocation(pk) || IsMatchEggLocationRemapped(pk);
+        return IsMatchEggLocationExact(pk) || IsMatchEggLocationRemapped(pk);
     }
 
     private static bool IsMatchEggLocationRemapped(PKM pk) => pk.EggLocation == 0;
+    private bool IsMatchEggLocationExact(PKM pk) => pk.EggLocation == EggLocation;
 
     private bool IsMatchLocation(PKM pk)
     {

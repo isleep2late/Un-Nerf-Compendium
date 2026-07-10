@@ -49,9 +49,7 @@ public partial class SAV_Database : Form
         FormClosing += (_, _) => cts.Cancel();
 
         var settings = new TabPage { Text = "Settings", Name = "Tab_Settings" };
-        var settingsGrid = new PropertyGrid { Dock = DockStyle.Fill };
-        PropertyGridLocalization.Apply(settingsGrid, Main.Settings.EntityDb, Main.CurrentLanguage);
-        settings.Controls.Add(settingsGrid);
+        settings.Controls.Add(new PropertyGrid { Dock = DockStyle.Fill, SelectedObject = Main.Settings.EntityDb });
         TC_SearchSettings.Controls.Add(settings);
 
         WinFormsUtil.TranslateInterface(this, Main.CurrentLanguage);

@@ -155,7 +155,11 @@ public abstract class MysteryGift : IEncounterable, IMoveset, ITrainerID32, IFat
     public abstract byte Ball { get; set; }
     public abstract ushort EggLocation { get; set; }
 
-    protected virtual bool IsMatchEggLocationInternal(PKM pk) => this.IsMatchEggLocation(pk);
+    protected virtual bool IsMatchEggLocation(PKM pk)
+    {
+        var expect = IsEgg ? EggLocation : pk is PB8 ? Locations.Default8bNone : 0;
+        return pk.EggLocation == expect;
+    }
 
     public Ball FixedBall => (Ball)Ball;
 

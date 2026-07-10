@@ -16,7 +16,7 @@ public sealed record EncounterSlot3XD(EncounterArea3XD Parent, ushort Species, b
     public AbilityPermission Ability => AbilityPermission.Any12;
     public Shiny Shiny => Shiny.Random;
     public bool IsShiny => false;
-    ushort ILocation.EggLocation => 0;
+    public ushort EggLocation => 0;
 
     public byte Form => 0;
 
