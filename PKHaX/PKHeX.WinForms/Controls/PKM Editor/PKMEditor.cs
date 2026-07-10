@@ -36,10 +36,6 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
         TLP_Main.Controls.Add(L_G1, 0, 17);
         TLP_Main.Controls.Add(G1_Editor, 1, 17);
         G1_Editor.Visible = L_G1.Visible = false;
-
-        var font = FontUtil.GetPKXFont();
-        TB_Nickname.Font = TB_OT.Font = TB_HT.Font = font;
-
         // Commonly reused Control arrays
         Moves = [MC_Move1, MC_Move2, MC_Move3, MC_Move4];
         Relearn = [CB_RelearnMove1, CB_RelearnMove2, CB_RelearnMove3, CB_RelearnMove4];
@@ -292,6 +288,7 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
         (GetFieldsfromPKM, GetPKMfromFields) = GetLoadSet(pk);
         foreach (var move in Moves)
             move.SetContext(pk.Context);
+        TB_Nickname.DisplayContext = TB_OT.DisplayContext = TB_HT.DisplayContext = pk.Context;
     }
 
     private (Action Load, Func<PKM> Set) GetLoadSet(PKM pk) => GetLoadSet(pk.Context);
@@ -416,12 +413,12 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
         if (!Unicode)
         {
             BTN_Shinytize.Text = Draw.ShinyDefault;
-            TB_Nickname.Font = TB_OT.Font = TB_HT.Font = GB_OT.Font;
+            TB_Nickname.DisableInGameFont = true;
         }
         else
         {
             BTN_Shinytize.Text = Draw.ShinyUnicode;
-            TB_Nickname.Font = TB_OT.Font = TB_HT.Font = FontUtil.GetPKXFont();
+            TB_Nickname.DisableInGameFont = false;
         }
     }
 
@@ -1373,8 +1370,8 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
             ValidateChildren(); // hacky validation forcing
         }
 
-        CB_MetLocation.SelectionLength = 0;
-        CB_EggLocation.SelectionLength = 0;
+        CB_MetLocation.Select(0, 0);
+        CB_EggLocation.Select(0, 0);
     }
 
     private void UpdateExtraByteValue(object sender, EventArgs e)
@@ -1460,6 +1457,9 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
 
     private void UpdateNickname(object sender, EventArgs e)
     {
+        if (!FieldsLoaded)
+            return;
+
         if (sender == Label_Species)
         {
             switch (ModifierKeys)
@@ -1858,7 +1858,7 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
         if (index != -1)
         {
             Moves[index].HealPP(Entity);
-            Entity.SetMove(index, value);
+            Entity.SetMove(index, value == NoMove1.Sentinel ? (ushort)0 : value); // PKHaX No Move
         }
         else if ((index = Relearn.IndexOf(cb)) != -1)
         {

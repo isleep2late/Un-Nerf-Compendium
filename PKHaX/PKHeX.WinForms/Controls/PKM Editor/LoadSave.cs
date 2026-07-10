@@ -106,10 +106,11 @@ public partial class PKMEditor
 
     private void LoadMoves(PKM pk)
     {
-        MC_Move1.SelectedMove = pk.Move1;
-        MC_Move2.SelectedMove = pk.Move2;
-        MC_Move3.SelectedMove = pk.Move3;
-        MC_Move4.SelectedMove = pk.Move4;
+        bool gb1 = pk is PK1; // PKHaX No Move: raw 0x00 with PP is the Gen 1 glitch move
+        MC_Move1.SelectedMove = gb1 && NoMove1.IsNoMoveSlot(pk.Move1, pk.Move1_PP) ? NoMove1.Sentinel : pk.Move1;
+        MC_Move2.SelectedMove = gb1 && NoMove1.IsNoMoveSlot(pk.Move2, pk.Move2_PP) ? NoMove1.Sentinel : pk.Move2;
+        MC_Move3.SelectedMove = gb1 && NoMove1.IsNoMoveSlot(pk.Move3, pk.Move3_PP) ? NoMove1.Sentinel : pk.Move3;
+        MC_Move4.SelectedMove = gb1 && NoMove1.IsNoMoveSlot(pk.Move4, pk.Move4_PP) ? NoMove1.Sentinel : pk.Move4;
         MC_Move1.PPUps = pk.Move1_PPUps;
         MC_Move2.PPUps = pk.Move2_PPUps;
         MC_Move3.PPUps = pk.Move3_PPUps;
@@ -122,10 +123,11 @@ public partial class PKMEditor
 
     private void SaveMoves(PKM pk)
     {
-        pk.Move1 = MC_Move1.SelectedMove;
-        pk.Move2 = MC_Move2.SelectedMove;
-        pk.Move3 = MC_Move3.SelectedMove;
-        pk.Move4 = MC_Move4.SelectedMove;
+        static ushort Store(ushort move) => move == NoMove1.Sentinel ? (ushort)0 : move; // PKHaX No Move
+        pk.Move1 = Store(MC_Move1.SelectedMove);
+        pk.Move2 = Store(MC_Move2.SelectedMove);
+        pk.Move3 = Store(MC_Move3.SelectedMove);
+        pk.Move4 = Store(MC_Move4.SelectedMove);
         pk.Move1_PP = MC_Move1.PP;
         pk.Move2_PP = MC_Move2.PP;
         pk.Move3_PP = MC_Move3.PP;
