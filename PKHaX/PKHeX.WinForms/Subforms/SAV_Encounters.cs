@@ -38,9 +38,7 @@ public partial class SAV_Encounters : Form
         InitializeComponent();
 
         var settings = new TabPage { Text = "Settings", Name = "Tab_Settings" };
-        var settingsGrid = new PropertyGrid { Dock = DockStyle.Fill };
-        PropertyGridLocalization.Apply(settingsGrid, Main.Settings.EncounterDb, Main.CurrentLanguage);
-        settings.Controls.Add(settingsGrid);
+        settings.Controls.Add(new PropertyGrid { Dock = DockStyle.Fill, SelectedObject = Main.Settings.EncounterDb });
         TC_SearchOptions.Controls.Add(settings);
 
         WinFormsUtil.TranslateInterface(this, Main.CurrentLanguage);
@@ -106,7 +104,7 @@ public partial class SAV_Encounters : Form
         L_Count.Text = "Ready...";
 
         CenterToParent();
-        CheckIsSearchAllowed();
+        CheckIsSearchDisallowed();
 
         if (Application.IsDarkModeEnabled)
         {
@@ -118,7 +116,7 @@ public partial class SAV_Encounters : Form
     private void UpdateCriteriaPropertyGrid(EncounterCriteria value)
     {
         _criteriaValue = value;
-        PropertyGridLocalization.Apply(PG_Criteria, _criteriaValue, Main.CurrentLanguage); // box the struct for PropertyGrid
+        PG_Criteria.SelectedObject = _criteriaValue; // box the struct for PropertyGrid
     }
 
     private void PG_Criteria_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -174,7 +172,7 @@ public partial class SAV_Encounters : Form
                         c.Checked = c == chk;
                 }
             };
-            chk.CheckStateChanged += (_, _) => CheckIsSearchAllowed();
+            chk.CheckStateChanged += (_, _) => CheckIsSearchDisallowed();
         }
     }
 
@@ -333,10 +331,7 @@ public partial class SAV_Encounters : Form
     {
         base.OnShown(e);
         foreach (var cb in TLP_Filters.Controls.OfType<ComboBox>())
-        {
-            cb.SelectedIndex = 0;
-            cb.Select(0, 0);
-        }
+            cb.SelectedIndex = cb.SelectionLength = 0;
     }
 
     // View Updates
@@ -345,7 +340,7 @@ public partial class SAV_Encounters : Form
         var settings = GetSearchSettings();
 
         // If nothing is specified, instead of just returning all possible encounters, just return nothing.
-        if (!IsSearchAllowed(settings))
+        if (DisallowSearch(settings))
             return [];
         var pk = SAV.BlankPKM;
 
@@ -383,13 +378,11 @@ public partial class SAV_Encounters : Form
         return results;
     }
 
-    private bool IsSearchAllowed(SearchSettings settings)
+    private bool DisallowSearch(SearchSettings settings)
     {
-        if (!TypeFilters.Controls.OfType<CheckBox>().Any(z => z.Checked))
+        if (TypeFilters.Controls.OfType<CheckBox>().All(z => !z.Checked))
             return false; // no types selected
-        if (settings is { Species: 0, Moves.Count: 0 } && !Main.Settings.EncounterDb.ReturnNoneIfEmptySearch)
-            return false;
-        return true;
+        return settings is { Species: 0, Moves.Count: 0 } && Main.Settings.EncounterDb.ReturnNoneIfEmptySearch;
     }
 
     private static IEnumerable<ushort> GetFullRange(int max)
@@ -614,11 +607,11 @@ public partial class SAV_Encounters : Form
         tb.AppendText(s);
     }
 
-    private void CB_Species_SelectedIndexChanged(object sender, EventArgs e) => CheckIsSearchAllowed();
+    private void CB_Species_SelectedIndexChanged(object sender, EventArgs e) => CheckIsSearchDisallowed();
 
-    private void CheckIsSearchAllowed()
+    private void CheckIsSearchDisallowed()
     {
         var settings = GetSearchSettings();
-        B_Search.Enabled = IsSearchAllowed(settings);
+        B_Search.Enabled = !DisallowSearch(settings);
     }
 }

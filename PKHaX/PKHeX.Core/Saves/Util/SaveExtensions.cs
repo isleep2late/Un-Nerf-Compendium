@@ -60,7 +60,7 @@ public static class SaveExtensions
 
             if (pk.Species >= strings.Species.Count)
                 errata.Add($"{MsgIndexSpeciesRange} {pk.Species}");
-            else if (sav.MaxSpeciesID < pk.Species && !(pk.Context == EntityContext.Gen5 && PokestarSpecies.IsPokestar(pk.Species))) // PKHaX Pokestar: props are intentionally addable in BW2
+            else if (sav.MaxSpeciesID < pk.Species)
                 errata.Add($"{MsgIndexSpeciesGame} {strings.Species[pk.Species]}");
 
             if (!sav.Personal[pk.Species].IsFormWithinRange(pk.Form) && !FormInfo.IsValidOutOfBoundsForm(pk.Species, pk.Form, pk.Generation))

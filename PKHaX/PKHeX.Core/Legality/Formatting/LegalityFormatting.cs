@@ -87,12 +87,7 @@ public static class LegalityFormatting
         var enc = la.EncounterOriginal;
         var display = l.Settings.Encounter;
         // Name
-        var encName = enc.GetEncounterName(l.Strings.specieslist);
-        // PKHaX Pokestar: BW2 props (652..684) collide with Gen-6 National-Dex numbers; show the prop
-        // name instead of the wrong-generation species name. Gated to Gen-5 so Gen-6+ is unaffected.
-        if (la.Entity.Context == EntityContext.Gen5 && PokestarSpecies.TryGetName(la.Entity.Species, out var pkstEncName))
-            encName = pkstEncName;
-        lines.Add(string.Format(display.Format, display.EncounterType, encName));
+        lines.Add(string.Format(display.Format, display.EncounterType, enc.GetEncounterName(l.Strings.specieslist)));
         if (enc is MysteryGift g)
             lines.Add(g.CardHeader);
 

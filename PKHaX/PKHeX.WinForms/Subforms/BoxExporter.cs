@@ -22,7 +22,7 @@ public partial class BoxExporter : Form
         var settings = obj.BoxExport;
         if (eo != 0)
             settings = settings with { Scope = eo == ExportOverride.All ? BoxExportScope.All : BoxExportScope.Current };
-        PropertyGridLocalization.Apply(PG_Settings, Settings = settings, Main.CurrentLanguage);
+        PG_Settings.SelectedObject = Settings = settings;
 
         int index = 0;
         for (var i = 0; i < Namers.Length; i++)
