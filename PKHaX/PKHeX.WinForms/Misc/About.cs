@@ -9,14 +9,8 @@ public partial class About : Form
         InitializeComponent();
         WinFormsUtil.TranslateInterface(this, Main.CurrentLanguage);
         RTB_Changelog.Text = Properties.Resources.changelog;
-        RTB_Shortcuts.Text = GetShortcutsText(Main.CurrentLanguage);
+        RTB_Shortcuts.Text = Properties.Resources.shortcuts;
         TC_About.SelectedIndex = (int)index;
-    }
-
-    private static string GetShortcutsText(string lang)
-    {
-        var localized = Properties.Resources.ResourceManager.GetObject($"shortcuts_{lang}") as string;
-        return localized ?? Properties.Resources.shortcuts;
     }
 }
 

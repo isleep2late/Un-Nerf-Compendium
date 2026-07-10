@@ -1,5 +1,3 @@
-using PKHeX.Core;
-
 namespace PKHeX.WinForms
 {
     partial class SAV_Trainer7GG
@@ -32,7 +30,7 @@ namespace PKHeX.WinForms
         {
             B_Cancel = new System.Windows.Forms.Button();
             B_Save = new System.Windows.Forms.Button();
-            TB_OTName = new PKHeX.WinForms.Controls.RenderedString();
+            TB_OTName = new System.Windows.Forms.TextBox();
             L_TrainerName = new System.Windows.Forms.Label();
             MT_Money = new System.Windows.Forms.MaskedTextBox();
             L_Money = new System.Windows.Forms.Label();
@@ -61,7 +59,7 @@ namespace PKHeX.WinForms
             Tab_Overview = new System.Windows.Forms.TabPage();
             B_AllFashionItems = new System.Windows.Forms.Button();
             B_AllTrainerTitles = new System.Windows.Forms.Button();
-            TB_RivalName = new PKHeX.WinForms.Controls.RenderedString();
+            TB_RivalName = new System.Windows.Forms.TextBox();
             L_RivalName = new System.Windows.Forms.Label();
             trainerID1 = new Controls.TrainerID();
             GB_Adventure = new System.Windows.Forms.GroupBox();
@@ -141,7 +139,7 @@ namespace PKHeX.WinForms
             // 
             // TB_OTName
             // 
-            TB_OTName.DisplayContext = EntityContext.Gen7b;
+            TB_OTName.Font = new System.Drawing.Font("Courier New", 8.25F);
             TB_OTName.Location = new System.Drawing.Point(115, 8);
             TB_OTName.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             TB_OTName.MaxLength = 12;
@@ -427,7 +425,7 @@ namespace PKHeX.WinForms
             // 
             // TB_RivalName
             // 
-            TB_RivalName.DisplayContext = EntityContext.Gen7b;
+            TB_RivalName.Font = new System.Drawing.Font("Courier New", 8.25F);
             TB_RivalName.Location = new System.Drawing.Point(338, 7);
             TB_RivalName.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             TB_RivalName.MaxLength = 12;
@@ -942,7 +940,7 @@ namespace PKHeX.WinForms
 
         private System.Windows.Forms.Button B_Cancel;
         private System.Windows.Forms.Button B_Save;
-        private PKHeX.WinForms.Controls.RenderedString TB_OTName;
+        private System.Windows.Forms.TextBox TB_OTName;
         private System.Windows.Forms.Label L_TrainerName;
         private System.Windows.Forms.MaskedTextBox MT_Money;
         private System.Windows.Forms.Label L_Money;
@@ -972,7 +970,7 @@ namespace PKHeX.WinForms
         private System.Windows.Forms.GroupBox GB_Adventure;
         private System.Windows.Forms.TabPage Tab_Complex;
         private Controls.TrainerID trainerID1;
-        private PKHeX.WinForms.Controls.RenderedString TB_RivalName;
+        private System.Windows.Forms.TextBox TB_RivalName;
         private System.Windows.Forms.Label L_RivalName;
         private System.Windows.Forms.Button B_ExportGoSummary;
         private System.Windows.Forms.NumericUpDown NUD_GoIndex;

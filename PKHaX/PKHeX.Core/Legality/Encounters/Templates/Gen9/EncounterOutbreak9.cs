@@ -17,7 +17,7 @@ public sealed record EncounterOutbreak9
     public Shiny Shiny => IsShiny ? Shiny.Always : Shiny.Random;
     public bool IsEgg => false;
     public Ball FixedBall => Ball.None;
-    ushort ILocation.EggLocation => 0;
+    public ushort EggLocation => 0;
     public AbilityPermission Ability => AbilityPermission.Any12;
 
     public required ushort Species { get; init; }
@@ -142,13 +142,18 @@ public sealed record EncounterOutbreak9
             return false;
         if (evo.Form != Form)
             return false;
-        if (!this.IsMatchEggLocation(pk))
+        if (!IsMatchEggLocation(pk))
             return false;
         if (!IsMatchLocation(pk))
             return false;
         return true;
     }
 
+    private bool IsMatchEggLocation(PKM pk)
+    {
+        var expect = pk is PB8 ? Locations.Default8bNone : EggLocation;
+        return pk.EggLocation == expect;
+    }
 
     private bool IsMatchLocation(PKM pk)
     {

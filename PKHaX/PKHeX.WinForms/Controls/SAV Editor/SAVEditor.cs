@@ -793,22 +793,18 @@ public partial class SAVEditor : UserControl, ISlotViewer<PictureBox>, ISaveFile
         _ => GetPropertyForm(sav),
     };
 
-    internal static string SimpleEditorKey = WinFormsTranslator.GetKey(nameof(SAVEditor), "SimpleEditor");
-
     private static Form GetPropertyForm(object sav)
     {
-        var key = SimpleEditorKey;
         var form = new Form
         {
-            Text = WinFormsTranslator.TranslateText(key, "Simple Editor", Main.CurrentLanguage),
+            Text = "Simple Editor",
             StartPosition = FormStartPosition.CenterParent,
             MinimumSize = new Size(350, 380),
             MinimizeBox = false,
             MaximizeBox = false,
             Icon = Properties.Resources.Icon,
         };
-        var pg = new PropertyGrid { Dock = DockStyle.Fill };
-        PropertyGridLocalization.Apply(pg, sav, Main.CurrentLanguage);
+        var pg = new PropertyGrid { SelectedObject = sav, Dock = DockStyle.Fill };
         form.Controls.Add(pg);
         return form;
     }

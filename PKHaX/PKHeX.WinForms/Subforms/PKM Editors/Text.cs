@@ -7,7 +7,7 @@ using PKHeX.Core;
 
 namespace PKHeX.WinForms;
 
-public sealed partial class TrashEditor : Form
+public partial class TrashEditor : Form
 {
     private readonly IStringConverter Converter;
     private readonly List<NumericUpDown> Bytes = [];
@@ -44,13 +44,12 @@ public sealed partial class TrashEditor : Form
     private TrashEditor(TextBoxBase tb, IStringConverter converter, byte generation, EntityContext context, Span<byte> raw = default) : this()
     {
         Converter = converter;
-        TB_Text.DisplayContext = context;
         FinalString = tb.Text;
 
         editing = true;
         if (raw.Length != 0)
         {
-            Raw = FinalBytes = [.. raw];
+            Raw = FinalBytes = raw.ToArray();
             AddTrashEditing(raw.Length, generation, context);
         }
         else
@@ -58,7 +57,7 @@ public sealed partial class TrashEditor : Form
             Raw = FinalBytes = [];
         }
 
-        var f = TB_Text.Font;
+        var f = FontUtil.GetPKXFont();
         AddCharEditing(f, context);
         TB_Text.MaxLength = tb.MaxLength;
         TB_Text.Text = tb.Text;
@@ -107,7 +106,8 @@ public sealed partial class TrashEditor : Form
         {
             var l = GetLabel(((char)c).ToString());
             l.Font = f;
-            l.AutoSize = true;
+            l.AutoSize = false;
+            l.Size = new Size(20, 20);
             l.Click += (_, _) => { if (TB_Text.Text.Length < TB_Text.MaxLength) TB_Text.AppendText(l.Text); };
             FLP_Characters.Controls.Add(l);
             Tip.SetToolTip(l, $"Insert {l.Text} (0x{c:X4})");
@@ -223,7 +223,7 @@ public sealed partial class TrashEditor : Form
     {
         Span<byte> temp = stackalloc byte[Raw.Length];
         var written = Converter.SetString(temp, text, text.Length, StringConverterOption.None);
-        return [.. temp[..written]];
+        return temp[..written].ToArray();
     }
 
     private string GetString() => Converter.GetString(Raw);
