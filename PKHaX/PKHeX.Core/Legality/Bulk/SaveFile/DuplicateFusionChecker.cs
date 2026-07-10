@@ -7,6 +7,7 @@ public sealed class DuplicateFusionChecker : IBulkAnalyzer
     /// <summary>
     /// <see cref="StorageSlotType"/>
     /// </summary>
+    /// <param name="input"></param>
     public void Analyze(BulkAnalysis input)
     {
         if (input.Trainer is not SaveFile sav)

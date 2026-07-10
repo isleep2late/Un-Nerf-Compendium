@@ -170,6 +170,7 @@ public partial class Main : Form
         var settings = Settings;
         Draw = C_SAV.M.Hover.Draw = PKME_Tabs.Draw = settings.Draw;
         ReloadProgramSettings(settings, true);
+        CB_MainLanguage.Items.AddRange(Enum.GetNames<ProgramLanguage>());
         PB_Legal.Visible = !HaX;
         C_SAV.HaX = PKME_Tabs.HaX = HaX;
 #if DEBUG
@@ -177,8 +178,7 @@ public partial class Main : Form
 #endif
 
         // Select Language
-        AddLanguageMenuItems();
-        ApplyMainLanguage(GameLanguage.GetLanguageIndex(settings.Startup.Language));
+        CB_MainLanguage.SelectedIndex = GameLanguage.GetLanguageIndex(settings.Startup.Language);
 
         if (Application.IsDarkModeEnabled)
             WinFormsUtil.InvertToolStripIcons(menuStrip1.Items);
@@ -965,40 +965,13 @@ public partial class Main : Form
     }
 
     // Language Translation
-    private void AddLanguageMenuItems()
+    private void ChangeMainLanguage(object sender, EventArgs e)
     {
-        Menu_Language.DropDownItems.Clear();
-        var names = Enum.GetNames<ProgramLanguage>();
-        for (int i = 0; i < names.Length; i++)
-        {
-            var item = new ToolStripMenuItem(names[i])
-            {
-                Name = names[i],
-                Tag = i,
-                CheckOnClick = false,
-            };
-            item.Click += ChangeMainLanguage;
-            Menu_Language.DropDownItems.Add(item);
-        }
-        UpdateLanguageMenuChecks(GameLanguage.GetLanguageIndex(CurrentLanguage));
-    }
-
-    private void ChangeMainLanguage(object? sender, EventArgs e)
-    {
-        var index = sender is ToolStripMenuItem { Tag: int menuIndex }
-            ? menuIndex
-            : GameLanguage.GetLanguageIndex(CurrentLanguage);
-        ApplyMainLanguage(index);
-    }
-
-    private void ApplyMainLanguage(int index)
-    {
-        if ((uint)index < GameLanguage.LanguageCount)
+        var index = CB_MainLanguage.SelectedIndex;
+        if ((uint)index < CB_MainLanguage.Items.Count)
             CurrentLanguage = GameLanguage.LanguageCode(index);
 
         var lang = CurrentLanguage;
-        UpdateLanguageMenuChecks(index);
-
         Settings.Startup.Language = lang;
         WinFormsUtil.SetCultureLanguage(lang);
 
@@ -1024,12 +997,6 @@ public partial class Main : Form
 
         foreach (var plugin in Plugins)
             plugin.NotifyDisplayLanguageChanged(lang);
-    }
-
-    private void UpdateLanguageMenuChecks(int index)
-    {
-        foreach (ToolStripMenuItem item in Menu_Language.DropDownItems)
-            item.Checked = item.Tag is int itemIndex && itemIndex == index;
     }
     #endregion
 

@@ -137,35 +137,10 @@ public abstract class SpriteBuilder : ISpriteBuilder<Bitmap>
 
     private Bitmap GetBaseImage(ushort species, byte form, byte gender, uint formarg, bool shiny, EntityContext context)
     {
-        if (context == EntityContext.Gen5 && PokestarSpecies.IsPokestar(species)) // PKHaX Pokestar: BW2 props share Gen-6 dex numbers -> use the extracted prop sprite (not Chesnaught/Delphox/etc.), falling back to "?".
-            return GetPokestarSprite(species) ?? Unknown;
         var img = FormInfo.IsTotemForm(species, form, context)
             ? GetBaseImageTotem(species, form, gender, formarg, shiny, context)
             : GetBaseImageDefault(species, form, gender, formarg, shiny, context);
         return img ?? GetBaseImageFallback(species, form, gender, formarg, shiny, context);
-    }
-
-    // PKHaX Pokestar: all BW2 props share ONE generic preview sprite (the clean "green box", embedded as
-    // "Pokestar.pokestar_generic.png"). The per-prop ROM back sprites are placeholders for most opponents,
-    // so a single generic reads cleanest. Cached; returns null (-> "?") only if the resource is missing.
-    private static Bitmap? _pokestarGeneric;
-    private static bool _pokestarLoaded;
-    private static Bitmap? GetPokestarSprite(ushort species)
-    {
-        lock (typeof(SpriteBuilder))
-        {
-            if (_pokestarLoaded)
-                return _pokestarGeneric;
-            _pokestarLoaded = true;
-            var asm = typeof(SpriteBuilder).Assembly;
-            using var s = asm.GetManifestResourceStream("Pokestar.pokestar_generic.png");
-            if (s is not null)
-            {
-                using var tmp = new Bitmap(s); // detach from the stream so the bitmap stays valid after dispose
-                _pokestarGeneric = new Bitmap(tmp);
-            }
-            return _pokestarGeneric;
-        }
     }
 
     private Bitmap? GetBaseImageTotem(ushort species, byte form, byte gender, uint formarg, bool shiny, EntityContext context)

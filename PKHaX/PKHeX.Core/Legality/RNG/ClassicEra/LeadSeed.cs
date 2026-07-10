@@ -13,12 +13,12 @@ public struct LeadSeed(uint Seed, LeadRequired Lead)
     /// <summary>
     /// Seed the encounter was triggered from.
     /// </summary>
-    public uint Seed { get; } = Seed;
+    public uint Seed = Seed;
 
     /// <summary>
     /// Lead condition required for the encounter.
     /// </summary>
-    public LeadRequired Lead { get; internal set; } = Lead;
+    public LeadRequired Lead = Lead;
 
     /// <summary>
     /// Checks if the player's lead Pokémon ability is not one of the abilities that impacts encounter generation.

@@ -17,7 +17,7 @@ public sealed record EncounterGift9a(ushort Species, byte Form, byte Level, byte
     public Ball FixedBall => Ball.Poke;
     public Shiny Shiny { get; init; } = Shiny.Never;
     public bool IsShiny => false;
-    ushort ILocation.EggLocation => 0;
+    public ushort EggLocation => 0;
     public byte FlawlessIVCount { get; init; }
     private const byte NoScale = 0;
     private bool NoScalarsDefined => Size == NoScale;
@@ -148,7 +148,7 @@ public sealed record EncounterGift9a(ushort Species, byte Form, byte Level, byte
             return false;
         if (Gender != FixedGenderUtil.GenderRandom && pk.Gender != Gender)
             return false;
-        if (!this.IsMatchEggLocation(pk))
+        if (!IsMatchEggLocation(pk))
             return false;
         if (!IsMatchLocation(pk))
             return false;
@@ -168,6 +168,7 @@ public sealed record EncounterGift9a(ushort Species, byte Form, byte Level, byte
         return true;
     }
 
+    private bool IsMatchEggLocation(PKM pk) => pk.EggLocation == EggLocation;
     private bool IsMatchLocation(PKM pk) => pk.MetLocation == Location;
 
     public EncounterMatchRating GetMatchRating(PKM pk)

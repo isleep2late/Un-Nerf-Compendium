@@ -18,7 +18,7 @@ public sealed record EncounterGift2
     public byte Form => 0;
     public Ball FixedBall => Ball.Poke;
     ushort ILocation.Location => Location;
-    ushort ILocation.EggLocation => 0;
+    public ushort EggLocation => 0;
     public bool IsShiny => Shiny == Shiny.Always;
     public AbilityPermission Ability => AbilityPermission.OnlyHidden;
     public bool IsEgg => EggCycles != 0;
@@ -177,7 +177,7 @@ public sealed record EncounterGift2
     {
         if (Shiny == Shiny.Always && !pk.IsShiny)
             return false;
-        if (!IsMatchEggLocationInternal(pk))
+        if (!IsMatchEggLocation(pk))
             return false;
         if (!IsMatchLocation(pk))
             return false;
@@ -266,10 +266,13 @@ public sealed record EncounterGift2
         _ => true,
     };
 
-    private bool IsMatchEggLocationInternal(PKM pk)
+    private bool IsMatchEggLocation(PKM pk)
     {
         if (pk is not ICaughtData2 c2)
-            return this.IsMatchEggLocation(pk);
+        {
+            var expect = pk is PB8 ? Locations.Default8bNone : EggLocation;
+            return pk.EggLocation == expect;
+        }
 
         if (pk.IsEgg)
         {
@@ -300,7 +303,7 @@ public sealed record EncounterGift2
 
     private bool IsMatchLocation(PKM pk)
     {
-        if (IsEgg && !pk.IsEgg)
+        if (IsEgg)
             return true;
         if (pk is not ICaughtData2 c2)
             return true;

@@ -11,7 +11,3 @@ PKHaX/_pub/
 # push_pr.sh saved remote URL
 .push_pr.conf
 .push_pr.command
-# macOS + stray scratch files
-.DS_Store
-**/.DS_Store
-.__wtest
