@@ -1858,7 +1858,7 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
         if (index != -1)
         {
             Moves[index].HealPP(Entity);
-            Entity.SetMove(index, value);
+            Entity.SetMove(index, value == NoMove1.Sentinel ? (ushort)0 : value); // PKHaX No Move
         }
         else if ((index = Relearn.IndexOf(cb)) != -1)
         {

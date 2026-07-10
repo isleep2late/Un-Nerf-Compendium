@@ -7,8 +7,13 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
 - **Gen 3 (RSE/FRLG):** **any ability on any Pokémon** (pairs with the Emerald un-nerf ROM patch).
 - **Gen 3 Deoxys forms:** select any of the four forms (Normal/Attack/Defense/Speed) with the
   correct per-form base stats and sprite (stored in PK3 `0x1F`; pairs with the Emerald engine patch).
+- **Gen 1 "No Move":** the glitch move ID `0x00` (Fissure's animation, 102 power, glitch type,
+  81/256 accuracy on Yellow) as a selectable entry in the move dropdowns for Gen 1 saves —
+  distinct from `(None)`. It writes the raw `0x00` move byte with your chosen PP kept intact
+  (slots holding it are not compacted away like empty slots), so the save loads on real hardware
+  with the corrupted move selectable from the FIGHT menu.
 
-Built on **upstream PKHeX `master` @ `452ddcb` (version 26.05.05)**. Every PKHaX edit is tagged with
+Built on **upstream PKHeX `master` @ `6501f0ab4` (post-26.07.07)**. Every PKHaX edit is tagged with
 a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
 
 ## What's in this folder

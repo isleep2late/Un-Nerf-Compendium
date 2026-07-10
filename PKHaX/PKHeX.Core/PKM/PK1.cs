@@ -285,6 +285,22 @@ public sealed class PK1 : GBPKML, IPersonalType
         => TrashBytesUTF16.GetStringLength(data, StringConverter4.Terminator);
     public override int GetBytesPerChar() => 2;
 
+    // PKHaX No Move: a raw 0x00 move with PP is the Gen 1 glitch move; treat it as an occupied
+    // slot instead of compacting it away like an empty one.
+    public override void FixMoves()
+    {
+        Span<(ushort Move, int PP, int Ups)> slots = stackalloc (ushort, int, int)[4];
+        int ctr = 0;
+        if (Move1 != 0 || Move1_PP > 0) slots[ctr++] = (Move1, Move1_PP, Move1_PPUps);
+        if (Move2 != 0 || Move2_PP > 0) slots[ctr++] = (Move2, Move2_PP, Move2_PPUps);
+        if (Move3 != 0 || Move3_PP > 0) slots[ctr++] = (Move3, Move3_PP, Move3_PPUps);
+        if (Move4 != 0 || Move4_PP > 0) slots[ctr++] = (Move4, Move4_PP, Move4_PPUps);
+        (Move1, Move1_PP, Move1_PPUps) = slots[0];
+        (Move2, Move2_PP, Move2_PPUps) = slots[1];
+        (Move3, Move3_PP, Move3_PPUps) = slots[2];
+        (Move4, Move4_PP, Move4_PPUps) = slots[3];
+    }
+
     /// <summary>
     /// Gets a checksum over all the entity's data using a single list to wrap all components.
     /// </summary>
