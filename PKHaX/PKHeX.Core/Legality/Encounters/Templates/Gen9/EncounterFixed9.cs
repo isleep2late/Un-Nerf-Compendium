@@ -19,7 +19,7 @@ public sealed record EncounterFixed9
     public bool IsEgg => false;
     public Ball FixedBall => Ball.None;
     public bool IsShiny => false;
-    ushort ILocation.EggLocation => 0;
+    public ushort EggLocation => 0;
     public AbilityPermission Ability { get; init; }
 
     public required ushort Species { get; init; }
@@ -139,7 +139,7 @@ public sealed record EncounterFixed9
             return false;
         if (Gender != FixedGenderUtil.GenderRandom && pk.Gender != Gender)
             return false;
-        if (!this.IsMatchEggLocation(pk))
+        if (!IsMatchEggLocation(pk))
             return false;
         if (!IsMatchLocation(pk))
             return false;
@@ -175,6 +175,11 @@ public sealed record EncounterFixed9
         return false;
     }
 
+    private bool IsMatchEggLocation(PKM pk)
+    {
+        var expect = pk is PB8 ? Locations.Default8bNone : EggLocation;
+        return pk.EggLocation == expect;
+    }
 
     private bool IsMatchLocation(PKM pk)
     {

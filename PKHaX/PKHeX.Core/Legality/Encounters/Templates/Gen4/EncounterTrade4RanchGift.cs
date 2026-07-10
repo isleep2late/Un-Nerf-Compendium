@@ -163,7 +163,7 @@ public sealed record EncounterTrade4RanchGift : IEncounterable, IEncounterMatch,
             return false;
         if (pk.OriginalTrainerGender != OTGender)
             return false;
-        if (!this.IsMatchEggLocation(pk))
+        if (!IsMatchEggLocation(pk))
             return false;
         if (pk.IsEgg)
             return false;
@@ -194,6 +194,14 @@ public sealed record EncounterTrade4RanchGift : IEncounterable, IEncounterMatch,
         if (FatefulEncounter)
             return !pk.IsShiny;
         return PID == pk.EncryptionConstant;
+    }
+
+    private bool IsMatchEggLocation(PKM pk)
+    {
+        var expect = EggLocation;
+        if (pk is PB8)
+            expect = Locations.Default8bNone;
+        return pk.EggLocation == expect;
     }
 
     public EncounterMatchRating GetMatchRating(PKM pk) => EncounterMatchRating.Match;

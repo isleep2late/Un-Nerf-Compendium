@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using static PKHeX.Core.TrainerIDFormat;
 
 namespace PKHeX.Core;

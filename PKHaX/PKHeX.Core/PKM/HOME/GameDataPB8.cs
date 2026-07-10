@@ -66,9 +66,6 @@ public sealed class GameDataPB8 : HomeOptional1, IGameDataSide<PB8>, IGameDataSp
         pk.PokerusState = PokerusState;
         pk.AbilityNumber = AbilityNumber;
         pk.Ability = Ability;
-
-        pk.EggLocation = Locations8b.GetLocationLocal(EggLocation);
-        pk.MetLocation = Locations8b.GetLocationLocal(MetLocation);
     }
 
     public void CopyFrom(PB8 pk, PKH pkh)
@@ -78,9 +75,6 @@ public sealed class GameDataPB8 : HomeOptional1, IGameDataSide<PB8>, IGameDataSp
         PokerusState = pk.PokerusState;
         AbilityNumber = (byte)pk.AbilityNumber;
         Ability = (ushort)pk.Ability;
-
-        EggLocation = Locations8b.GetLocationMainline(pk.EggLocation);
-        MetLocation = Locations8b.GetLocationMainline(pk.MetLocation);
     }
 
     public PB8 ConvertToPKM(PKH pkh)
@@ -114,8 +108,8 @@ public sealed class GameDataPB8 : HomeOptional1, IGameDataSide<PB8>, IGameDataSp
     public void InitializeFrom(IGameDataSide side, PKH pkh)
     {
         Ball = side.Ball;
-        MetLocation = side.MetLocation;
-        EggLocation = side.EggLocation;
+        MetLocation = side.MetLocation == 0 ? Locations.Default8bNone : side.MetLocation;
+        EggLocation = side.EggLocation == 0 ? Locations.Default8bNone : side.EggLocation;
 
         if (side is IPokerusStatus p)
             PokerusState = p.PokerusState;

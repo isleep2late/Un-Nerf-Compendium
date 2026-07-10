@@ -38,7 +38,6 @@ public enum BattleTemplateToken : byte
     // Manually appended, not stored or recognized on import
     AVs,
     GVs,
-    SPs,
 
     // Future Showdown propositions
     AbilityHeldItem, // [Ability] Item

@@ -166,7 +166,7 @@ public sealed record EncounterStatic9(GameVersion Version)
             return false;
         if (Gender != FixedGenderUtil.GenderRandom && pk.Gender != Gender)
             return false;
-        if (!IsMatchEggLocationInternal(pk))
+        if (!IsMatchEggLocation(pk))
             return false;
         if (!IsMatchLocation(pk))
             return false;
@@ -184,19 +184,24 @@ public sealed record EncounterStatic9(GameVersion Version)
         return true;
     }
 
-    private bool IsMatchEggLocationInternal(PKM pk)
+    private bool IsMatchEggLocation(PKM pk)
     {
-        if (!IsEgg)
-            return this.IsMatchEggLocation(pk);
-
         var eggLoc = pk.EggLocation;
-        var metState = LocationsHOME.GetRemapState(Context, pk.Context);
-        if (metState == LocationRemapState.Remapped)
-            return pk.EggLocation == 0;
-
         if (!IsEgg)
-            return this.IsMatchEggLocation(pk);
-        return eggLoc == EggLocation || (!pk.IsEgg && eggLoc == Locations.LinkTrade6);
+        {
+            var expect = pk is PB8 ? Locations.Default8bNone : EggLocation;
+            return eggLoc == expect;
+        }
+
+        if (!pk.IsEgg) // hatched
+            return eggLoc == EggLocation || eggLoc == Locations.LinkTrade6;
+
+        // Unhatched:
+        if (eggLoc != EggLocation)
+            return false;
+        if (pk.MetLocation is not (0 or Locations.LinkTrade6))
+            return false;
+        return true;
     }
 
     private bool IsMatchLocation(PKM pk)
@@ -218,12 +223,9 @@ public sealed record EncounterStatic9(GameVersion Version)
 
     private bool IsMatchLocationExact(PKM pk)
     {
-        var met = pk.MetLocation;
-        if (met == Location)
-            return true;
         if (IsEgg)
-            return !pk.IsEgg || met == Locations.LinkTrade6;
-        return false;
+            return true;
+        return pk.MetLocation == Location;
     }
 
     private bool IsMatchLocationRemapped(PKM pk)
