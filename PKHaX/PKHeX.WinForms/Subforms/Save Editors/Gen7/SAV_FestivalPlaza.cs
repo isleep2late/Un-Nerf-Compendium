@@ -39,8 +39,10 @@ public partial class SAV_FestivalPlaza : Form
             TC_Editor.TabPages.Remove(Tab_BattleAgency);
         }
 
-        if (!Main.Unicode)
-            TB_OTName.DisableInGameFont = true;
+        if (Main.Unicode)
+        {
+            TB_OTName.Font = FontUtil.GetPKXFont();
+        }
 
         var cc = SAV.Festa.FestaCoins;
         var cu = SAV.GetRecord(038);

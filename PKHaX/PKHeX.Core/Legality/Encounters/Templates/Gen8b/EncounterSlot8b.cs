@@ -14,7 +14,7 @@ public sealed record EncounterSlot8b(EncounterArea8b Parent, ushort Species, byt
     public bool IsEgg => false;
     public Shiny Shiny => Shiny.Random;
     public bool IsShiny => false;
-    ushort ILocation.EggLocation => 0;
+    public ushort EggLocation => 0;
     public bool IsUnderground => Locations8b.IsUnderground(Parent.Location);
 
     /// <summary>

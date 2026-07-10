@@ -1,5 +1,3 @@
-using PKHeX.Core;
-
 namespace PKHeX.WinForms
 {
     partial class PokeathlonEventTrainer4Editor
@@ -19,7 +17,7 @@ namespace PKHeX.WinForms
         {
             TLP_Main = new System.Windows.Forms.TableLayoutPanel();
             L_OT = new System.Windows.Forms.Label();
-            TB_OT = new PKHeX.WinForms.Controls.RenderedString();
+            TB_OT = new System.Windows.Forms.TextBox();
             L_TID16 = new System.Windows.Forms.Label();
             TB_TID16 = new System.Windows.Forms.TextBox();
             L_SID16 = new System.Windows.Forms.Label();
@@ -69,7 +67,6 @@ namespace PKHeX.WinForms
             // TB_OT
             // 
             TB_OT.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            TB_OT.DisplayContext = EntityContext.Gen4;
             TB_OT.Location = new System.Drawing.Point(71, 0);
             TB_OT.Margin = new System.Windows.Forms.Padding(3, 0, 0, 3);
             TB_OT.Name = "TB_OT";
@@ -152,7 +149,7 @@ namespace PKHeX.WinForms
 
         private System.Windows.Forms.TableLayoutPanel TLP_Main;
         private System.Windows.Forms.Label L_OT;
-        private PKHeX.WinForms.Controls.RenderedString TB_OT;
+        private System.Windows.Forms.TextBox TB_OT;
         private System.Windows.Forms.Label L_TID16;
         private System.Windows.Forms.TextBox TB_TID16;
         private System.Windows.Forms.Label L_SID16;

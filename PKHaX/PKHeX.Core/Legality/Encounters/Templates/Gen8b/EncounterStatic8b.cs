@@ -163,13 +163,11 @@ public sealed record EncounterStatic8b(GameVersion Version)
 
     private bool IsMatchLocationExact(PKM pk)
     {
-        var met = pk.MetLocation;
         if (IsEgg)
-            return !pk.IsEgg || met == Location || met == Locations.LinkTrade6NPC;
-        if (IsRoaming)
-            return IsRoamingLocation(met);
-
-        return met == Location;
+            return !pk.IsEgg || pk.MetLocation == Location || pk.MetLocation == Locations.LinkTrade6NPC;
+        if (!IsRoaming)
+            return pk.MetLocation == Location;
+        return IsRoamingLocation(pk);
     }
 
     private bool IsMatchEggLocationExact(PKM pk)
@@ -216,7 +214,7 @@ public sealed record EncounterStatic8b(GameVersion Version)
         return LocationsHOME.IsLocationSWSHEgg(pk.Version, pk.MetLocation, pk.EggLocation, EggLocation);
     }
 
-    private static bool IsRoamingLocation(ushort loc) => RoamingLocations.Contains(loc);
+    private static bool IsRoamingLocation(PKM pk) => RoamingLocations.Contains(pk.MetLocation);
 
     #endregion
 }

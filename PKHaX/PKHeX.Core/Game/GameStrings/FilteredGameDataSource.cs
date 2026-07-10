@@ -12,10 +12,7 @@ public sealed class FilteredGameDataSource
     public FilteredGameDataSource(SaveFile sav, GameDataSource source, bool HaX = false)
     {
         Source = source;
-        var speciesList = GetFilteredSpecies(sav, source.SpeciesDataSource, HaX);
-        if (sav is SAV5B2W2) // PKHaX Pokestar: expose the 17 BW2 Pokéstar props (652-684) in the dropdown/search
-            speciesList.AddRange(PokestarSpecies.GetComboItems());
-        Species = speciesList;
+        Species = GetFilteredSpecies(sav, source.SpeciesDataSource, HaX);
         Moves = GetFilteredMoves(sav, sav.Context, source, HaX);
         Relearn = sav is SAV7SM sm
             ? GetFilteredMoves(sm.Context, source, HaX, Legal.MaxMoveID_7_USUM) // allow for US/UM relearn move limits on S/M
