@@ -16,7 +16,7 @@ cd "$REPO_ROOT"
 
 CONF_FILE="$REPO_ROOT/.push_pr.conf"
 DEFAULT_REMOTE_URL="https://github.com/isleep2late/Un-Nerf-Compendium.git"  # used automatically if nothing else is set
-COMMIT_MSG="PKHaX: Gen 1/2 level-255 support (UI unlock + ResetPartyStats guard); rebuild exe"
+COMMIT_MSG=""  # resolved at branch time: unpushed local main commit message, else generic
 
 step()  { printf '\n\033[1;36m==>\033[0m \033[1m%s\033[0m\n' "$1"; }
 info()  { printf '    %s\n' "$1"; }
@@ -78,7 +78,12 @@ git rev-parse --verify --quiet origin/main >/dev/null || die "Remote has no 'mai
 ok "Got origin/main"
 
 step "Creating the PR branch"
-TS="$(date +%Y%m%d-%H%M)"; BRANCH="pkhax-level255-gen12-${TS}"
+TS="$(date +%Y%m%d-%H%M)"; BRANCH="compendium-update-${TS}"
+if [[ -z "$COMMIT_MSG" ]] && git rev-parse --verify --quiet main >/dev/null && [[ -n "$(git rev-list origin/main..main 2>/dev/null | head -n1)" ]]; then
+    COMMIT_MSG="$(git log -1 --format=%s main)"
+    info "Using unpushed local main commit message: $COMMIT_MSG"
+fi
+[[ -n "$COMMIT_MSG" ]] || COMMIT_MSG="Compendium update ${TS}"
 git update-ref "refs/heads/${BRANCH}" origin/main
 git symbolic-ref HEAD "refs/heads/${BRANCH}"
 git reset --mixed >/dev/null
@@ -110,12 +115,10 @@ web_url() {
 }
 REPO_WEB="$(web_url "$REMOTE_URL")"
 COMPARE_URL="${REPO_WEB}/compare/main...${BRANCH}?expand=1"
-PR_BODY="Adds Gen 1/2 level-255 support to the PKHaX save editor:
-- PKMEditor.UpdateEXPLevel: in HaX mode on a GB mon, allow level up to 255 and stamp Stat_Level directly (EXP pegged at L100).
-- PKM.ResetPartyStats: preserve an intentionally over-leveled Gen 1/2 stored level instead of clamping back to the EXP-derived level.
+PR_BODY="${COMMIT_MSG}
 
-Gated entirely on GBPKM; no other generation is affected. See PKHaX/LEVEL255_CHANGES.md.
-The rebuilt PKHeX.exe is shipped via Releases (kept out of git)."
+$(git diff --stat origin/main..HEAD | tail -n 1)
+$(git diff --name-only origin/main..HEAD | head -n 20)"
 PR_URL=""
 if [[ "$HAVE_GH" -eq 1 ]] && gh auth status >/dev/null 2>&1; then
     if PR_URL="$(gh pr create --base main --head "$BRANCH" --title "$COMMIT_MSG" --body "$PR_BODY" 2>/dev/null)"; then

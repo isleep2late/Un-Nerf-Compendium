@@ -23,7 +23,7 @@ public partial class MoveChoice : UserControl
 
     private void UpdateTypeSprite(int value)
     {
-        if (value <= 0)
+        if (value <= 0 || value == NoMove1.Sentinel) // PKHaX No Move
         {
             PB_Type.Image = null;
             return;
@@ -57,6 +57,11 @@ public partial class MoveChoice : UserControl
     public void HealPP(PKM pk)
     {
         var move = SelectedMove;
+        if (move == NoMove1.Sentinel) // PKHaX No Move: Yellow's glitch-move PP
+        {
+            PP = NoMove1.DefaultPP;
+            return;
+        }
         var up = PPUps;
         if (move == 0)
             PPUps = up = 0;
