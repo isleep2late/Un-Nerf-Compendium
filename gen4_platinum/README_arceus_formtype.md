@@ -1,5 +1,10 @@
 # Platinum — permanent Arceus form-typing (source patch)
 
+> **Already included in `Platinum_UnNerf_Full.xdelta`.** If you just apply that prebuilt patch you get
+> this behaviour automatically (it also enables the Gen-4-only **???** form = type 9). This doc is for
+> building a *custom* subset from source. (The older `Platinum_unbanned_species_item_clause_formefix.xdelta`
+> did **not** include this fix — that's why a no-plate Arceus reverted to Normal with it.)
+
 `platinum_arceus_formtype.patch` makes a PKHeX'd Arceus keep its form's type, against the pret
 [`pokeplatinum`](https://github.com/pret/pokeplatinum) decomp (US, rev 1).
 
