@@ -1,7 +1,7 @@
 namespace PKHeX.Core;
 
 /// <summary>
-/// PKHaX: Generation 1 glitch move ID 0x00 ("No Move"), distinct from an empty (None) slot.
+/// PKHaX: Generation 1 and 2 glitch move ID 0x00 ("No Move"), distinct from an empty (None) slot.
 /// Stored in the save as move ID 0 with nonzero PP; represented in the editor by a sentinel ID.
 /// </summary>
 public static class NoMove1

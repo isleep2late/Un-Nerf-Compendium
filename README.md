@@ -40,8 +40,9 @@ BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX).
 - **Platinum** adds 6-Pokemon Tower, permanent Giratina-Origin / Sky Shaymin, Arceus typing in
   doubles, and **AbilityLock** (hacked abilities survive forme changes).
 - **PKHaX** now also allows the **Gen-1 RBY sprite/type "desync"** combinations (the mismatched
-  species-sprite/type pairings the stock editor blocks), a **Gen-1/2 level-255 cap** (set any
-  RBY/GSC mon's stored level up to 255; RBY/GSC read the level byte directly and never clamp it to 100),
+  species-sprite/type pairings the stock editor blocks), an **all-games level-255 cap** (set any
+  Pokemon's stored party level up to 255 in every generation Gen 1-9/LGPE/BDSP/LA; the game reads the
+  party level byte directly and never clamps it to 100 on load — party-only and volatile),
   and the **Gen-1 "No Move" glitch move** (move ID `0x00` — Fissure's animation, 102 power, glitch type,
   ~31.6% accuracy on Yellow) as a selectable move distinct from `(None)`, written to the save with real
   PP so it is usable from the FIGHT menu on cartridge. **Slot 1 only:** the Gen 1 menu treats `0x00`
@@ -62,14 +63,15 @@ BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX).
 | Gen | Game(s) | What it removes / restores | Delivered as | Folder |
 |-----|---------|----------------------------|--------------|--------|
 | 1 | Red/Blue/Yellow | RBY sprite/type "desync" combos; **level up to 255**; **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
-| 2 | Gold/Silver/Crystal | **level up to 255** in the save editor | PKHaX | `PKHaX/` |
-| 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
-| 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock | xdelta + source patches | `gen4_platinum/` |
-| 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)** | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
-| 6 | Omega Ruby / Alpha Sapphire | Maison ban list + clauses + team-size + 510 EV cap; forme persistence (full Hoopa); Arceus form-typing | Python (cia/3ds) | `gen6_oras/`, `gen67_arceus_typefix/` |
-| 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally** | Python (cia) | `gen7_usum/`, `gen67_arceus_typefix/` |
-| 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock | LayeredFS pchtxt + Python | `gen8_swsh/` |
-| Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause | exefs ips/pchtxt + Python | `bdsp/` |
+| 2 | Gold/Silver/Crystal | **level up to 255** in the save editor;  **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
+| 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower | **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
+| 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock | **level up to 255** in the save editor | xdelta + source patches | `gen4_platinum/` |
+| 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)** | **level up to 255** in the save editor | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
+| 6 | Omega Ruby / Alpha Sapphire | Maison ban list + clauses + team-size + 510 EV cap; forme persistence (full Hoopa); Arceus form-typing | **level up to 255** in the save editor | Python (cia/3ds) | `gen6_oras/`, `gen67_arceus_typefix/` |
+| 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally** | **level up to 255** in the save editor | Python (cia) | `gen7_usum/`, `gen67_arceus_typefix/` |
+| 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock | **level up to 255** in the save editor | LayeredFS pchtxt + Python | `gen8_swsh/` |
+| Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause | **level up to 255** in the save editor| exefs ips/pchtxt + Python | `bdsp/` |
+| 9 | Scarlet / Violet | **level up to 255** in the save editor |
 
 PKHaX (a patched PKHeX save editor) lives in `PKHaX/`; the built `PKHeX.exe` is included and is what
 you attach as a GitHub Release.
@@ -93,9 +95,9 @@ at the bottom - it lists, per game, exactly which patch / tagged block / byte to
 
 ## PKHaX
 
-A patched PKHeX. On top of stock it adds: Gen-1 RBY sprite/type desync combos; a **Gen-1/2 level-255
-cap** (HaX mode lets you set any RBY/GSC Pokemon's stored level up to 255 and it persists in-game — see
-"Level 255 (Gen 1/2)" below); the **Gen-1 "No Move" glitch move** (a dropdown entry for move `0x00`,
+A patched PKHeX. On top of stock it adds: Gen-1 RBY sprite/type desync combos; an **all-games level-255
+cap** (HaX mode lets you set any Pokemon's stored party level up to 255 in every generation and it
+persists in-game — see "Level 255" below); the **Gen-1 "No Move" glitch move** (a dropdown entry for move `0x00`,
 separate from `(None)`, that keeps its PP and slot so the corrupted move is selectable in battle on
 real hardware); a Gen-3 any-ability dropdown (all 78, written to PK3 0x1E for the patched
 Emerald); Deoxys form box icons; status-condition editing in every generation (a dropdown for Gen 1/2,
@@ -103,9 +105,9 @@ a lower-left clickable icon for Gen 3+ — see "Status condition editing" below)
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
 
-### Level 255 (Gen 1/2)
+### Level 255 (all games)
 
-RBY and GSC store a Pokemon's level as a single byte that the game engine reads directly; neither game
+Every generation stores a party Pokemon's level as a single byte that the game engine reads directly (the box format has no level byte — only EXP). RBY and GSC read this byte, and so does every later game; no game
 clamps a pre-existing level byte back to 100 (the level-up routine only refuses to *raise* a mon past
 100, and Gen 2's `CorrectPartyErrors` clamp is dead/unreferenced code). So a save-edited level-255 mon
 persists. In HaX mode, PKHaX lets you type a level up to 255 for any Gen-1 (PK1) or Gen-2 (PK2) mon; it

@@ -106,7 +106,7 @@ public partial class PKMEditor
 
     private void LoadMoves(PKM pk)
     {
-        bool gb1 = pk is PK1; // PKHaX No Move: raw 0x00 with PP is the Gen 1 glitch move
+        bool gb1 = pk is GBPKM; // PKHaX No Move: raw 0x00 with PP is the Gen 1/2 glitch move
         MC_Move1.SelectedMove = gb1 && NoMove1.IsNoMoveSlot(pk.Move1, pk.Move1_PP) ? NoMove1.Sentinel : pk.Move1;
         MC_Move2.SelectedMove = gb1 && NoMove1.IsNoMoveSlot(pk.Move2, pk.Move2_PP) ? NoMove1.Sentinel : pk.Move2;
         MC_Move3.SelectedMove = gb1 && NoMove1.IsNoMoveSlot(pk.Move3, pk.Move3_PP) ? NoMove1.Sentinel : pk.Move3;
