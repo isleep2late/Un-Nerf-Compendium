@@ -1006,9 +1006,9 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
         {
             // Change the XP
             var input = Util.ToInt32(TB_Level.Text);
-            // PKHaX: Gen 1/2 store level as a raw byte the game reads directly (RBY/GSC never clamp to 100).
-            // In HaX mode on a GB mon, allow up to 255 and stamp the stored level byte (Stat_Level) directly.
-            var maxLvl = (HaX && Entity is GBPKM) ? byte.MaxValue : Experience.MaxLevel;
+            // PKHaX: every generation stores level as a party byte the game reads directly and never
+            // recomputes from EXP on load. In HaX mode allow up to 255 and stamp Stat_Level directly.
+            var maxLvl = HaX ? byte.MaxValue : Experience.MaxLevel;
             var level = (byte)Math.Clamp(input, Experience.MinLevel, maxLvl);
             if (input != level && !string.IsNullOrWhiteSpace(TB_Level.Text))
                 TB_Level.Text = level.ToString();

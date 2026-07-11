@@ -7,9 +7,10 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
 - **Gen 3 (RSE/FRLG):** **any ability on any Pokémon** (pairs with the Emerald un-nerf ROM patch).
 - **Gen 3 Deoxys forms:** select any of the four forms (Normal/Attack/Defense/Speed) with the
   correct per-form base stats and sprite (stored in PK3 `0x1F`; pairs with the Emerald engine patch).
-- **Gen 1 "No Move":** the glitch move ID `0x00` (Fissure's animation, 102 power, glitch type,
-  81/256 accuracy on Yellow) as a selectable entry in the move dropdowns for Gen 1 saves —
-  distinct from `(None)`. It writes the raw `0x00` move byte with your chosen PP kept intact
+- **Gen 1/2 "No Move":** the glitch move ID `0x00` as a selectable entry in the move dropdowns
+  for Gen 1 and Gen 2 saves — distinct from `(None)`. In Gen 1 it is Fissure's animation, 102
+  power, glitch type, 81/256 accuracy (Yellow); in Gen 2 it is a Rapid Spin animation, glitch
+  type, ~20% accuracy Toxic-effect move (power 5 in Gold/Silver, 9 in Crystal). It writes the raw `0x00` move byte with your chosen PP kept intact
   (slots holding it are not compacted away like empty slots), so the save loads on real hardware
   with the corrupted move selectable from the FIGHT menu.
   **It must be in move slot 1 to be usable in-game:** the Gen 1 FIGHT menu treats a `0x00` move
