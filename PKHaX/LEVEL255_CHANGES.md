@@ -1,9 +1,12 @@
-# PKHaX change: Gen 1/2 level up to 255
+# PKHaX change: level up to 255 in every game
 
-Lets HaX mode set any Gen-1 (PK1) or Gen-2 (PK2) Pokemon's stored level to 255. RBY/GSC read the level
-byte directly and never clamp a pre-existing value to 100, so it persists in-game. Three changes, all
-gated on `GBPKM` (base of PK1/PK2) so no other generation is affected. `Stat_Level` (PK1 Data[0x21] +
-mirror Data[0x03]; PK2 Data[0x1F]) already accepts a full byte — only the clamps below were lifted.
+Lets HaX mode set any Pokemon's stored level up to 255, for every generation PKHeX supports (Gen 1-9,
+LGPE, BDSP, LA). Every game stores the level as a raw byte in the party-format stat block that the game
+reads directly and never recomputes from EXP on load, so an over-100 level on a party Pokemon persists
+and battles at that level. It is party-only and volatile: box withdrawal, level-up, evolution, rare
+candy, or EV items re-derive the level from EXP and clamp back to 100 (box storage has no level byte).
+Stats are still computed at level 100 (computing them at 255 would overflow the 16-bit stat fields).
+Two changes below; the load/save path already reads and writes `Stat_Level` directly for all formats.
 
 ## 1. UI unlock + stamp the stored byte
 `PKHeX.WinForms/Controls/PKM Editor/PKMEditor.cs` — `UpdateEXPLevel`, the `else` ("Change the XP") branch.
@@ -45,8 +48,9 @@ AFTER:
         }
 ```
 
-## 2. Stop the party-stat refresh from resetting the level
-`PKHeX.Core/PKM/PKM.cs` — `ResetPartyStats`.
+## 2. Stop the party-stat refresh from resetting the level (all games)
+`PKHeX.Core/PKM/PKM.cs` — `ResetPartyStats`. Guard broadened from `GBPKM` to any entity whose
+`Stat_Level > CurrentLevel`.
 
 BEFORE:
 ```csharp

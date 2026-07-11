@@ -298,4 +298,18 @@ public abstract class GBPKM : PKM
 
         static ushort Square(int ev) => (ushort)(Math.Min(EffortValues.Max12, ev * ev));
     }
+
+    public override void FixMoves()
+    {
+        Span<(ushort Move, int PP, int Ups)> slots = stackalloc (ushort, int, int)[4];
+        int ctr = 0;
+        if (Move1 != 0 || Move1_PP > 0) slots[ctr++] = (Move1, Move1_PP, Move1_PPUps);
+        if (Move2 != 0 || Move2_PP > 0) slots[ctr++] = (Move2, Move2_PP, Move2_PPUps);
+        if (Move3 != 0 || Move3_PP > 0) slots[ctr++] = (Move3, Move3_PP, Move3_PPUps);
+        if (Move4 != 0 || Move4_PP > 0) slots[ctr++] = (Move4, Move4_PP, Move4_PPUps);
+        (Move1, Move1_PP, Move1_PPUps) = slots[0];
+        (Move2, Move2_PP, Move2_PPUps) = slots[1];
+        (Move3, Move3_PP, Move3_PPUps) = slots[2];
+        (Move4, Move4_PP, Move4_PPUps) = slots[3];
+    }
 }

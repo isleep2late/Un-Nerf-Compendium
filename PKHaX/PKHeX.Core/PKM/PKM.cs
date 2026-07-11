@@ -804,9 +804,9 @@ public abstract class PKM : ISpeciesForm, ITrainerID32, IGeneration, IShiny, ILa
         Span<ushort> stats = stackalloc ushort[6];
         LoadStats(PersonalInfo, stats);
         SetStats(stats);
-        // PKHaX: preserve an intentionally over-leveled Gen 1/2 stored level (RBY/GSC read this byte
-        // directly and never clamp it to 100). Normal mons still get the EXP-derived level.
-        if (this is not GBPKM gb || gb.Stat_Level <= CurrentLevel)
+        // PKHaX: preserve an intentionally over-leveled stored level in any game (the party level byte
+        // is read directly and never clamped to 100). Normal mons still get the EXP-derived level.
+        if (Stat_Level <= CurrentLevel)
             Stat_Level = CurrentLevel;
         Status_Condition = 0;
     }
