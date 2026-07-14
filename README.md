@@ -8,6 +8,8 @@ BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX).
 > You supply your own **legally-dumped** games. **Nothing copyrighted is distributed here, so do NOT
 > ask for ROMs, CIAs, or saves** - only small patch tools and patch files.
 
+Join our Discord: https://discord.gg/hackmons
+
 ---
 
 ## July 2026 update (v5)
@@ -71,7 +73,7 @@ BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX).
 | 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally** | **level up to 255** in the save editor | Python (cia) | `gen7_usum/`, `gen67_arceus_typefix/` |
 | 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock | **level up to 255** in the save editor | LayeredFS pchtxt + Python | `gen8_swsh/` |
 | Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause | **level up to 255** in the save editor| exefs ips/pchtxt + Python | `bdsp/` |
-| 9 | Scarlet / Violet | **level up to 255** in the save editor |
+| 9 | Scarlet / Violet | **level up to 255** in the save editor | *Please note that lvl 255 is an experimental feature across all games. YMMV.* |
 
 PKHaX (a patched PKHeX save editor) lives in `PKHaX/`; the built `PKHeX.exe` is included and is what
 you attach as a GitHub Release.
