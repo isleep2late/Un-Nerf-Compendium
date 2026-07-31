@@ -65,6 +65,7 @@ public sealed class SummaryPreviewer
         Previewer.Populate(pk, settings, ctx);
 
         SetWindowState(Previewer, true);
+        Previewer.EnsureTopMost(); // PKHaX: keep the hover preview above the main window
         bool showFirst = !_isFirstShown;
         if (showFirst)
             _isFirstShown = true;

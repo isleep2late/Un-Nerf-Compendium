@@ -1,0 +1,32 @@
+name: Update PKHaX release
+
+# The "PKHaX" release is a rolling release: GitHub generates its "Source code (zip)"
+# from wherever the PKHaX *tag* points, not from the current main branch. This
+# workflow moves the tag to the latest main commit on every push, so the source
+# zip attached to the release always matches the repository's current state, and
+# refreshes the PKHaX.exe / zip assets from the build committed in PKHaX/.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Move PKHaX tag to latest main
+        run: |
+          git tag -f PKHaX
+          git push -f origin PKHaX
+
+      - name: Refresh release assets from committed build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          unzip -o PKHaX/PKHaX_win-x64_net10.zip PKHaX.exe -d "$RUNNER_TEMP/pkhax"
+          gh release upload PKHaX "$RUNNER_TEMP/pkhax/PKHaX.exe" PKHaX/PKHaX_win-x64_net10.zip --clobber
