@@ -482,17 +482,35 @@ public sealed partial class PokePreview : Form
     public void MoveForm(int x, int y)
     {
         const uint SWP_NOSIZE = 0x0001;
-        const uint SWP_NOZORDER = 0x0004;
         const uint SWP_NOREDRAW = 0x0008;
         const uint SWP_NOACTIVATE = 0x0010;
         const uint SWP_NOSENDCHANGING = 0x0400;
         const uint SWP_ASYNCWINDOWPOS = 0x4000;
-        const uint flags = SWP_NOZORDER | SWP_NOSIZE | SWP_NOREDRAW | SWP_NOACTIVATE | SWP_NOSENDCHANGING | SWP_ASYNCWINDOWPOS;
-
+        // PKHaX: SWP_NOZORDER removed -- it made Windows ignore the HWND_TOPMOST argument, so the
+        // preview could stay stacked behind the main window (the WS_EX_TOPMOST create-style alone
+        // is not reliably honored for a never-activated tool window). Re-asserting top-most on
+        // every reposition keeps the preview in front without activating it.
+        const uint flags = SWP_NOSIZE | SWP_NOREDRAW | SWP_NOACTIVATE | SWP_NOSENDCHANGING | SWP_ASYNCWINDOWPOS;
 
         const int HWND_TOPMOST = -1;
         SetWindowPos(Handle, HWND_TOPMOST, x, y, 0, 0, flags);
         return;
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+    }
+
+    /// <summary>
+    /// Re-asserts the preview window as top-most (without activating it) so it is never
+    /// rendered behind the window that spawned it.
+    /// </summary>
+    public void EnsureTopMost() // PKHaX: fix hover preview rendering behind the main window
+    {
+        const uint SWP_NOSIZE = 0x0001;
+        const uint SWP_NOMOVE = 0x0002;
+        const uint SWP_NOACTIVATE = 0x0010;
+        const int HWND_TOPMOST = -1;
+        SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
