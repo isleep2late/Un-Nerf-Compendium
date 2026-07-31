@@ -8,6 +8,9 @@ namespace PKHeX.Core;
 /// </summary>
 /// <remarks>Frame advancement for forward and reverse.
 /// <br>
+/// Standard MSVC (Microsoft Visual C/C++) runtime library implementation.
+/// </br>
+/// <br>
 /// https://en.wikipedia.org/wiki/Linear_congruential_generator
 /// </br>
 /// <br>
@@ -17,8 +20,8 @@ namespace PKHeX.Core;
 public static class XDRNG
 {
     // Forward and reverse constants
-    public const uint Mult  = 0x000343FD;
-    public const uint Add   = 0x00269EC3;
+    public const uint Mult  = 0x000343FD; // 214013
+    public const uint Add   = 0x00269EC3; // 2531011
     public const uint rMult = 0xB9B33155;
     public const uint rAdd  = 0xA170F641;
 
@@ -240,6 +243,18 @@ public static class XDRNG
         return GetSeedsIVs(result, first, second);
     }
 
+    // RNG IVs Constants (bounding the second variable)
+    // https://github.com/StarfBerry/PokeRNG/blob/1e9b9ddf2494837c7d6704c7b8a3831f644bdea9/Recovery/LCG_Recovery.py#L229
+    private const uint Lag0 = 0xE8D1; // 59601
+    private const uint Lag1 = 0x5F47; // -35210 mod 59601
+    private const uint RLower = 0x55FF8537; // ((-0x92D27AC8F311 + 0xffff_ffff) >> 16) + (59601 << 16)
+    private const uint RUpper = 0x55FFBC6D; // (-0x92D14392F311 >> 16) + (59601 << 16)
+
+    private const uint Lag0IVs = 0x44C5; // 17605
+    private const uint Lag1IVs = 0xE8D1; // 59601
+    private const uint RLowerIVs = 0x1E694392; // (0x1E68C392F311 + 0x7fff_ffff) >> 16
+    private const uint RUpperIVs = 0x1E69FAC8; // (0x1E69FAC8F311 >> 16)
+
     /// <summary>
     /// Finds all the origin seeds for two 16 bit rand() calls
     /// </summary>
@@ -249,15 +264,33 @@ public static class XDRNG
     /// <returns>Count of results added to <see cref="result"/></returns>
     public static int GetSeeds(Span<uint> result, uint first, uint second)
     {
-        ulong t = second - (first * Mult) - Sub;
-        ulong kmax = (Base - t) >> 32;
+        // `tmp` must be 64bit to avoid overflow via addition with the LOWER and UPPER constants
+        ulong tmp = ((first - (second * rMult)) >> 16) * Lag0;
+        uint lo = (uint)((tmp + RLower) >> 16);
+        uint up = (uint)((tmp + RUpper) >> 16);
 
         int ctr = 0;
-        for (ulong k = 0; k <= kmax; k++, t += 0x1_0000_0000) // at most 4 iterations
+
+        // each loop performs at most 2 iterations
+        uint low = (lo * Lag1) % Lag0;
+        do
         {
-            if (t % Mult < 0x1_0000)
-                result[ctr++] = Prev(first | (ushort)(t / Mult));
-        }
+            uint seed = Prev(second | low);
+            if ((seed & 0xffff0000) == first)
+                result[ctr++] = Prev(seed);
+        } while ((low += Lag0) < 0x1_0000);
+
+        if (lo == up)
+            return ctr;
+
+        // true in around 22% of cases
+        low = (up * Lag1) % Lag0;
+        do
+        {
+            uint seed = Prev(second | low);
+            if ((seed & 0xffff0000) == first)
+                result[ctr++] = Prev(seed);
+        } while ((low += Lag0) < 0x1_0000);
         return ctr;
     }
 
@@ -270,19 +303,50 @@ public static class XDRNG
     /// <returns>Count of results added to <see cref="result"/></returns>
     public static int GetSeedsIVs(Span<uint> result, uint first, uint second)
     {
-        ulong t = (second - (first * Mult) - Sub) & 0x7FFF_FFFF;
-        ulong kmax = (Base - t) >> 31;
+        ulong tmp = ((((rMult * second) - first) >> 16) & 0xFFFF) * Lag1IVs;
+
+        var lo = (uint)((tmp + RLowerIVs) >> 15) * Lag0IVs;
+        var mi = lo + Lag0IVs;
+        var up = (uint)((tmp + RUpperIVs) >> 15) * Lag0IVs;
 
         int ctr = 0;
-        for (ulong k = 0; k <= kmax; k++, t += 0x8000_0000) // at most 7 iterations
+        // each loop performs at most 2 iterations
+        uint low = lo % Lag1IVs;
+        do
         {
-            if (t % Mult < 0x1_0000)
-            {
-                var s = Prev(first | (ushort)(t / Mult));
-                result[ctr++] = s;
-                result[ctr++] = s ^ 0x8000_0000; // top bit flip
-            }
-        }
+            uint seed = Prev(second | low);
+            if ((seed & 0x7fff0000) != first)
+                continue;
+            seed = Prev(seed);
+            result[ctr++] = seed;
+            result[ctr++] = seed ^ 0x80000000;
+        } while ((low += Lag1IVs) < 0x1_0000);
+
+        low = mi % Lag1IVs;
+        do
+        {
+            uint seed = Prev(second | low);
+            if ((seed & 0x7fff0000) != first)
+                continue;
+            seed = Prev(seed);
+            result[ctr++] = seed;
+            result[ctr++] = seed ^ 0x80000000;
+        } while ((low += Lag1IVs) < 0x1_0000);
+
+        if (mi == up)
+            return ctr;
+
+        // true in around 43% of cases
+        low = up % Lag1IVs;
+        do
+        {
+            uint seed = Prev(second | low);
+            if ((seed & 0x7fff0000) != first)
+                continue;
+            seed = Prev(seed);
+            result[ctr++] = seed;
+            result[ctr++] = seed ^ 0x80000000;
+        } while ((low += Lag1IVs) < 0x1_0000);
         return ctr;
     }
 
@@ -292,59 +356,85 @@ public static class XDRNG
     /// <inheritdoc cref="GetSeeds(Span{uint}, uint, uint, uint, uint, uint, uint)"/>
     public static int GetSeedsChannel(Span<uint> result, uint hp, uint atk, uint def, uint spa, uint spd, uint spe)
     {
-        // Mult(j) = Mult^j
-        // Add(j) = Add * (Mult^0 + Mult^1 + ... + Mult^(j-1))
-        // Using j = 3 and XDRNG gives Mult = 0x45c82be5 and Add = 0xd2f65b55
-        const uint mult = Mult3; // Modified mult (3 advances)
-        const uint sub = 0xcaf65b56; // Modified add - 0x7ffffff
-        const ulong b = 0x22e415e_ea37d41a; // (Modified mult + 1) * 0x7ffffff
+        // https://github.com/StarfBerry/PokeRNG/blob/main/Recovery/LCG_Recovery.py
+        // First row of the BKZ-reduced matrix
+        const uint r0 = 0xFFD96A7C; // -2528644
+        const uint r1 = 0xFE8F9BCA; // -24142902
+        const uint r2 = 0x3282056;  // 52961366
+        const uint r3 = 0x737133;   // 7565619
+        const uint r4 = 0x17CA524;  // 24945956
+        const uint r5 = 0xFA0B0157; // -99942057
 
-        const ulong prime = 3;
-        const ulong add = 0x3_0000_0000; // prime * 0x1_0000_0000
-        const uint rmax = 0x__1800_0000; // prime * 0x__0800_0000
-        const ulong skip = 0x661D29; // prime * 2^32 % mult
+        // Constants to bound the variables in the linear combinations for calculating potential solutions
+        const long lower0 =  0x2A_B966_D1C2;
+        const long lower1 =  0x21_69A3_AA47;
+        const long lower2 = -0x05_049D_5FDC;
+        const long lower3 = -0x02_AACD_A387;
+        const long lower4 =  0x0F_E7FF_FFFF;
+        const long lower5 = -0x08_9800_0001;
+        const long upper0 =  0x2E_8966_D1C3;
+        const long upper1 =  0x23_D9A3_AA48;
+        const long upper2 = -0x03_549D_5FDB;
+        const long upper3 = -0x00_DACD_A386;
+        const long upper4 =  0x10_9800_0000;
+        const long upper5 = -0x07_E800_0000;
 
-        uint first = hp << 27;
-        uint t = (spe << 27) - (mult * first) - sub;
-        uint kmax = (uint)((b - t) >> 32);
-        ulong x = (t * prime) % mult;
+        long f0 = ((-10L * hp) + (23L * atk) - def - (15L * spe) + (52L * spa) - (53L * spd)) << 27;
+        uint x0Min = (uint)((f0 + upper0) >> 32) * r0; // LOWER and UPPER are inverted relative to xmin and xmax because r0 is negative (same with r1 and r5)
+        uint x0Max = (uint)((f0 + lower0) >> 32) * r0 - r0;
+        long f1 = ((-14L * hp) + (7L * atk) - (18L * def) - (21L * spe) - (26L * spa) - (24L * spd)) << 27;
+        uint x1Min = (uint)((f1 + upper1) >> 32) * r1;
+        uint x1Max = (uint)((f1 + lower1) >> 32) * r1 - r1;
+        long f2 = ((24L * hp) - (5L * atk) + (22L * def) + (15L * spe) - (5L * spa) - (15L * spd)) << 27;
+        uint x2Min = (uint)((f2 + lower2) >> 32) * r2;
+        uint x2Max = (uint)((f2 + upper2) >> 32) * r2 + r2;
+        long f3 = ((-5L * hp) - (24L * atk) + (26L * def) - (12L * spe) + (9L * spa) + (14L * spd)) << 27;
+        uint x3Min = (uint)((f3 + lower3) >> 32) * r3;
+        uint x3Max = (uint)((f3 + upper3) >> 32) * r3 + r3;
+        long f4 = ((27L * atk) - (18L * spe) - (8L * spa) - spd) << 27;
+        uint x4Min = (uint)((f4 + lower4) >> 32) * r4;
+        uint x4Max = (uint)((f4 + upper4) >> 32) * r4 + r4;
+        long f5 = ((-27L * hp) + (18L * def) + (8L * spe) + spa) << 27;
+        uint x5Min = (uint)((f5 + upper5) >> 32) * r5;
+        uint x5Max = (uint)((f5 + lower5) >> 32) * r5 - r5;
 
+        // at most 720 iterations in total (around 369 in average, 48 in the best case)
         int ctr = 0;
-        for (ulong k = 0; k <= kmax;)
+        for (uint x5 = x5Min; x5 != x5Max; x5 -= r5)
         {
-            var r = (x + (skip * k)) % mult;
-            var m = r % prime;
-            if (m != 0)
+            for (uint x4 = x4Min; x4 != x4Max; x4 += r4)
             {
-                m = m == 1 ? 2u : 1u;
-                r += m * skip;
-                k += (byte)m;
-            }
-
-            var tmp = k << 32 | t;
-            while (r < rmax && k <= kmax)
-            {
-                uint seed = first | (uint)(tmp / mult); // hp
-                if (Next5(ref seed) == atk)
+                uint l4 = x5 + x4;
+                for (uint x2 = x2Min; x2 != x2Max; x2 += r2)
                 {
-                    if (Next5(ref seed) == def)
+                    uint l2 = l4 + x2;
+                    for (uint x3 = x3Min; x3 != x3Max; x3 += r3)
                     {
-                        _ = Next5(ref seed); // spe
-                        if (Next5(ref seed) == spa)
+                        uint l3 = l2 + x3;
+                        for (uint x1 = x1Min; x1 != x1Max; x1 -= r1)
                         {
-                            if (Next5(ref seed) == spd)
-                                result[ctr++] = Prev12(seed); // unroll to origin
+                            uint l1 = l3 + x1;
+                            for (uint x0 = x0Min; x0 != x0Max; x0 -= r0)
+                            {
+                                uint seed = l1 + x0;
+                                if ((seed >> 27) != hp)
+                                    continue;
+                                if (Next5(ref seed) != atk)
+                                    continue;
+                                if (Next5(ref seed) != def)
+                                    continue;
+                                if (Next5(ref seed) != spe)
+                                    continue;
+                                if (Next5(ref seed) != spa)
+                                    continue;
+                                if (Next5(ref seed) != spd)
+                                    continue;
+                                result[ctr++] = ChannelJirachi.PrevToOrigin(seed);
+                            }
                         }
                     }
                 }
-
-                r += prime * skip;
-                k += prime;
-                tmp += add;
             }
-
-            // Rounding up without using floats
-            k += ((mult - r) + skip - 1) / skip;
         }
 
         return ctr;
