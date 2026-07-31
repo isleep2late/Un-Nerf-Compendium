@@ -258,5 +258,7 @@ feature; omit it to keep stock.
 ## Credits
 
 Builds on community findings, including SmolJoltik and ABZB (Platinum Frontier forme/banlist),
-MeroMero (gen-5 Subway/PWT regulation offsets), theSLAYER’s prior work on Gen 5 Pokestar editing, and the broader projectpokemon.org and hackmons.com
+MeroMero (gen-5 Subway/PWT regulation offsets), theSLAYER’s prior work on Gen 5 Pokestar editing,
+Kurt (kwsch) for creating and maintaining [PKHeX](https://github.com/kwsch/PKHeX) — the save editor
+our PKHaX build is based on — and the broader projectpokemon.org and hackmons.com
 research threads.
