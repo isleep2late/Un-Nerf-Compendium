@@ -22,7 +22,12 @@ public sealed record SlotInfoBox : ISlotInfo
 
     public StorageSlotType Type { get; private set; } = StorageSlotType.Box;
 
-    public bool CanWriteTo(SaveFile sav) => sav.HasBox && !sav.IsBoxSlotLocked(Box, Slot);
+    // PKHaX: allow writing to Battle Team slots even when the team is locked; other lock types stay protected.
+    public static bool AllowBattleTeamWrites { get; set; } = true;
+
+    public bool CanWriteTo(SaveFile sav) => sav.HasBox && (!sav.IsBoxSlotLocked(Box, Slot) || IsBattleTeamOverride(sav)); // PKHaX
+
+    private bool IsBattleTeamOverride(SaveFile sav) => AllowBattleTeamWrites && sav.GetBoxSlotFlags(Box, Slot).IsBattleTeam() >= 0; // PKHaX
     public WriteBlockedMessage CanWriteTo(SaveFile sav, PKM pk) => WriteBlockedMessage.None;
 
     public bool WriteTo(SaveFile sav, PKM pk, EntityImportSettings settings = default)

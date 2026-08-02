@@ -2,7 +2,7 @@
 
 A one-stop collection of patches that restore Pokemon games to how a lot of us wish they still played:
 un-nerfed abilities and items, lifted Battle Frontier / Subway / Maison / Tree / Tower ban lists and
-clauses, form-driven typing, and permanent alternate formes, across **Generations 3 through 8 plus
+clauses, form-driven typing, and permanent alternate formes, across **Generations 3 through 9 plus
 BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX).
 
 > You supply your own **legally-dumped** games. **Nothing copyrighted is distributed here, so do NOT
@@ -11,6 +11,21 @@ BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX).
 Join our Discord: https://discord.gg/hackmons
 
 ---
+
+## August 2026 update (v6)
+
+- **Gen 8/9 has been "de-nerfed" with all the pre-update goodies.** New `gen9_sv/` folder: a
+  self-validating patcher restores the **version 1.0.0 Treasures of Ruin stats** that the
+  Scarlet/Violet day-one update nerfed (Wo-Chien 90 Atk/100 SpA, Chien-Pao 130 Atk, Ting-Lu
+  165 HP/130 Def, Chi-Yu 145 SpA — the only base-stat patch nerfs in series history), with an
+  optional `--gen8-legends` restore of the Gen 8 Zacian / Zamazenta / Cresselia stats that the
+  Gen 9 transition lowered. Fact check inside: no Sword/Shield update ever changed a base stat —
+  these all live in SV — and the Neutralizing Gas behavior change (SV 3.0.0) is code-side, so the
+  folder documents your real options instead of pretending to patch it.
+- **PKHaX user interface updated/enhanced** — see the PKHaX section: Gen 6/7 **battle team
+  editing** (team-locked slots are now editable, plus a battle-team manager), and a new
+  **pop-out Team + PC window** for every generation that shows your party, battle teams (where
+  the save has them), and PC boxes side by side with free click-and-drag between all of them.
 
 ## July 2026 update (v5)
 
@@ -73,7 +88,9 @@ Join our Discord: https://discord.gg/hackmons
 | 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally** | **level up to 255** in the save editor | Python (cia) | `gen7_usum/`, `gen67_arceus_typefix/` |
 | 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock | **level up to 255** in the save editor | LayeredFS pchtxt + Python | `gen8_swsh/` |
 | Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause | **level up to 255** in the save editor| exefs ips/pchtxt + Python | `bdsp/` |
-| 9 | Scarlet / Violet | **level up to 255** in the save editor | *Please note that lvl 255 is an experimental feature across all games. YMMV.* |
+| 9 | Scarlet / Violet | **v1.0.0 Treasures of Ruin stats restored** (the day-one 1.0.1 nerf undone), optional Gen 8 Zacian/Zamazenta/Cresselia stats; **level up to 255** in the save editor | Python (extracted romfs personal data) + PKHaX | `gen9_sv/` |
+
+*Please note that lvl 255 is an experimental feature across all games. YMMV.*
 
 PKHaX (a patched PKHeX save editor) lives in `PKHaX/`; the built `PKHeX.exe` is included and is what
 you attach as a GitHub Release.
@@ -106,6 +123,26 @@ Emerald); Deoxys form box icons; status-condition editing in every generation (a
 a lower-left clickable icon for Gen 3+ — see "Status condition editing" below); and loosened legality
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
+
+### Team + PC pop-out, and battle team editing (new in v6)
+
+Two long-standing PKHeX limitations are gone.
+
+**Battle teams are editable.** Stock PKHeX padlocks the box slots your registered battle teams point
+at and refuses to write them, so the Pokemon on a battle team could not be edited at all. PKHaX now
+allows writes to *battle-team* locks specifically (other lock types, e.g. starters, stay protected),
+toggleable in Settings → SlotWrite → `AllowBattleTeamEdits`. A new **Battle Team Manager** lists every
+team with its six slots (sprite plus the box/slot it points at), and lets you assign a slot, clear a
+slot, clear a whole team, and flip each team's Locked flag. Generation 7 teams are index lists into
+your boxes (editing a slot edits the box Pokemon it references); Generation 6's Battle Box is separate
+storage and is handled as such.
+
+**Pop-out "Team + PC" window (all generations).** Opens with **Ctrl+T**, or from the box pop-out menu
+next to "Single Box" / "All Boxes". It shows your **party**, your **battle teams** (only for saves that
+have them), and a full **PC box** with its box switcher side by side, and you can **click and drag
+Pokemon freely between all three** — party to box, box to team, team to party, and across to the main
+window's box view, exactly like PKHeX's normal drag-and-drop. Dropping onto a Generation 7 team slot
+writes the box slot that team slot references; the panels refresh live.
 
 ### Level 255 (all games)
 

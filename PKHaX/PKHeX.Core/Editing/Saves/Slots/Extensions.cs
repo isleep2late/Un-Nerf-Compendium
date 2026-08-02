@@ -108,12 +108,13 @@ public static partial class Extensions
             new(sav.Fused[0], 0) {Type = StorageSlotType.FusedKyurem},
             new(sav.SUBE.GiveSlot, 0, Mutable: true) {Type = StorageSlotType.Scripted}, // Old Man
 
-            new(sav.BattleBox[0], 0) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[1], 1) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[2], 2) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[3], 3) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[4], 4) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[5], 5) {Type = StorageSlotType.BattleBox},
+            // PKHaX: Battle Box slots are writable when battle team editing is enabled.
+            new(sav.BattleBox[0], 0, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[1], 1, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[2], 2, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[3], 3, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[4], 4, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[5], 5, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
         ];
     }
 
@@ -125,12 +126,13 @@ public static partial class Extensions
             new(sav.Fused[0], 0) { Type = StorageSlotType.FusedKyurem },
             new(sav.SUBE.GiveSlot, 0) {Type = StorageSlotType.Scripted},
 
-            new(sav.BattleBox[0], 0) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[1], 1) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[2], 2) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[3], 3) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[4], 4) {Type = StorageSlotType.BattleBox},
-            new(sav.BattleBox[5], 5) {Type = StorageSlotType.BattleBox},
+            // PKHaX: Battle Box slots are writable when battle team editing is enabled.
+            new(sav.BattleBox[0], 0, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[1], 1, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[2], 2, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[3], 3, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[4], 4, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
+            new(sav.BattleBox[5], 5, Mutable: SlotInfoBox.AllowBattleTeamWrites) {Type = StorageSlotType.BattleBox},
         ];
     }
 

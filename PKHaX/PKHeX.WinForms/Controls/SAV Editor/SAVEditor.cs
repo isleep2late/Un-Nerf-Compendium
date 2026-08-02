@@ -498,9 +498,10 @@ public partial class SAVEditor : UserControl, ISlotViewer<PictureBox>, ISaveFile
 
     private void OpenBoxViewer()
     {
-        if (M.Boxes.Count > 1) // subview open
+        var existing = M.Boxes.Find(static b => b.FindForm() is SAV_BoxViewer); // PKHaX: ignore other subview types (Team + PC viewer)
+        if (existing is not null) // subview open
         {
-            var z = M.Boxes[1].ParentForm;
+            var z = existing.FindForm();
             if (z is null)
                 return;
             z.CenterToForm(ParentForm);
@@ -517,10 +518,27 @@ public partial class SAVEditor : UserControl, ISlotViewer<PictureBox>, ISaveFile
         {
             // close all subviews
             for (int i = M.Boxes.Count - 1; i >= 1; i--)
-                M.Boxes[i].ParentForm?.Close();
+            {
+                var z = M.Boxes[i].FindForm();
+                if (z is SAV_BoxViewer or SAV_BoxList) // PKHaX: leave the Team + PC viewer open
+                    z.Close();
+            }
         }
 
         var form = new SAV_BoxList(this, M);
+        form.Show();
+    }
+
+    // PKHaX: pop-out viewer showing Party + Battle Teams + PC side by side.
+    private void OpenTeamPCViewer()
+    {
+        if (WinFormsUtil.FirstFormOfType<SAV_TeamPCViewer>() is { } existing)
+        {
+            existing.CenterToForm(ParentForm);
+            existing.BringToFront();
+            return;
+        }
+        var form = new SAV_TeamPCViewer(this, M) { Owner = FindForm() };
         form.Show();
     }
 
@@ -1561,6 +1579,8 @@ public partial class SAVEditor : UserControl, ISlotViewer<PictureBox>, ISaveFile
     private void Menu_PopoutBoxSingle_Click(object? sender, EventArgs e) => OpenBoxViewer();
 
     private void Menu_PopoutBoxAll_Click(object? sender, EventArgs e) => OpenBoxList();
+
+    private void Menu_PopoutTeamPC_Click(object? sender, EventArgs e) => OpenTeamPCViewer(); // PKHaX
 
     private static void ShowContextMenuBelow(ToolStripDropDown menu, Control control) =>
         menu.Show(control.PointToScreen(new Point(0, control.Height)));

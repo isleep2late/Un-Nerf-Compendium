@@ -39,6 +39,7 @@ namespace PKHeX.WinForms.Controls
             PopoutMenu = new System.Windows.Forms.ContextMenuStrip(components);
             Menu_PopoutBoxSingle = new System.Windows.Forms.ToolStripMenuItem();
             Menu_PopoutBoxAll = new System.Windows.Forms.ToolStripMenuItem();
+            Menu_PopoutTeamPC = new System.Windows.Forms.ToolStripMenuItem(); // PKHaX
             B_SearchBox = new System.Windows.Forms.Button();
             Box = new BoxEditor();
             Tab_PartyBattle = new System.Windows.Forms.TabPage();
@@ -178,7 +179,7 @@ namespace PKHeX.WinForms.Controls
             // 
             // PopoutMenu
             // 
-            PopoutMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { Menu_PopoutBoxSingle, Menu_PopoutBoxAll });
+            PopoutMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { Menu_PopoutBoxSingle, Menu_PopoutBoxAll, Menu_PopoutTeamPC }); // PKHaX: Team + PC viewer entry
             PopoutMenu.Name = "PopoutMenu";
             PopoutMenu.Size = new System.Drawing.Size(137, 48);
             // 
@@ -197,6 +198,15 @@ namespace PKHeX.WinForms.Controls
             Menu_PopoutBoxAll.Size = new System.Drawing.Size(136, 22);
             Menu_PopoutBoxAll.Text = "All Boxes";
             Menu_PopoutBoxAll.Click += Menu_PopoutBoxAll_Click;
+            //
+            // Menu_PopoutTeamPC
+            //
+            // PKHaX: pop-out viewer for Party + Battle Teams + PC.
+            Menu_PopoutTeamPC.Image = Properties.Resources.users;
+            Menu_PopoutTeamPC.Name = "Menu_PopoutTeamPC";
+            Menu_PopoutTeamPC.Size = new System.Drawing.Size(136, 22);
+            Menu_PopoutTeamPC.Text = "Team + PC";
+            Menu_PopoutTeamPC.Click += Menu_PopoutTeamPC_Click;
             // 
             // B_SearchBox
             // 
@@ -1228,6 +1238,7 @@ namespace PKHeX.WinForms.Controls
         private System.Windows.Forms.ContextMenuStrip PopoutMenu;
         private System.Windows.Forms.ToolStripMenuItem Menu_PopoutBoxSingle;
         private System.Windows.Forms.ToolStripMenuItem Menu_PopoutBoxAll;
+        private System.Windows.Forms.ToolStripMenuItem Menu_PopoutTeamPC; // PKHaX
         private System.Windows.Forms.Button B_OpenGlobalLink;
         private System.Windows.Forms.TableLayoutPanel TLP_SAVEditor;
     }

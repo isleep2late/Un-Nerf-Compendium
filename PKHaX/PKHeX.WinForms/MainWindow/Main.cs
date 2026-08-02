@@ -364,6 +364,7 @@ public partial class Main : Form
         SpriteBuilderUtil.SpriterPreference = settings.Sprite.SpritePreference;
 
         C_SAV.ModifyPKM = PKME_Tabs.ModifyPKM = settings.SlotWrite.SetUpdatePKM;
+        SlotInfoBox.AllowBattleTeamWrites = settings.SlotWrite.AllowBattleTeamEdits; // PKHaX: battle team slot editing toggle
         C_SAV.FlagIllegal = settings.Display.FlagIllegal;
         C_SAV.M.Hover.GlowHover = settings.Hover.HoverSlotGlowEdges;
         PKME_Tabs.HideSecretValues = settings.Privacy.HideSecretDetails;
@@ -838,9 +839,11 @@ public partial class Main : Form
 
     private static string GetProgramTitle(SaveFile sav)
     {
-        string title = GetProgramTitle() + $" - {sav.GetType().Name}: ";
+        var type = sav.GetType().Name;
         if (sav is ISaveFileRevision rev)
-            title = title.Insert(title.Length - 2, rev.SaveRevisionString);
+            type += rev.SaveRevisionString;
+
+        var title = GetProgramTitle() + $" - {type}: ";
         var version = GameInfo.GetVersionName(sav.Version);
         if (Settings.Privacy.HideSAVDetails)
             return title + $"[{version}]";
