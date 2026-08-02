@@ -38,7 +38,7 @@ public sealed class SlotPublisher<T>
         if (Previous is not null)
             sub.NotifySlotOld(Previous);
 
-        if (slot is not SlotInfoBox b || sub.ViewIndex == b.Box)
+        if (slot is not SlotInfoBox b || sub.ViewIndex == b.Box || sub.GetViewIndex(slot) >= 0) // PKHaX: also notify viewers that map the slot indirectly (battle team panels)
             sub.NotifySlotChanged(slot, type, pk);
     }
 
