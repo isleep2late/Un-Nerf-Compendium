@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using static PKHeX.Core.Species;
 
 namespace PKHeX.Core;
@@ -76,8 +75,12 @@ public static class RibbonRules
         // Gen8-BDSP: Variable by species Footprint
         if (evos.HasVisitedBDSP)
         {
-            if (IsAnyWithoutFootprint8b(evos.Gen8b))
-                return true; // no footprint
+            // If it was a "voiceless" species in BD/SP, then it can obtain it at any level.
+            foreach (var evo in evos.Gen8b)
+            {
+                if (PersonalInfo8BDSP.IsVoiceless(evo.Species))
+                    return true; // no voice, any level.
+            }
             if (IsWellTraveled30(pk))
                 return true; // traveled well
         }
@@ -230,79 +233,6 @@ public static class RibbonRules
     }
 
     /// <summary>
-    /// Checks if any of the species it existed as in BD/SP lacked footprints.
-    /// </summary>
-    private static bool IsAnyWithoutFootprint8b(EvoCriteria[] evos)
-    {
-        var arr = HasFootprintBDSP;
-        foreach (var evo in evos)
-        {
-            var species = evo.Species;
-            if (species >= arr.Length)
-                continue;
-            if (!arr[species])
-                return true;
-        }
-        return false;
-    }
-
-    // Derived from ROM data: true for all Footprint types besides 5 (5 = no feet).
-    // If true, requires gaining 30 levels to obtain ribbon. If false, can obtain ribbon at any level.
-    private static ReadOnlySpan<bool> HasFootprintBDSP =>
-    [
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true, false,  true,  true, false,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true, false, false,  true, false,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true, false, false,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-       false, false,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true, false,  true,  true,
-       false,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true, false,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true, false,  true,  true, false, false,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true, false,  true,  true,  true,  true,  true,  true,
-        true,  true,  true, false,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true, false,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true, false,  true, false,  true,
-        true,  true,  true, false,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-       false,  true,  true,  true,  true,  true,  true,  true,  true, false,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true, false, false,  true,
-        true,  true,  true, false, false, false, false, false,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true, false,  true, false, false,  true, false, false, false,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true, false, false,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-        true,  true, false,  true,  true,  true,  true,  true,  true,  true,
-        true,  true,  true,  true, false,  true, false,  true,  true,  true,
-        true,  true,  true,  true,  true,  true, false,  true,  true,  true,
-        true,  true,  true,  true,
-    ];
-
-    /// <summary>
     /// Checks if the input can receive the <see cref="IRibbonSetEvent3.RibbonNational"/> ribbon.
     /// </summary>
     /// <remarks>
@@ -409,7 +339,7 @@ public static class RibbonRules
     /// <summary>
     /// Checks if the input species could have participated in any Battle Frontier trial.
     /// </summary>
-    public static bool IsAllowedBattleFrontier(ushort species) => !BattleFrontierBanlist.Contains(species);
+    public static bool IsAllowedBattleFrontier(ushort species) => BattleFrontierBanlist.BinarySearch(species) < 0;
 
     /// <summary>
     /// Checks if the input species could have participated in Generation 4's Battle Frontier.
@@ -433,9 +363,12 @@ public static class RibbonRules
     }
 
     /// <summary>
-    /// Generation 3 &amp; 4 Battle Frontier Species banlist. When referencing this in context to generation 4, be sure to disallow <see cref="Pichu"/> with Form 1 (Spiky).
+    /// Generation 3 &amp; 4 Battle Frontier Species banlist. Sorted in ascending order for binary search.
     /// </summary>
-    public static readonly HashSet<ushort> BattleFrontierBanlist =
+    /// <remarks>
+    /// When referencing this in context to generation 4, be sure to disallow <see cref="Pichu"/> with Form 1 (Spiky).
+    /// </remarks>
+    public static ReadOnlySpan<ushort> BattleFrontierBanlist =>
     [
         (int)Mewtwo, (int)Mew,
         (int)Lugia, (int)HoOh, (int)Celebi,

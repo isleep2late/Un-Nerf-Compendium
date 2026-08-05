@@ -20,7 +20,7 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
   move hits without KOing the target, the game may freeze (its garbage effect byte jumps into
   Echo RAM) — save first.
 
-Built on **upstream PKHeX `master` @ `789022234` (post-26.07.07)**. Every PKHaX edit is tagged with
+Built on **upstream PKHeX `master` @ `18cc30d64` (2026-08-03)**. Every PKHaX edit is tagged with
 a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
 
 ## What's in this folder
@@ -46,10 +46,16 @@ a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
   but not across single `.pk1` export/import (same as PikaSav).
 
 ## Re-basing onto a newer upstream PKHeX
-This tree carries `upstream` → `https://github.com/kwsch/PKHeX`. To pull in newer upstream changes:
+This tree carries `upstream` → `https://github.com/kwsch/PKHeX`, but it shares no git history with
+upstream, so `git merge upstream/master` does not work. The working method is a recorded-base
+diff-apply: take the base commit recorded in the "Built on" line above, then
+
 ```
 git fetch upstream
-git merge upstream/master      # keep both upstream's changes and our // PKHaX blocks
-build_pkhax.bat                # rebuild; produces PKHaX.exe
+git diff <recorded-base>..upstream/master | git apply --3way --directory=PKHaX
+bash build_pkhax.sh            # rebuild; produces PKHaX.exe
 ```
-Because every edit is tagged `// PKHaX`, conflicts are easy to resolve by keeping both sides.
+
+Afterwards verify every `// PKHaX` tag survived (`git grep -c "// PKHaX" -- '*.cs'` before and
+after should match), run the Core tests, and update the "Built on" line above to the new upstream
+commit — future syncs diff from whatever is recorded there.
