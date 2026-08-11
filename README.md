@@ -14,6 +14,15 @@ Join our Discord: https://discord.gg/hackmons
 
 ## August 2026 update (v6)
 
+- **Xerneas can finally keep a hacked Ability (ORAS).** New `gen6_oras/oras_xerneas_ability.py`.
+  Xerneas was the last Pokemon in Gen 6 whose Ability could not be edited — set anything other than
+  Fairy Aura and the game put Fairy Aura straight back. It turns out this was never a legality check
+  and never the Ability slots on their own: the engine re-derives the Ability from the personal table
+  on a forme change, Xerneas is forced through one on the way into battle, and its three Ability
+  slots are all Fairy Aura, so the re-derivation is always destructive. The patch makes the *write*
+  conditional so it is skipped for Xerneas alone. Xerneas still gets Fairy Aura by default; only an
+  Ability you deliberately edited now survives. Confirmed working in the Battle Maison.
+
 - **Gen 8/9 has been "de-nerfed" with all the pre-update goodies.** New `gen9_sv/` folder: a
   self-validating patcher restores the **version 1.0.0 Treasures of Ruin stats** that the
   Scarlet/Violet day-one update nerfed (Wo-Chien 90 Atk/100 SpA, Chien-Pao 130 Atk, Ting-Lu
@@ -84,7 +93,7 @@ Join our Discord: https://discord.gg/hackmons
 | 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower | **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
 | 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock | **level up to 255** in the save editor | xdelta + source patches | `gen4_platinum/` |
 | 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)** | **level up to 255** in the save editor | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
-| 6 | Omega Ruby / Alpha Sapphire | Maison ban list + clauses + team-size + 510 EV cap; forme persistence (full Hoopa); Arceus form-typing | **level up to 255** in the save editor | Python (cia/3ds) | `gen6_oras/`, `gen67_arceus_typefix/` |
+| 6 | Omega Ruby / Alpha Sapphire | Maison ban list + clauses + team-size + 510 EV cap; forme persistence (full Hoopa); Arceus form-typing; **hacked Abilities stay on Xerneas** | **level up to 255** in the save editor | Python (cia/3ds) | `gen6_oras/`, `gen67_arceus_typefix/` |
 | 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally** | **level up to 255** in the save editor | Python (cia) | `gen7_usum/`, `gen67_arceus_typefix/` |
 | 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock | **level up to 255** in the save editor | LayeredFS pchtxt + Python | `gen8_swsh/` |
 | Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause | **level up to 255** in the save editor| exefs ips/pchtxt + Python | `bdsp/` |
@@ -268,6 +277,11 @@ everything (ban list + clauses + Arceus form-typing + Pokéstar props usable + p
 - **Maison unban / clauses / team-size / EV cap** -> `oras_nobanlist.py` + `oras_no_restrictions.py` +
   `oras_evcap.py`; run only the ones you want (team-size and EV-cap are separate tagged blocks).
 - **Forme persistence + Hoopa** -> `gen6_oras/formepersist.py` (`--full` for Hoopa).
+- **Hacked Abilities stay on Xerneas** -> `gen6_oras/oras_xerneas_ability.py`. Xerneas keeps Fairy
+  Aura by default; what this removes is the engine putting Fairy Aura *back* on a Xerneas whose
+  Ability you edited. Run it, then set the Ability in PKHaX as you would for any other Pokemon.
+  Skip this script to keep the stock behaviour. Details, and why the obvious fixes do not work, are
+  in **"Why Xerneas was the one Pokemon you could not re-ability"** below.
 - **Arceus form-typing (getter cave)** -> `gen67_arceus_typefix/`; skip for stock plate-only typing.
 
 **Gen 7 - USUM (`gen7_usum/`, `gen67_arceus_typefix/`).**
@@ -291,6 +305,57 @@ feature; omit it to keep stock.
 > (Emerald, Platinum) carry the inline `// UN-NERF` / `// PKHaX` tags you delete to drop a feature.
 
 ---
+
+## Why Xerneas was the one Pokemon you could not re-ability
+
+Worth writing down, because almost every guess about this turns out to be wrong.
+
+**It is not a legality check, and it is not simply "all three Ability slots are Fairy Aura."**
+Plenty of species have one Ability in all three slots — Arceus, Deoxys, Yveltal, Zygarde — and none
+of them is ability-locked. Three identical slots are the *enabling condition*, not the lock.
+
+The lock is a **runtime re-derivation**. Whenever the engine changes a Pokemon's forme it recomputes
+the Ability from the personal table and stores the result back over whatever was there:
+
+```
+r0 = <personal ability getter>(species, newForm, abilitySlot)
+     pml::pokepara::CoreParam::SetTokusei(mon, r0)
+```
+
+Two facts combine to make this fatal for Xerneas specifically. Its `FormStatsIndex` is 0, so Neutral
+and Active share a single personal row and *every* slot index resolves to Fairy Aura. And it is put
+through a forme change on the way into a battle. So the stored byte is overwritten going in, and
+overwritten again coming out — which is why the old "store it as Xerneas-Active" trick only ever
+survived a single battle.
+
+**What does not work:** NOPing the forme-change call. That was the first thing tried and it fails.
+`ChangeFormNo` has **32 callers**; silencing the one that is easy to find still leaves the path the
+battle module actually uses, and Fairy Aura comes back exactly as before.
+
+**What does work:** guard the *write* instead of the callers. `SetTokusei` has only **three** call
+sites in the whole executable, and the two that re-derive from the personal table become
+
+```
+cmp   rN, #0x2CC        ; species 716?
+blne  SetTokusei        ; store only if it is not Xerneas
+```
+
+Guarding the sink covers every path that reaches it, including calls made from the battle module.
+The third call site is left alone deliberately: both of its callers zero a buffer and build a
+Pokemon from a stack template, so it *constructs* a Pokemon rather than rewriting a saved one.
+
+Nine instruction words in total. Both patched functions happen to have a spare slot immediately
+after the call, so the displaced instruction is relocated into it and no code is lost. The guard
+only fires for species 716, so Megas, Primals, Zygarde, Kyogre/Groudon, Hoopa and every other forme
+keep re-deriving normally. Everything written lives in the ExeFS, so the RomFS and its hash chain
+are never touched.
+
+**Side effects:** none that are visible. Xerneas keeps Fairy Aura unless you change it, its Neutral
+and Active formes share one personal row so their stats, typing and Abilities are identical anyway,
+and the script is idempotent — running it twice is a no-op. It locates its patch sites by matching
+the surrounding instructions rather than by hardcoded offsets, works on Omega Ruby and Alpha
+Sapphire alike, and refuses to write anything if a site does not match.
+
 
 ## Credits
 
