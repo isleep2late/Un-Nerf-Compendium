@@ -136,7 +136,7 @@ def main():
             f.seek(info["tmd_off"]); f.write(bytes(td))
         f.flush()
         # --- verify ---
-        for va in EV_VADDRS:
+        for va in ev_vaddrs(cr):
             f.seek(cr["code_abs"] + (va - CODE_VBASE))
             v = struct.unpack("<I", f.read(4))[0]
             print(f"  VERIFY 0x{va:X} = {v} {'OK' if v == NEW else 'FAILED'}")
