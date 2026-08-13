@@ -2,7 +2,7 @@ using FluentAssertions;
 using PKHeX.Core;
 using Xunit;
 
-namespace PKHeX.Core.Tests.PKM;
+namespace PKHeX.Core.Tests.Entity;
 
 public class GBHaxExportTests
 {
