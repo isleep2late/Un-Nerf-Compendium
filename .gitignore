@@ -15,3 +15,13 @@ PKHaX/_pub/
 .DS_Store
 **/.DS_Store
 .__wtest
+
+# iOS/Android signing material — never commit (generate under ~/keys/, this is a backstop)
+*.p12
+*.key
+*.csr
+*.cer
+*.pem
+*.keystore
+*.mobileprovision
+*.b64

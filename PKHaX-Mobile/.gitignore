@@ -1,0 +1,16 @@
+# .NET / MAUI build outputs
+bin/
+obj/
+*.user
+*.binlog
+
+# iOS/Android intermediate
+*.ipa
+*.apk
+*.aab
+Platforms/iOS/*.mobileprovision
+Platforms/iOS/*.p12
+
+# Rider / VS
+.vs/
+.idea/
