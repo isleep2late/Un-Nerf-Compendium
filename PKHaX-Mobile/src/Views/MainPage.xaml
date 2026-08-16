@@ -38,7 +38,22 @@
                     <Label x:Name="TrainerLabel" FontSize="14" TextColor="{StaticResource Muted}" />
                     <Label x:Name="CountsLabel" FontSize="14" TextColor="{StaticResource Muted}" />
 
-                    <Button Text="Open boxes" Clicked="OnBoxesClicked" Margin="0,10,0,0"
+                    <Button Text="Party" Clicked="OnPartyClicked" Margin="0,10,0,0"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button Text="PC boxes" Clicked="OnBoxesClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button Text="Battle teams" Clicked="OnTeamsClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button Text="Box tools" Clicked="OnBoxToolsClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button Text="Bag / items" Clicked="OnBagClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button Text="Trainer info" Clicked="OnTrainerClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
                     <Button x:Name="SaveButton" Text="Save changes to file" Clicked="OnSaveClicked"
@@ -47,7 +62,25 @@
                 </VerticalStackLayout>
             </Border>
 
+            <Border x:Name="UpdateCard" IsVisible="False" StrokeShape="RoundRectangle 16"
+                    BackgroundColor="{StaticResource Surface}" Padding="18" Stroke="{StaticResource Accent}">
+                <VerticalStackLayout Spacing="10">
+                    <Label x:Name="UpdateTitle" FontSize="16" FontAttributes="Bold"
+                           TextColor="{StaticResource Text}" />
+                    <Label x:Name="UpdateNotes" FontSize="12" TextColor="{StaticResource Muted}" />
+                    <ProgressBar x:Name="UpdateProgress" IsVisible="False"
+                                 ProgressColor="{StaticResource Accent}" />
+                    <Button x:Name="UpdateButton" Text="Update now" Clicked="OnUpdateClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource Accent}" TextColor="White" />
+                    <Label Text="Installs over the current app — your saves and settings are kept."
+                           FontSize="11" TextColor="{StaticResource Muted}" />
+                </VerticalStackLayout>
+            </Border>
+
             <Label x:Name="StatusLabel" FontSize="13" TextColor="{StaticResource Muted}"
+                   HorizontalOptions="Center" />
+            <Label x:Name="VersionLabel" FontSize="11" TextColor="{StaticResource Muted}"
                    HorizontalOptions="Center" />
 
         </VerticalStackLayout>

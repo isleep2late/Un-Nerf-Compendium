@@ -35,6 +35,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- PKHeX.Core enumerates ribbons/marks by reflecting over "Ribbon*" properties, which a trimmed
+		     Release publish would strip. Root the whole assembly so `dotnet publish` (used by CI) keeps it. -->
+		<TrimmerRootAssembly Include="PKHeX.Core" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.*" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.*" />
 	</ItemGroup>
