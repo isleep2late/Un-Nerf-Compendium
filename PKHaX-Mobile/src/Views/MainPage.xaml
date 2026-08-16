@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PKHaX.Mobile.Views.MainPage"
+             Title="PKHaX"
+             BackgroundColor="{StaticResource Background}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="20">
+
+            <Label Text="PKHaX" FontSize="34" FontAttributes="Bold"
+                   TextColor="{StaticResource Accent}" HorizontalOptions="Center" />
+            <Label Text="Illegal mode save editor · Un-Nerf Compendium"
+                   FontSize="13" TextColor="{StaticResource Muted}" HorizontalOptions="Center" />
+
+            <Border StrokeShape="RoundRectangle 16" BackgroundColor="{StaticResource Surface}"
+                    Padding="18" Stroke="{StaticResource SurfaceStroke}">
+                <VerticalStackLayout Spacing="14">
+                    <HorizontalStackLayout Spacing="12">
+                        <Label Text="Illegal edits (HaX)" FontSize="16" VerticalOptions="Center"
+                               HorizontalOptions="StartAndExpand" TextColor="{StaticResource Text}" />
+                        <Switch x:Name="HaxSwitch" IsToggled="True" Toggled="OnHaxToggled"
+                                OnColor="{StaticResource Accent}" />
+                    </HorizontalStackLayout>
+                    <Label Text="On: no legality clamping — set any species, ability, sprite, typing or move (Gen 1-9). Off: standard legal edits only."
+                           FontSize="12" TextColor="{StaticResource Muted}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Button x:Name="OpenButton" Text="Open save file" Clicked="OnOpenClicked"
+                    HeightRequest="56" FontSize="18" CornerRadius="14"
+                    BackgroundColor="{StaticResource Accent}" TextColor="White" />
+
+            <Border x:Name="SummaryCard" IsVisible="False" StrokeShape="RoundRectangle 16"
+                    BackgroundColor="{StaticResource Surface}" Padding="18" Stroke="{StaticResource SurfaceStroke}">
+                <VerticalStackLayout Spacing="8">
+                    <Label x:Name="GameLabel" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource Text}" />
+                    <Label x:Name="TrainerLabel" FontSize="14" TextColor="{StaticResource Muted}" />
+                    <Label x:Name="CountsLabel" FontSize="14" TextColor="{StaticResource Muted}" />
+
+                    <Button Text="Open boxes" Clicked="OnBoxesClicked" Margin="0,10,0,0"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button x:Name="SaveButton" Text="Save changes to file" Clicked="OnSaveClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource Positive}" TextColor="White" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label x:Name="StatusLabel" FontSize="13" TextColor="{StaticResource Muted}"
+                   HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

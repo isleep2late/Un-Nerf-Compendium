@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- No capability-gated entitlements. The document picker grants file access at pick time, so the
+	     app needs nothing here. Adding a capability (App Groups, iCloud, etc.) would require the App ID
+	     to declare the same capability or ad-hoc/distribution signing fails. -->
+</dict>
+</plist>

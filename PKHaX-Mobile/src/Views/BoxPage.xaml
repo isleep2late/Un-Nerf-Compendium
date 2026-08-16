@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PKHaX.Mobile.ViewModels"
+             x:Class="PKHaX.Mobile.Views.BoxPage"
+             Title="Boxes"
+             BackgroundColor="{StaticResource Background}">
+
+    <Grid RowDefinitions="Auto,*" Padding="12" RowSpacing="10">
+
+        <!-- Box switcher: big touch targets, swipeable -->
+        <Grid Grid.Row="0" ColumnDefinitions="48,*,48" ColumnSpacing="8">
+            <Button Grid.Column="0" Text="‹" FontSize="24" Clicked="OnPrevBox"
+                    CornerRadius="12" BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+            <Label Grid.Column="1" x:Name="BoxTitle" FontSize="18" FontAttributes="Bold"
+                   HorizontalOptions="Center" VerticalOptions="Center" TextColor="{StaticResource Text}" />
+            <Button Grid.Column="2" Text="›" FontSize="24" Clicked="OnNextBox"
+                    CornerRadius="12" BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+        </Grid>
+
+        <CollectionView Grid.Row="1" x:Name="SlotGrid"
+                        SelectionMode="Single" SelectionChanged="OnSlotSelected">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="8" VerticalItemSpacing="8" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:SlotItem">
+                    <Border StrokeShape="RoundRectangle 14" BackgroundColor="{StaticResource Surface}"
+                            Stroke="{StaticResource SurfaceStroke}" Padding="8" MinimumHeightRequest="120">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <Image Source="{Binding SpriteUrl}" HeightRequest="64" WidthRequest="64"
+                                   Aspect="AspectFit" HorizontalOptions="Center" />
+                            <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold"
+                                   HorizontalOptions="Center" TextColor="{StaticResource Text}"
+                                   LineBreakMode="TailTruncation" />
+                            <Label Text="{Binding Detail}" FontSize="11"
+                                   HorizontalOptions="Center" TextColor="{StaticResource Muted}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
