@@ -7,14 +7,16 @@ namespace PKHaX.Mobile.Views;
 public partial class BoxPage : ContentPage
 {
 	private readonly SaveManager saves;
+	private readonly GameLists lists;
 	private int box;
 
 	public ObservableCollection<SlotItem> Slots { get; } = [];
 
-	public BoxPage(SaveManager saves)
+	public BoxPage(SaveManager saves, GameLists lists)
 	{
 		InitializeComponent();
 		this.saves = saves;
+		this.lists = lists;
 		SlotGrid.ItemsSource = Slots;
 
 		// Swipe left/right to change boxes — the primary touch gesture.
@@ -58,10 +60,7 @@ public partial class BoxPage : ContentPage
 		SlotGrid.SelectedItem = null;
 		if (item.IsEmpty) return;
 
-		await Shell.Current.GoToAsync("editor", new Dictionary<string, object>
-		{
-			["box"] = box,
-			["slot"] = item.Index,
-		});
+		await Shell.Current.Navigation.PushAsync(
+			new EntityEditorPage(saves, lists, box, item.Index, isParty: false));
 	}
 }

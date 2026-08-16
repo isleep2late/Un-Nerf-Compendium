@@ -94,6 +94,8 @@ public sealed class SaveManager
 		return list;
 	}
 
+	public void SetPartySlot(int index, PKM pk) => Save?.SetPartySlotAtIndex(pk, index);
+
 	public string SpeciesName(int species) =>
 		species >= 0 && species < Strings.specieslist.Length ? Strings.specieslist[species] : $"#{species}";
 

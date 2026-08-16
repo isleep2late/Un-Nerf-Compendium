@@ -35,6 +35,11 @@ Join our Discord: https://discord.gg/hackmons
   editing** (team-locked slots are now editable, plus a battle-team manager), and a new
   **pop-out Team + PC window** for every generation that shows your party, battle teams (where
   the save has them), and PC boxes side by side with free click-and-drag between all of them.
+- **PKHaX now has a mobile app, for iOS and Android.** `PKHaX-Mobile/` is a .NET MAUI app built on
+  this repo's own `PKHeX.Core`, so it carries every PKHaX feature — Gen-3 any-ability, the Gen-1
+  sprite/type desync, Deoxys forms, "No Move", level 255 — and edits your emulator's save **in
+  place** on the phone. Touch-friendly box grid and editor, illegal-edit mode on by default.
+  Download `PKHaX.apk` / `PKHaX-unsigned.ipa` from the release assets; details in the PKHaX section.
 
 ## July 2026 update (v5)
 
@@ -132,6 +137,34 @@ Emerald); Deoxys form box icons; status-condition editing in every generation (a
 a lower-left clickable icon for Gen 3+ — see "Status condition editing" below); and loosened legality
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
+
+### PKHaX Mobile — iOS and Android (new in v6)
+
+PKHaX now runs on your phone. `PKHaX-Mobile/` is a **.NET MAUI** app that references this repo's own
+`PKHaX/PKHeX.Core` directly, so it inherits **every** fork feature above — Gen-3 any-ability, the Gen-1
+sprite/type desync, Deoxys forms, "No Move", level 255 — and picks up each upstream PKHeX sync
+automatically the next time it is built. There is no second copy of the save logic to keep in step.
+
+It edits the save **in place**, wherever your emulator keeps it: Android uses the Storage Access
+Framework with a persisted read/write grant, iOS a security-scoped bookmark, so "Save changes to file"
+overwrites the original rather than a copy. The UI is built for touch — a swipeable three-wide box grid,
+tap a Pokemon to edit species, level, ability (the full list, so Gen-3 any-ability works exactly as on
+desktop), shiny and moves. **Illegal-edit mode is on by default**, which is the whole point of the `HaX`
+spelling; a legality read-out is shown but never blocks a write.
+
+Grab `PKHaX.apk` (Android) or `PKHaX-unsigned.ipa` (iOS) from the release assets. Android installs
+directly — enable "install unknown apps" for your browser or file manager. The iOS build is unsigned, so
+sideload it with **AltStore**, **Sideloadly** or **iMazing**, which re-sign it with your own Apple ID; if
+you have a paid Apple Developer account you can instead build an ad-hoc signed copy yourself (see
+`PKHaX-Mobile/docs/ios-cloud-build.md`). The app also checks for newer builds on launch and offers a
+one-tap in-place upgrade that keeps your settings.
+
+Building it yourself: Android needs only the .NET 10 SDK plus the Android SDK and works on Linux,
+Windows or macOS — run `PKHaX-Mobile/build-android-local.sh`, or
+`dotnet build PKHaX-Mobile/src/PKHaX.Mobile.csproj -c Release -f net10.0-android -p:AndroidPackageFormats=apk`.
+iOS binaries can only be produced on macOS (Apple's rule), so the included GitHub Actions workflow
+`.github/workflows/build-mobile.yml` builds both platforms on a hosted macOS runner — no Mac of your own
+required. Full notes in `PKHaX-Mobile/README.md`.
 
 ### Team + PC pop-out, and battle team editing (new in v6)
 

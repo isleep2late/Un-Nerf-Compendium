@@ -51,6 +51,12 @@ elif [ "${#DEVICES[@]}" -gt 1 ]; then
 	echo "     $ADB -s <serial> install -r \"$APK\""
 else
 	SER="${DEVICES[0]}"
+	# Samsung blocks adb installs unless "Install via USB" is on; unset, the install hangs forever with
+	# no error and no on-device prompt. Enabling it is harmless on non-Samsung devices.
+	if [ "$("$ADB" -s "$SER" shell settings get global install_via_usb 2>/dev/null | tr -d '\r')" != "1" ]; then
+		"$ADB" -s "$SER" shell settings put global install_via_usb 1 >/dev/null 2>&1 &&
+			echo ">> enabled 'Install via USB' on $SER (Samsung blocks installs without it)"
+	fi
 	echo ">> installing to $SER ..."
 	"$ADB" -s "$SER" install -r "$APK" || {
 		echo ">> signature mismatch? removing the old copy and retrying..."
