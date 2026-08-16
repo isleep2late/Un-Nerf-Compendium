@@ -28,8 +28,10 @@ permissions:
   contents: read
 
 concurrency:
+  # Do NOT cancel in progress: a push and a manual dispatch on the same ref share this group, so
+  # cancel-in-progress made them kill each other and lose the release artifacts mid-build.
   group: build-mobile-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   PROJECT: PKHaX-Mobile/src/PKHaX.Mobile.csproj
