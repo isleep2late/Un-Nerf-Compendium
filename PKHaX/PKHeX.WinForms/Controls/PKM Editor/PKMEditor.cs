@@ -1948,6 +1948,28 @@ public sealed partial class PKMEditor : UserControl, IMainEditor
     }
 
     // Secondary Windows for Ribbons/Amie/Memories
+    // PKHaX: max everything in one press. Shares MaxHax.Apply with PKHaX Mobile so both behave identically.
+    private void ClickMaxHax(object sender, EventArgs e)
+    {
+        if (!HaX)
+        {
+            WinFormsUtil.Alert("Max Hax is only available in HaX mode (run PKHaX.exe).");
+            return;
+        }
+
+        var prompt = WinFormsUtil.Prompt(MessageBoxButtons.YesNo,
+            "Give this Pokemon every ribbon and mark, 252 EVs and max IVs in every stat,",
+            "both memory ribbon counts, maxed memories/affection, 255 contest stats, Pokerus and shiny?"
+            + Environment.NewLine + Environment.NewLine
+            + "This is intentionally illegal and will fail legality checks.");
+        if (prompt != DialogResult.Yes)
+            return;
+
+        MaxHax.Apply(Entity);
+        LoadFieldsFromPKM(Entity, focus: false);
+        UpdateLegality();
+    }
+
     private void OpenRibbons(object sender, EventArgs e)
     {
         using var form = new RibbonEditor(Entity);

@@ -199,6 +199,7 @@ namespace PKHeX.WinForms.Controls
             BTN_Ribbons = new System.Windows.Forms.Button();
             BTN_Medals = new System.Windows.Forms.Button();
             BTN_History = new System.Windows.Forms.Button();
+            BTN_MaxHax = new System.Windows.Forms.Button(); // PKHaX
             Contest = new ContestStat();
             Hidden_OTMisc = new System.Windows.Forms.TabPage();
             TLP_OTMisc = new System.Windows.Forms.TableLayoutPanel();
@@ -2459,6 +2460,7 @@ namespace PKHeX.WinForms.Controls
             FLP_PKMEditors.Controls.Add(BTN_Ribbons);
             FLP_PKMEditors.Controls.Add(BTN_Medals);
             FLP_PKMEditors.Controls.Add(BTN_History);
+            FLP_PKMEditors.Controls.Add(BTN_MaxHax); // PKHaX
             FLP_PKMEditors.Location = new System.Drawing.Point(48, 0);
             FLP_PKMEditors.Margin = new System.Windows.Forms.Padding(0);
             FLP_PKMEditors.Name = "FLP_PKMEditors";
@@ -2479,6 +2481,21 @@ namespace PKHeX.WinForms.Controls
             BTN_Ribbons.Text = "Ribbons";
             BTN_Ribbons.UseVisualStyleBackColor = true;
             BTN_Ribbons.Click += OpenRibbons;
+            // 
+            // BTN_MaxHax
+            // 
+            BTN_MaxHax.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            BTN_MaxHax.AutoSize = true;
+            BTN_MaxHax.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            BTN_MaxHax.Location = new System.Drawing.Point(4, 0);
+            BTN_MaxHax.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            BTN_MaxHax.Name = "BTN_MaxHax";
+            BTN_MaxHax.Size = new System.Drawing.Size(66, 27);
+            BTN_MaxHax.TabIndex = 31;
+            BTN_MaxHax.Text = "Max Hax";
+            BTN_MaxHax.AccessibleDescription = "When pressed, maxes every ribbon, EV/IV, memory, contest stat, Pokerus and shininess.";
+            BTN_MaxHax.UseVisualStyleBackColor = true;
+            BTN_MaxHax.Click += ClickMaxHax; // PKHaX
             // 
             // BTN_Medals
             // 
@@ -3437,6 +3454,7 @@ namespace PKHeX.WinForms.Controls
         private System.Windows.Forms.Button BTN_Ribbons;
         private System.Windows.Forms.Button BTN_Medals;
         private System.Windows.Forms.Button BTN_History;
+    private System.Windows.Forms.Button BTN_MaxHax; // PKHaX
         private System.Windows.Forms.TextBox TB_EC;
         private PKHeX.WinForms.Controls.RenderedString TB_HT;
         private System.Windows.Forms.Label Label_PrevOT;

@@ -651,6 +651,25 @@ public sealed partial class EntityEditorPage : ContentPage
 		catch { legality.Text = ""; }
 		root.Add(legality);
 
+		// PKHaX: one press = every ribbon, maxed EV/IV, memories, contest stats, Pokerus and shiny.
+		// Deliberately illegal (252 EVs x6 = 1512 vs the 510 cap), so it is gated on illegal mode.
+		if (saves.IllegalMode)
+		{
+			var maxHax = Ui.Action("MAX HAX", Ui.Accent);
+			maxHax.Margin = new Thickness(0, 10, 0, 0);
+			maxHax.Clicked += async (_, _) =>
+			{
+				if (!await DisplayAlertAsync("Max Hax",
+					"Give this Pokemon every ribbon and mark, 252 EVs and max IVs in every stat, both memory "
+					+ "ribbon counts, maxed memories/affection, 255 contest stats, Pokerus and shiny?\n\n"
+					+ "This is intentionally illegal and will fail legality checks.", "Max it", "Cancel"))
+					return;
+				MaxHax.Apply(pk);
+				Rebuild();
+			};
+			root.Add(maxHax);
+		}
+
 		var apply = Ui.Action("Apply to save", Ui.Positive);
 		apply.Margin = new Thickness(0, 10, 0, 0);
 		apply.Clicked += async (_, _) =>
