@@ -36,6 +36,16 @@ Join our Discord: https://discord.gg/hackmons
   editing** (team-locked slots are now editable, plus a battle-team manager), and a new
   **pop-out Team + PC window** for every generation that shows your party, battle teams (where
   the save has them), and PC boxes side by side with free click-and-drag between all of them.
+- **RAM editing arrives: PKHaX opens Space World '97 save states.** The 1997 Gold/Silver prototype is the
+  one game where save editing cannot work — its save routine runs and writes a valid battery file, but the
+  main menu clobbers the save-file check before it is used, so `Continue` is unreachable dead code and the
+  game can never load what it wrote. Editing the **save state** is the only way a hacked party survives. Drop
+  one on `PKHaX.exe`, or pick it in PKHaX Mobile on **Android and iOS**, and you get the party: species,
+  level up to 255, DVs, stat experience, moves, Japanese nickname/OT, **persistent disguises**, and the
+  **volatile battle typing**. Data comes from the pret `pokegold-spaceworld` disassembly. See the PKHaX
+  section for what "persistent" and "volatile" mean here — the prototype splits them in a way no retail game
+  does.
+
 - **PKHaX now has a mobile app, for iOS and Android.** `PKHaX-Mobile/` is a .NET MAUI app built on
   this repo's own `PKHeX.Core`, so it carries every PKHaX feature — Gen-3 any-ability, the Gen-1
   sprite/type desync, Deoxys forms, "No Move", level 255 — and edits your emulator's save **in
@@ -96,6 +106,7 @@ Join our Discord: https://discord.gg/hackmons
 |-----|---------|----------------------------|--------------|--------|
 | 1 | Red/Blue/Yellow | RBY sprite/type "desync" combos; **level up to 255**; **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
 | 2 | Gold/Silver/Crystal | **level up to 255** in the save editor;  **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
+| 2 proto | **Space World '97 demo** (Gold/Silver prototype) | **save-state (RAM) editing**: party, level 255, DVs, moves, **persistent disguises**, **volatile battle typing** — the prototype cannot reload its own save, so RAM is the only place edits survive | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
 | 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower | **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
 | 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock | **level up to 255** in the save editor | xdelta + source patches | `gen4_platinum/` |
 | 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)** | **level up to 255** in the save editor | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
@@ -134,7 +145,7 @@ cap** (HaX mode lets you set any Pokemon's stored party level up to 255 in every
 persists in-game — see "Level 255" below); the **Gen-1 "No Move" glitch move** (a dropdown entry for move `0x00`,
 separate from `(None)`, that keeps its PP and slot so the corrupted move is selectable in battle on
 real hardware); a Gen-3 any-ability dropdown (all 78, written to PK3 0x1E for the patched
-Emerald); Deoxys form box icons; status-condition editing in every generation (a dropdown for Gen 1/2,
+Emerald); **Space World '97 save-state (RAM) editing** (party, disguises, battle typing — desktop and mobile); Deoxys form box icons; status-condition editing in every generation (a dropdown for Gen 1/2,
 a lower-left clickable icon for Gen 3+ — see "Status condition editing" below); and loosened legality
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
