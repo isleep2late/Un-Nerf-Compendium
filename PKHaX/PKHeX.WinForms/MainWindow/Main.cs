@@ -558,6 +558,13 @@ public partial class Main : Form
         if (obj is not null && LoadFile(obj, path))
             return;
 
+        if (SW97Save.TryLoad(input.Span, path, out var sw97) && sw97 is not null) // PKHaX: Space World '97 states
+        {
+            using var editor = new SAV_SpaceWorld(sw97);
+            editor.ShowDialog();
+            return;
+        }
+
         WinFormsUtil.Error(GetHintInvalidFile(input.Span, path),
             $"{MsgFileLoad}{Environment.NewLine}{path}",
             $"{string.Format(MsgFileSize, input.Length)}{Environment.NewLine}{input.Length} bytes (0x{input.Length:X4})");
