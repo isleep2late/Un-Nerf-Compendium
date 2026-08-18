@@ -38,22 +38,25 @@
                     <Label x:Name="TrainerLabel" FontSize="14" TextColor="{StaticResource Muted}" />
                     <Label x:Name="CountsLabel" FontSize="14" TextColor="{StaticResource Muted}" />
 
-                    <Button Text="Party" Clicked="OnPartyClicked" Margin="0,10,0,0"
+                    <Button x:Name="PartyButton" Text="Party" Clicked="OnPartyClicked" Margin="0,10,0,0"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
-                    <Button Text="PC boxes" Clicked="OnBoxesClicked"
+                    <Button x:Name="BoxesButton" Text="PC boxes" Clicked="OnBoxesClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
-                    <Button Text="Battle teams" Clicked="OnTeamsClicked"
+                    <Button x:Name="TeamsButton" Text="Battle teams" Clicked="OnTeamsClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
-                    <Button Text="Box tools" Clicked="OnBoxToolsClicked"
+                    <Button x:Name="BoxToolsButton" Text="Box tools" Clicked="OnBoxToolsClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
-                    <Button Text="Bag / items" Clicked="OnBagClicked"
+                    <Button x:Name="BagButton" Text="Bag / items" Clicked="OnBagClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
-                    <Button Text="Trainer info" Clicked="OnTrainerClicked"
+                    <Button x:Name="TrainerButton" Text="Trainer info" Clicked="OnTrainerClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button x:Name="SpaceWorldButton" IsVisible="False" Text="SpaceWorld party" Clicked="OnSpaceWorldClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
                     <Button x:Name="SaveButton" Text="Save changes to file" Clicked="OnSaveClicked"

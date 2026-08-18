@@ -17,6 +17,10 @@ public sealed class SaveManager
 	/// <summary>The loaded save, or null if none is open.</summary>
 	public SaveFile? Save { get; private set; }
 
+	/// <summary>A loaded Space World '97 save state or battery file, or null. PKHeX has no SaveFile for the
+	/// 1997 prototype, so it is carried separately and edited through its own page.</summary>
+	public SW97Save? SpaceWorld { get; private set; }
+
 	/// <summary>The opaque handle the platform layer needs to write the file back where it came from.</summary>
 	public SaveFileHandle? Handle { get; private set; }
 
@@ -27,7 +31,7 @@ public sealed class SaveManager
 	/// </summary>
 	public bool IllegalMode { get; set; } = true;
 
-	public bool IsLoaded => Save is not null;
+	public bool IsLoaded => Save is not null || SpaceWorld is not null;
 
 	public GameStrings Strings { get; } = GameInfo.GetStrings("en");
 
@@ -45,8 +49,19 @@ public sealed class SaveManager
 	{
 		var sav = SaveUtil.GetSaveFile(bytes, handle.DisplayName);
 		if (sav is null)
-			return "That file was not recognised as a supported save (Gen 1-9, main-series).";
+		{
+			if (SW97Save.TryLoad(bytes, handle.DisplayName, out var sw97) && sw97 is not null)
+			{
+				Save = null;
+				SpaceWorld = sw97;
+				Handle = handle;
+				originalBytes = bytes;
+				return null;
+			}
+			return "That file was not recognised as a supported save (Gen 1-9, main-series) or as a Space World '97 save state.";
+		}
 
+		SpaceWorld = null;
 		Save = sav;
 		Handle = handle;
 		originalBytes = bytes;
@@ -56,12 +71,12 @@ public sealed class SaveManager
 	/// <summary>Serialises the save through PKHeX.Core and writes it back to its original location.</summary>
 	public async Task<string?> SaveBackAsync()
 	{
-		if (Save is null || Handle is null)
+		if ((Save is null && SpaceWorld is null) || Handle is null)
 			return "No save is open.";
 
 		try
 		{
-			var data = Save.Write().ToArray();
+			var data = SpaceWorld is not null ? SpaceWorld.PrepareForWrite() : Save!.Write().ToArray();
 			await gateway.WriteSaveAsync(Handle.Value, data);
 			originalBytes = data;
 			return null;

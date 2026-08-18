@@ -3,7 +3,8 @@
 A one-stop collection of patches that restore Pokemon games to how a lot of us wish they still played:
 un-nerfed abilities and items, lifted Battle Frontier / Subway / Maison / Tree / Tower ban lists and
 clauses, form-driven typing, and permanent alternate formes, across **Generations 3 through 9 plus
-BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX).
+BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX, plus Space World '97 save-state
+editing).
 
 > You supply your own **legally-dumped** games. **Nothing copyrighted is distributed here, so do NOT
 > ask for ROMs, CIAs, or saves** - only small patch tools and patch files.
@@ -137,6 +138,41 @@ Emerald); Deoxys form box icons; status-condition editing in every generation (a
 a lower-left clickable icon for Gen 3+ — see "Status condition editing" below); and loosened legality
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
+
+### Space World '97 save states — RAM editing (new in v6)
+
+PKHaX opens **emulator save states** for the 1997 Space World Gold/Silver prototype. Drop one on
+`PKHaX.exe` and a SpaceWorld party editor opens: species, level (up to 255), DVs, stat experience,
+moves with PP Ups, nickname and OT in the prototype's Japanese character map, **disguises**, and the
+**battle types**. It also opens the demo's own 32 KB battery file.
+
+This is RAM editing rather than save editing, and the prototype is the reason it has to be. Its save
+routine works and writes a valid battery file, but the main menu computes the save-file check into `A`
+and immediately overwrites it, so `Continue` is unreachable dead code and the game can never load what
+it wrote. A save state is the only place a hacked party survives.
+
+Two SpaceWorld-specific notes:
+
+- **Disguises are persistent.** The game copies level, status, HP and all five stats out of the stored
+  party entry and only *then* derives types from the species, so changing the species byte alone gives
+  a Pokemon that shows one species' name, dex number, sprite and types while fighting with another's
+  stats. The editor's "Disguise (keep stored stats)" box does exactly that.
+- **Typing is volatile.** The stored entry has no type bytes at all; the editable copies live in the
+  battle structure and are re-derived on every send-out, so a type edit applies to the currently active
+  Pokemon and is lost when it switches. The editor only enables that section for a state taken during a
+  battle.
+
+Species, base stats, types, moves and the character map all come from the pret `pokegold-spaceworld`
+disassembly. Recognition runs only after PKHeX's own save detection has already declined a file, and a
+32 KB file is only treated as SpaceWorld when its party block is structurally valid **and** all three of
+the prototype's checksums verify — so a Gold/Silver/Crystal save is never at risk of being read as one.
+
+**It works on the phone too.** PKHaX Mobile opens the same states: pick one with "Open save file" and a
+**SpaceWorld party** button appears, with the party list, a per-slot editor (species, level, DVs, moves,
+nickname/OT, the disguise switch, max/recalculate) and the battle-type rows when the state was taken during
+a battle. The PC-box, battle-team, bag and trainer pages hide themselves for a SpaceWorld state, because the
+prototype has none of those in a form PKHeX models — the party is the whole product (its PC save routine is
+dummied out with an unconditional `ret`).
 
 ### PKHaX Mobile — iOS and Android (new in v6)
 

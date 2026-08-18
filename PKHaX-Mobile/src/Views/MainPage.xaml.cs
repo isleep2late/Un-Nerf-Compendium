@@ -87,37 +87,37 @@ public partial class MainPage : ContentPage
 
 	private async void OnBoxesClicked(object? sender, EventArgs e)
 	{
-		if (!saves.IsLoaded) return;
+		if (saves.Save is null) return;
 		await Shell.Current.GoToAsync("box");
 	}
 
 	private async void OnPartyClicked(object? sender, EventArgs e)
 	{
-		if (!saves.IsLoaded) return;
+		if (saves.Save is null) return;
 		await Shell.Current.Navigation.PushAsync(new PartyPage(saves, lists));
 	}
 
 	private async void OnTeamsClicked(object? sender, EventArgs e)
 	{
-		if (!saves.IsLoaded) return;
+		if (saves.Save is null) return;
 		await Shell.Current.Navigation.PushAsync(new BattleTeamPage(saves, lists));
 	}
 
 	private async void OnBoxToolsClicked(object? sender, EventArgs e)
 	{
-		if (!saves.IsLoaded) return;
+		if (saves.Save is null) return;
 		await Shell.Current.Navigation.PushAsync(new BoxToolsPage(saves, 0));
 	}
 
 	private async void OnBagClicked(object? sender, EventArgs e)
 	{
-		if (!saves.IsLoaded) return;
+		if (saves.Save is null) return;
 		await Shell.Current.Navigation.PushAsync(new BagPage(saves));
 	}
 
 	private async void OnTrainerClicked(object? sender, EventArgs e)
 	{
-		if (!saves.IsLoaded) return;
+		if (saves.Save is null) return;
 		await Shell.Current.Navigation.PushAsync(new TrainerPage(saves, lists));
 	}
 
@@ -130,8 +130,28 @@ public partial class MainPage : ContentPage
 		SaveButton.IsEnabled = true;
 	}
 
+	private async void OnSpaceWorldClicked(object? sender, EventArgs e)
+	{
+		if (saves.SpaceWorld is null) return;
+		await Shell.Current.Navigation.PushAsync(new SpaceWorldPage(saves));
+	}
+
 	private void RefreshSummary()
 	{
+		var sw97 = saves.SpaceWorld;
+		SpaceWorldButton.IsVisible = sw97 is not null;
+
+		if (sw97 is not null)
+		{
+			SummaryCard.IsVisible = true;
+			GameLabel.Text = "Space World '97 · Gen 2 prototype";
+			TrainerLabel.Text = sw97.IsBattery ? "Battery file" : $"Save state · player {sw97.PlayerName}";
+			CountsLabel.Text = $"party {sw97.PartyCount} of 6" + (sw97.IsBattleActive ? " · battle in progress" : "");
+			SetSaveFilePagesVisible(false);
+			return;
+		}
+
+		SetSaveFilePagesVisible(true);
 		var sav = saves.Save;
 		if (sav is null)
 		{
@@ -143,5 +163,15 @@ public partial class MainPage : ContentPage
 		GameLabel.Text = $"{sav.Version} · Gen {sav.Generation}";
 		TrainerLabel.Text = $"OT {sav.OT}   ID {sav.DisplayTID}/{sav.DisplaySID}";
 		CountsLabel.Text = $"{sav.BoxCount} boxes · party {sav.PartyCount}";
+	}
+
+	private void SetSaveFilePagesVisible(bool visible)
+	{
+		PartyButton.IsVisible = visible;
+		BoxesButton.IsVisible = visible;
+		TeamsButton.IsVisible = visible;
+		BoxToolsButton.IsVisible = visible;
+		BagButton.IsVisible = visible;
+		TrainerButton.IsVisible = visible;
 	}
 }
