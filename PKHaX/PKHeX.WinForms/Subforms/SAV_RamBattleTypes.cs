@@ -44,7 +44,7 @@ public sealed class SAV_RamBattleTypes : Form
             {
                 var cb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList };
                 cb.SetBounds(130 + (half * 130), 12 + (rows * 30), 122, 22);
-                foreach (var (value, name) in RamBattle.TypeNames)
+                foreach (var (value, name) in Battle.TypeTable)
                     cb.Items.Add(new TypeItem(value, name));
                 Select(cb, half == 0 ? t1 : t2);
                 Controls.Add(cb);

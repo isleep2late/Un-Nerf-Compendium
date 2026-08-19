@@ -190,11 +190,16 @@ Drop a state on `PKHaX.exe` (or open it in PKHaX Mobile) and a picker shows what
   type edits are persistent and battle-live, and the classic sprite/type desync (list byte vs data byte)
   is editable per slot — the same levers PKHaX already exposes for Gen 1 saves. Gen 2 derives types from
   the species except during battle, so a state taken mid-battle offers the volatile battle-typing editor
-  (the SpaceWorld model). **Gen 3-5 typing is battle-volatile too, and now editable**: a state taken
-  mid-battle offers a battle-typing editor over the engine's live battler structures (found by anchoring
-  on your party, so Emerald/FRLG's shifting addresses don't matter). Verified in-game: a wild Zigzagoon
-  edited to Steel resists Tackle, and edited to Ghost is immune to it. In every generation a species
-  swap that keeps the stored stats acts as a Gen-1-style disguise until the game next recalculates.
+  (the SpaceWorld model). **Gen 3-7 typing is battle-volatile too, and now editable**: a state taken
+  mid-battle offers a battle-typing editor over the engine's live battler structures. Gens 3-5 anchor on
+  your party (so Emerald/FRLG's shifting addresses don't matter) and were verified in-game — a wild
+  Zigzagoon edited to Steel resists Tackle, and edited to Ghost is immune to it. **Gens 6-7 (X/Y, ORAS,
+  SM, USUM on Citra/Azahar)** edit the 3DS battle engine's cached BTL_POKEPARAM type bytes, located by a
+  coincidence-proof signature (the decrypted species is repeated inside the block) cross-checked against
+  each Pokémon's natural typing, writing both of the engine's double-buffered copies. The offsets and
+  the effect were confirmed on a live Azahar battle: writing Ghost onto a Normal-type foe flips a Ghost
+  move from "No effect" to "Super effective". In every generation a species swap that keeps the stored
+  stats also acts as a Gen-1-style disguise until the game next recalculates.
 
 Coverage now runs **Gen 1 through Gen 7**: Gens 1-3 on mGBA/BGB/VBA-M states, Gens 4-5 on melonDS and
 DeSmuME states, and Gens 6-7 on Citra-family `.cst` states (party located by checksum scan inside the

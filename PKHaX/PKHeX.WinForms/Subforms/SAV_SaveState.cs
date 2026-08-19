@@ -66,7 +66,7 @@ public sealed class SAV_SaveState : Form
             b.Click += (_, _) => Pick(SaveStateSession.CreateRamParty(analysis, local));
             y += 56;
         }
-        if (analysis.Battle is null && (analysis.RamParties.Exists(p => p.Generation is >= 3 and <= 5) || analysis.GBParty is { HasBattleTypes: true }))
+        if (analysis.Battle is null && (analysis.RamParties.Exists(p => p.Generation is >= 3 and <= 7) || analysis.GBParty is { HasBattleTypes: true }))
         {
             var hint = new Label { AutoSize = false };
             hint.SetBounds(12, y, 436, 34);

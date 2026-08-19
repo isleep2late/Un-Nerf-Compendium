@@ -37,8 +37,7 @@ public sealed class SaveStateAnalysis
             result.RamParties.AddRange(RamPartyScan.FindGen4Parties(container));
         if (container.Console == StateConsole.N3DS)
             result.RamParties.AddRange(RamPartyScan.FindGen67Parties(container));
-        if (result.RamParties.Count > 0)
-            result.Battle = RamBattleScan.FindBattle(container, result.RamParties);
+        result.Battle = RamBattleScan.FindBattle(container, result.RamParties);
         return result;
     }
 
