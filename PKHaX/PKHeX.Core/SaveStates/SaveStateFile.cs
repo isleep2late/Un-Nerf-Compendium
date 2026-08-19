@@ -16,6 +16,7 @@ public enum SaveStateKind
     VbaM,
     DeSmuME,
     MelonDS,
+    CitraCst,
     RawMemory,
 }
 
@@ -24,6 +25,7 @@ public enum StateConsole
     GB,
     GBA,
     NDS,
+    N3DS,
 }
 
 public sealed class SaveStateFile
@@ -46,8 +48,8 @@ public sealed class SaveStateFile
     public int WramSize { get; private set; }
     public int EwramOffset { get; private set; } = -1;
     public int IwramOffset { get; private set; } = -1;
-    public int MainRamOffset { get; private set; } = -1;
-    public int MainRamSize { get; private set; }
+    public int MainRamOffset { get; internal set; } = -1;
+    public int MainRamSize { get; internal set; }
 
     public byte[]? EmbeddedSave { get; private set; }
     private int _embeddedSaveOffset = -1;
@@ -116,6 +118,8 @@ public sealed class SaveStateFile
             return TryParseDeSmuME(input, path, out result);
         if (input.StartsWith("MELN"u8))
             return TryParseMelonDS(input, path, out result);
+        if (input is [0x43, 0x53, 0x54, 0x1B, ..])
+            return TryParseCitra(input, path, out result);
         if (input is [0x50, 0x4B, 0x03, 0x04, ..] || input is [0x28, 0xB5, 0x2F, 0xFD, ..])
             return false;
         return TryParseRaw(input, path, out result);
@@ -384,6 +388,30 @@ public sealed class SaveStateFile
         return true;
     }
 
+    private static bool TryParseCitra(ReadOnlySpan<byte> input, string path, out SaveStateFile? result)
+    {
+        result = null;
+        if (input.Length < 0x200)
+            return false;
+        byte[] payload;
+        try
+        {
+            using var decompressor = new ZstdSharp.Decompressor();
+            payload = decompressor.Unwrap(input[0x100..]).ToArray();
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        if (payload.Length < 0x600000)
+            return false;
+        var file = new SaveStateFile(SaveStateKind.CitraCst, StateConsole.N3DS, input.ToArray(), payload) { FilePath = path };
+        file.MainRamOffset = 0;
+        file.MainRamSize = payload.Length;
+        result = file;
+        return true;
+    }
+
     private static bool TryParseRaw(ReadOnlySpan<byte> input, string path, out SaveStateFile? result)
     {
         result = new SaveStateFile(SaveStateKind.RawMemory, StateConsole.GB, input.ToArray(), input.ToArray()) { FilePath = path };
@@ -426,6 +454,15 @@ public sealed class SaveStateFile
                 using (var gz = new GZipStream(ms, CompressionLevel.Optimal, true))
                     gz.Write(State);
                 return ms.ToArray();
+            }
+            case SaveStateKind.CitraCst:
+            {
+                using var compressor = new ZstdSharp.Compressor(3);
+                var compressed = compressor.Wrap(State).ToArray();
+                var output = new byte[0x100 + compressed.Length];
+                FileData.AsSpan(0, 0x100).CopyTo(output);
+                compressed.CopyTo(output, 0x100);
+                return output;
             }
             case SaveStateKind.DeSmuME:
             {

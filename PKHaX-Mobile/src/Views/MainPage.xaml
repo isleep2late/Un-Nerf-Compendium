@@ -59,6 +59,9 @@
                     <Button x:Name="SpaceWorldButton" IsVisible="False" Text="SpaceWorld party" Clicked="OnSpaceWorldClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button x:Name="BattleTypingButton" IsVisible="False" Text="Battle typing" Clicked="OnBattleTypingClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
                     <Button x:Name="SaveButton" Text="Save changes to file" Clicked="OnSaveClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource Positive}" TextColor="White" />
