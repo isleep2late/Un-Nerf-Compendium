@@ -149,13 +149,30 @@ public sealed class SW97Save
         }
     }
 
+    /// True when the loaded game is an English translation patch (retail Latin charset instead of the demo's Japanese one).
+    public bool IsEnglish
+    {
+        get
+        {
+            int offset = IsBattery ? -1 : GetWramOffset(AddressPlayerName);
+            if (offset >= 0 && SW97Data.IsLatinName(Data.AsSpan(offset, NameLength)))
+                return true;
+            if (PartyCount > 0)
+            {
+                int ot = PartyOffset + 8 + (PartyLength * MonSize);
+                return SW97Data.IsLatinName(Data.AsSpan(ot, NameLength));
+            }
+            return false;
+        }
+    }
+
     public SW97Mon GetMon(int slot)
     {
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)slot, (uint)PartyLength);
         int mon = PartyOffset + 8 + (slot * MonSize);
         int ot = PartyOffset + 8 + (PartyLength * MonSize) + (slot * NameLength);
         int nick = ot + (PartyLength * NameLength);
-        return new SW97Mon(Data, mon, ot, nick);
+        return new SW97Mon(Data, mon, ot, nick) { English = IsEnglish };
     }
 
     public void SyncSpeciesList()
@@ -213,7 +230,7 @@ public sealed class SW97Save
         get
         {
             int offset = GetWramOffset(AddressPlayerName);
-            return offset < 0 ? string.Empty : SW97Data.DecodeName(Data.AsSpan(offset, NameLength));
+            return offset < 0 ? string.Empty : SW97Data.DecodeName(Data.AsSpan(offset, NameLength), IsEnglish);
         }
     }
 
