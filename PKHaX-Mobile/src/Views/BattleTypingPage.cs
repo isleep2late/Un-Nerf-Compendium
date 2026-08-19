@@ -42,7 +42,8 @@ public sealed class BattleTypingPage : ContentPage
 		root.Add(Ui.SectionHeader($"Gen {battle.Generation} battle"));
 		root.Add(Ui.Caption("Types here are the battle engine's live copies - the edit applies the moment the state is loaded and lasts until the Pokémon leaves the field."));
 
-		var names = RamBattle.TypeNames.Select(t => t.Name).ToList();
+		var table = battle.TypeTable;
+		var names = table.Select(t => t.Name).ToList();
 		for (int battler = 0; battler < battle.Battlers; battler++)
 		{
 			if (!battle.IsPresent(battler))
@@ -55,8 +56,8 @@ public sealed class BattleTypingPage : ContentPage
 				_ => "Foe 2",
 			};
 			var (t1, t2) = battle.GetTypes(battler);
-			var pick1 = MakePicker(names, t1);
-			var pick2 = MakePicker(names, t2);
+			var pick1 = MakePicker(table, names, t1);
+			var pick2 = MakePicker(table, names, t2);
 			var row = new VerticalStackLayout { Spacing = 4 };
 			row.Add(Ui.Caption($"{who} — raw species #{battle.GetSpecies(battler)}"));
 			var line = new HorizontalStackLayout { Spacing = 12 };
@@ -77,10 +78,10 @@ public sealed class BattleTypingPage : ContentPage
 		root.Add(save);
 	}
 
-	private static Picker MakePicker(List<string> names, byte value)
+	private static Picker MakePicker((byte Value, string Name)[] table, List<string> names, byte value)
 	{
 		var picker = new Picker { ItemsSource = names, TextColor = Ui.Text, WidthRequest = 150 };
-		int index = Array.FindIndex(RamBattle.TypeNames, t => t.Value == value);
+		int index = Array.FindIndex(table, t => t.Value == value);
 		picker.SelectedIndex = index >= 0 ? index : 0;
 		return picker;
 	}
@@ -92,8 +93,9 @@ public sealed class BattleTypingPage : ContentPage
 			return;
 		foreach (var (battler, pick1, pick2) in rows)
 		{
-			byte t1 = RamBattle.TypeNames[Math.Max(0, pick1.SelectedIndex)].Value;
-			byte t2 = RamBattle.TypeNames[Math.Max(0, pick2.SelectedIndex)].Value;
+			var table = battle.TypeTable;
+			byte t1 = table[Math.Max(0, pick1.SelectedIndex)].Value;
+			byte t2 = table[Math.Max(0, pick2.SelectedIndex)].Value;
 			battle.SetTypes(battler, t1, t2);
 		}
 		var error = await saves.SaveBackAsync();
