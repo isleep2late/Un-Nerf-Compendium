@@ -36,12 +36,14 @@ Join our Discord: https://discord.gg/hackmons
   editing** (team-locked slots are now editable, plus a battle-team manager), and a new
   **pop-out Team + PC window** for every generation that shows your party, battle teams (where
   the save has them), and PC boxes side by side with free click-and-drag between all of them.
-- **RAM editing arrives: PKHaX opens emulator save states — Space World '97 and retail Gens 1-4.**
-  Drop an mGBA / BGB / SameBoy / VBA-M / melonDS / DeSmuME state on PKHaX (desktop or mobile) and edit
-  what is inside: the embedded cartridge save in the full editor (boxes and all, written back into the
-  state), the live in-RAM party (Gen 1-4, found via the pret disassemblies' addresses or by checksum
-  scanning), Gen 1 per-Pokémon typing and sprite desyncs persistently, and Gen 2 battle typing. See
-  "Emulator save states" in the PKHaX section.
+- **RAM editing arrives: PKHaX opens emulator save states — Space World '97 and retail Gens 1-7.**
+  Drop an mGBA / BGB / SameBoy / VBA-M / melonDS / DeSmuME / Citra-Azahar state on PKHaX (desktop or
+  mobile) and edit what is inside: the embedded cartridge save in the full editor (boxes and all,
+  written back into the state), the live in-RAM party (Gens 1-7, found via the pret disassemblies'
+  addresses or by checksum scanning), Gen 1 per-Pokémon typing and sprite desyncs persistently, and
+  battle typing for Gens 2-5 on states taken mid-battle — proven in-game (a Ghost-typed wild
+  Zigzagoon shrugs off Scratch). Nintendo Switch emulators have no save states at all, so Gens 8/9
+  stop at the save-file editor. See "Emulator save states" in the PKHaX section.
 - **PKHaX opens Space World '97 save states.** The 1997 Gold/Silver prototype is the
   one game where save editing cannot work — its save routine runs and writes a valid battery file, but the
   main menu clobbers the save-file check before it is used, so `Continue` is unreachable dead code and the
@@ -113,7 +115,7 @@ Join our Discord: https://discord.gg/hackmons
 | 1 | Red/Blue/Yellow | RBY sprite/type "desync" combos; **level up to 255**; **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
 | 2 | Gold/Silver/Crystal | **level up to 255** in the save editor;  **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
 | 2 proto | **Space World '97 demo** (Gold/Silver prototype) | **save-state (RAM) editing**: party, level 255, DVs, moves, **persistent disguises**, **volatile battle typing** — the prototype cannot reload its own save, so RAM is the only place edits survive | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
-| 1-4 | Retail games in an emulator | **save-state editing** (mGBA, BGB, SameBoy, VBA-M, melonDS, DeSmuME): the embedded cartridge save opens in the full editor and writes back into the state; the live in-RAM party is editable directly — incl. persistent Gen 1 typing/sprite desyncs and Gen 2 battle typing | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
+| 1-7 | Retail games in an emulator | **save-state editing** (mGBA, BGB, SameBoy, VBA-M, melonDS, DeSmuME, Citra/Azahar): the embedded cartridge save opens in the full editor and writes back into the state; the live in-RAM party is editable directly — incl. persistent Gen 1 typing/sprite desyncs and mid-battle typing edits for Gens 2-5 | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
 | 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower | **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
 | 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock | **level up to 255** in the save editor | xdelta + source patches | `gen4_platinum/` |
 | 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)** | **level up to 255** in the save editor | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
@@ -157,10 +159,10 @@ a lower-left clickable icon for Gen 3+ — see "Status condition editing" below)
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
 
-### Emulator save states — Gens 1-4 (new in v6)
+### Emulator save states — Gens 1-7 (new in v6)
 
 Save-state editing is no longer SpaceWorld-only. PKHaX opens **emulator save states** for the retail
-Gen 1-4 games and finds every piece of Pokémon data inside:
+Gen 1-7 games and finds every piece of Pokémon data inside:
 
 | Emulator | State | Consoles |
 |---|---|---|
@@ -171,6 +173,7 @@ Gen 1-4 games and finds every piece of Pokémon data inside:
 | **melonDS** | `.ml1`-`.ml9`, `.mln` | Nintendo DS |
 | **DeSmuME** | `.dst`, `.ds0`-`.ds9` | Nintendo DS |
 | **PyBoy** and other raw dumps | `.state` | Game Boy |
+| **Citra / Azahar / Lime3DS** | `.cst` | Nintendo 3DS |
 
 Drop a state on `PKHaX.exe` (or open it in PKHaX Mobile) and a picker shows what was found:
 
@@ -187,7 +190,19 @@ Drop a state on `PKHaX.exe` (or open it in PKHaX Mobile) and a picker shows what
   type edits are persistent and battle-live, and the classic sprite/type desync (list byte vs data byte)
   is editable per slot — the same levers PKHaX already exposes for Gen 1 saves. Gen 2 derives types from
   the species except during battle, so a state taken mid-battle offers the volatile battle-typing editor
-  (the SpaceWorld model). Gen 3/4 typing is also battle-only and is not editable yet.
+  (the SpaceWorld model). **Gen 3-5 typing is battle-volatile too, and now editable**: a state taken
+  mid-battle offers a battle-typing editor over the engine's live battler structures (found by anchoring
+  on your party, so Emerald/FRLG's shifting addresses don't matter). Verified in-game: a wild Zigzagoon
+  edited to Steel resists Tackle, and edited to Ghost is immune to it. In every generation a species
+  swap that keeps the stored stats acts as a Gen-1-style disguise until the game next recalculates.
+
+Coverage now runs **Gen 1 through Gen 7**: Gens 1-3 on mGBA/BGB/VBA-M states, Gens 4-5 on melonDS and
+DeSmuME states, and Gens 6-7 on Citra-family `.cst` states (party located by checksum scan inside the
+decompressed console RAM; edits are re-compressed into a state the same emulator build loads).
+**Nintendo Switch (Gens 8-9 and Let's Go) cannot be supported this way: no Switch emulator has save
+states** — not Ryujinx or any of its continuations (the current maintainers explicitly declined the
+feature), and not yuzu or any of its forks. On real hardware the equivalent live-RAM route is
+sys-botbase + LiveHeX (PKHeX-Plugins), and JKSV for save dumps — both work with stock PKHeX/PKHaX.
 
 The scan never runs over compressed data (a PNG-wrapped state is properly unpacked first), so the
 garbage-party false positives of build 2026-08-18 are structurally impossible now. BizHawk `.State`

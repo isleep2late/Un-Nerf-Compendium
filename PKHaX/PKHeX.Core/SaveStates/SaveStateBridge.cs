@@ -47,11 +47,28 @@ public sealed class SaveStateSession
 
     public static SaveStateSession? CreateRamParty(SaveStateAnalysis analysis, RamParty party)
     {
-        var version = party.Generation == 3 ? GameVersion.E : GameVersion.Pt;
+        var version = party.Generation switch
+        {
+            3 => GameVersion.E,
+            5 => GameVersion.B2,
+            6 or 7 => VersionFor67(party),
+            _ => GameVersion.Pt,
+        };
         var sav = BlankSaveFile.Get(version, "PKHAX");
         for (int i = 0; i < party.Count; i++)
             sav.SetPartySlotAtIndex(party.GetSlot(i), i);
         return new SaveStateSession { Analysis = analysis, Facet = SaveStateFacet.RamParty, Save = sav, Party = party };
+    }
+
+    private static GameVersion VersionFor67(RamParty party)
+    {
+        var version = party.GetSlot(0).Version;
+        return version switch
+        {
+            GameVersion.X or GameVersion.Y or GameVersion.AS or GameVersion.OR
+                or GameVersion.SN or GameVersion.MN or GameVersion.US or GameVersion.UM => version,
+            _ => party.Generation == 6 ? GameVersion.X : GameVersion.US,
+        };
     }
 
     /// Pulls the edits out of the SaveFile, pushes them into the container, and returns the rebuilt state file.

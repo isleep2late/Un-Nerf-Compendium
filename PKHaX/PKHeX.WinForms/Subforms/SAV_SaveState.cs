@@ -49,12 +49,30 @@ public sealed class SAV_SaveState : Form
             };
             y += 56;
         }
+        if (analysis.Battle is { } ramBattle)
+        {
+            var b = MakeButton($"Battle typing — edit the active Gen {ramBattle.Generation} battle's volatile types", y);
+            b.Click += (_, _) =>
+            {
+                using var dlg = new SAV_RamBattleTypes(analysis, ramBattle);
+                dlg.ShowDialog();
+            };
+            y += 56;
+        }
         foreach (var party in analysis.RamParties)
         {
             var local = party;
             var b = MakeButton($"Live party (RAM) — Gen {party.Generation}, {party.Count} Pokémon at 0x{party.Offset:X}", y);
             b.Click += (_, _) => Pick(SaveStateSession.CreateRamParty(analysis, local));
             y += 56;
+        }
+        if (analysis.Battle is null && (analysis.RamParties.Exists(p => p.Generation is >= 3 and <= 5) || analysis.GBParty is { HasBattleTypes: true }))
+        {
+            var hint = new Label { AutoSize = false };
+            hint.SetBounds(12, y, 436, 34);
+            hint.Text = "Typing is battle-volatile in these games — take the save state DURING a battle and a battle-typing editor will appear here.";
+            Controls.Add(hint);
+            y += 40;
         }
         if (y == 60)
         {

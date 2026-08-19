@@ -10,6 +10,7 @@ public sealed class SaveStateAnalysis
     public SaveFile? EmbeddedSaveFile { get; private set; }
     public GBRamGame? GBParty { get; private set; }
     public List<RamParty> RamParties { get; } = [];
+    public RamBattle? Battle { get; private set; }
 
     public bool HasAnything => EmbeddedSaveFile is not null || GBParty is not null || RamParties.Count > 0;
 
@@ -34,6 +35,10 @@ public sealed class SaveStateAnalysis
         }
         if (container.Console == StateConsole.NDS)
             result.RamParties.AddRange(RamPartyScan.FindGen4Parties(container));
+        if (container.Console == StateConsole.N3DS)
+            result.RamParties.AddRange(RamPartyScan.FindGen67Parties(container));
+        if (result.RamParties.Count > 0)
+            result.Battle = RamBattleScan.FindBattle(container, result.RamParties);
         return result;
     }
 

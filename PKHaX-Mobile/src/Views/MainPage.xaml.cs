@@ -137,10 +137,17 @@ public partial class MainPage : ContentPage
 		await Shell.Current.Navigation.PushAsync(new SpaceWorldPage(saves));
 	}
 
+	private async void OnBattleTypingClicked(object? sender, EventArgs e)
+	{
+		if (saves.StateSession?.Analysis.Battle is null) return;
+		await Shell.Current.Navigation.PushAsync(new BattleTypingPage(saves));
+	}
+
 	private void RefreshSummary()
 	{
 		var sw97 = saves.SpaceWorld;
 		SpaceWorldButton.IsVisible = sw97 is not null;
+		BattleTypingButton.IsVisible = saves.StateSession?.Analysis.Battle is not null;
 
 		if (sw97 is not null)
 		{
