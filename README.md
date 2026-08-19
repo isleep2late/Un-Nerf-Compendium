@@ -36,7 +36,13 @@ Join our Discord: https://discord.gg/hackmons
   editing** (team-locked slots are now editable, plus a battle-team manager), and a new
   **pop-out Team + PC window** for every generation that shows your party, battle teams (where
   the save has them), and PC boxes side by side with free click-and-drag between all of them.
-- **RAM editing arrives: PKHaX opens Space World '97 save states.** The 1997 Gold/Silver prototype is the
+- **RAM editing arrives: PKHaX opens emulator save states — Space World '97 and retail Gens 1-4.**
+  Drop an mGBA / BGB / SameBoy / VBA-M / melonDS / DeSmuME state on PKHaX (desktop or mobile) and edit
+  what is inside: the embedded cartridge save in the full editor (boxes and all, written back into the
+  state), the live in-RAM party (Gen 1-4, found via the pret disassemblies' addresses or by checksum
+  scanning), Gen 1 per-Pokémon typing and sprite desyncs persistently, and Gen 2 battle typing. See
+  "Emulator save states" in the PKHaX section.
+- **PKHaX opens Space World '97 save states.** The 1997 Gold/Silver prototype is the
   one game where save editing cannot work — its save routine runs and writes a valid battery file, but the
   main menu clobbers the save-file check before it is used, so `Continue` is unreachable dead code and the
   game can never load what it wrote. Editing the **save state** is the only way a hacked party survives. Drop
@@ -107,6 +113,7 @@ Join our Discord: https://discord.gg/hackmons
 | 1 | Red/Blue/Yellow | RBY sprite/type "desync" combos; **level up to 255**; **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
 | 2 | Gold/Silver/Crystal | **level up to 255** in the save editor;  **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
 | 2 proto | **Space World '97 demo** (Gold/Silver prototype) | **save-state (RAM) editing**: party, level 255, DVs, moves, **persistent disguises**, **volatile battle typing** — the prototype cannot reload its own save, so RAM is the only place edits survive | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
+| 1-4 | Retail games in an emulator | **save-state editing** (mGBA, BGB, SameBoy, VBA-M, melonDS, DeSmuME): the embedded cartridge save opens in the full editor and writes back into the state; the live in-RAM party is editable directly — incl. persistent Gen 1 typing/sprite desyncs and Gen 2 battle typing | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
 | 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower | **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
 | 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock | **level up to 255** in the save editor | xdelta + source patches | `gen4_platinum/` |
 | 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)** | **level up to 255** in the save editor | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
@@ -149,6 +156,42 @@ Emerald); **Space World '97 save-state (RAM) editing** (party, disguises, battle
 a lower-left clickable icon for Gen 3+ — see "Status condition editing" below); and loosened legality
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
+
+### Emulator save states — Gens 1-4 (new in v6)
+
+Save-state editing is no longer SpaceWorld-only. PKHaX opens **emulator save states** for the retail
+Gen 1-4 games and finds every piece of Pokémon data inside:
+
+| Emulator | State | Consoles |
+|---|---|---|
+| **mGBA** | `.ss0`-`.ss9` (PNG-wrapped or raw) | Game Boy, Game Boy Color, Game Boy Advance |
+| **BGB** | `.sn0`-`.sn9`, `.sna` (BESS) | Game Boy, Game Boy Color |
+| **SameBoy / Emulicious** | `.s0`-`.s9`, BESS states | Game Boy, Game Boy Color |
+| **VisualBoyAdvance-M** | `.sgm` | GB and GBA |
+| **melonDS** | `.ml1`-`.ml9`, `.mln` | Nintendo DS |
+| **DeSmuME** | `.dst`, `.ds0`-`.ds9` | Nintendo DS |
+| **PyBoy** and other raw dumps | `.state` | Game Boy |
+
+Drop a state on `PKHaX.exe` (or open it in PKHaX Mobile) and a picker shows what was found:
+
+- **The game's save file, when the state carries one.** mGBA and BESS states embed the cartridge
+  SRAM, and DS states embed the 512 KB flash save — that is the *complete* save, so it opens in the
+  **full editor**: boxes, bag, trainer, everything the save-file editor can do. Exporting offers to
+  write the edits back **into the state file** (a `.bak` of the original is kept).
+- **The live party in console RAM.** Gen 1/2 parties are located at the exact WRAM addresses from the
+  pret disassemblies (Red/Blue, Yellow, Gold/Silver, Crystal are all distinguished automatically);
+  Gen 3/4 parties are found by scanning for validly-checksummed encrypted party structures, so
+  Emerald/FRLG's save-block ASLR does not matter. Party edits are synced back into RAM, so they are
+  live the moment the state is loaded — no in-game save or reset needed.
+- **Typing and sprites.** Gen 1 stores each Pokémon's two type bytes *in the party structure*, so Gen 1
+  type edits are persistent and battle-live, and the classic sprite/type desync (list byte vs data byte)
+  is editable per slot — the same levers PKHaX already exposes for Gen 1 saves. Gen 2 derives types from
+  the species except during battle, so a state taken mid-battle offers the volatile battle-typing editor
+  (the SpaceWorld model). Gen 3/4 typing is also battle-only and is not editable yet.
+
+The scan never runs over compressed data (a PNG-wrapped state is properly unpacked first), so the
+garbage-party false positives of build 2026-08-18 are structurally impossible now. BizHawk `.State`
+files are zip+zstd archives and are refused with a clear message rather than misread.
 
 ### Space World '97 save states — RAM editing (new in v6)
 

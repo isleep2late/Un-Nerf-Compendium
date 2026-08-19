@@ -21,6 +21,10 @@ public sealed class SaveManager
 	/// 1997 prototype, so it is carried separately and edited through its own page.</summary>
 	public SW97Save? SpaceWorld { get; private set; }
 
+	/// <summary>When the open "save" actually lives inside an emulator save state, the session that
+	/// syncs edits back into the state container on write.</summary>
+	public SaveStateSession? StateSession { get; private set; }
+
 	/// <summary>The opaque handle the platform layer needs to write the file back where it came from.</summary>
 	public SaveFileHandle? Handle { get; private set; }
 
@@ -53,15 +57,32 @@ public sealed class SaveManager
 			if (SW97Save.TryLoad(bytes, handle.DisplayName, out var sw97) && sw97 is not null)
 			{
 				Save = null;
+				StateSession = null;
 				SpaceWorld = sw97;
 				Handle = handle;
 				originalBytes = bytes;
 				return null;
 			}
-			return "That file was not recognised as a supported save (Gen 1-9, main-series) or as a Space World '97 save state.";
+			if (SaveStateAnalysis.TryAnalyze(bytes, handle.DisplayName) is { HasAnything: true } analysis)
+			{
+				var session = SaveStateSession.CreateEmbedded(analysis)
+					?? SaveStateSession.CreateGBParty(analysis)
+					?? (analysis.RamParties.Count > 0 ? SaveStateSession.CreateRamParty(analysis, analysis.RamParties[0]) : null);
+				if (session is not null)
+				{
+					SpaceWorld = null;
+					StateSession = session;
+					Save = session.Save;
+					Handle = handle;
+					originalBytes = bytes;
+					return null;
+				}
+			}
+			return "That file was not recognised as a supported save (Gen 1-9, main-series), an emulator save state with Pokémon data, or a Space World '97 save state.";
 		}
 
 		SpaceWorld = null;
+		StateSession = null;
 		Save = sav;
 		Handle = handle;
 		originalBytes = bytes;
@@ -76,7 +97,9 @@ public sealed class SaveManager
 
 		try
 		{
-			var data = SpaceWorld is not null ? SpaceWorld.PrepareForWrite() : Save!.Write().ToArray();
+			var data = SpaceWorld is not null ? SpaceWorld.PrepareForWrite()
+				: StateSession is not null ? StateSession.WriteBack()
+				: Save!.Write().ToArray();
 			await gateway.WriteSaveAsync(Handle.Value, data);
 			originalBytes = data;
 			return null;

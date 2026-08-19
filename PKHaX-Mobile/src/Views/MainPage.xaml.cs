@@ -1,3 +1,4 @@
+using PKHeX.Core;
 using PKHaX.Mobile.Services;
 
 namespace PKHaX.Mobile.Views;
@@ -163,6 +164,22 @@ public partial class MainPage : ContentPage
 		GameLabel.Text = $"{sav.Version} · Gen {sav.Generation}";
 		TrainerLabel.Text = $"OT {sav.OT}   ID {sav.DisplayTID}/{sav.DisplaySID}";
 		CountsLabel.Text = $"{sav.BoxCount} boxes · party {sav.PartyCount}";
+		if (saves.StateSession is { } session)
+		{
+			GameLabel.Text += " · inside a save state";
+			CountsLabel.Text = session.Facet switch
+			{
+				SaveStateFacet.EmbeddedSave => CountsLabel.Text + " · edits write back into the state",
+				SaveStateFacet.GBParty => $"live RAM party of {sav.PartyCount} · party edits write back into the state",
+				_ => $"live RAM party of {sav.PartyCount} · party edits write back into the state",
+			};
+			bool full = session.Facet == SaveStateFacet.EmbeddedSave;
+			BoxesButton.IsVisible = full;
+			TeamsButton.IsVisible = full;
+			BoxToolsButton.IsVisible = full;
+			BagButton.IsVisible = full;
+			TrainerButton.IsVisible = full;
+		}
 	}
 
 	private void SetSaveFilePagesVisible(bool visible)

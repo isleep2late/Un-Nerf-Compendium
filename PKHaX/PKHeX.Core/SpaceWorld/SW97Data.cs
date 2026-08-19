@@ -413,6 +413,21 @@ public static class SW97Data
 
     public static bool IsPhysicalType(int type) => type < 0x0A;
 
+    public static bool IsCleanName(ReadOnlySpan<byte> raw)
+    {
+        int chars = 0;
+        foreach (var b in raw)
+        {
+            if (b == 0x50)
+                break;
+            var ch = Charmap[b];
+            if (ch.Length == 0 || ch[0] == '<')
+                return false;
+            chars++;
+        }
+        return chars != 0;
+    }
+
     public static string DecodeName(ReadOnlySpan<byte> raw)
     {
         var sb = new System.Text.StringBuilder(raw.Length);
