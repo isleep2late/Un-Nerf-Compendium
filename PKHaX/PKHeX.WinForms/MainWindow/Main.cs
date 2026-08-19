@@ -565,6 +565,16 @@ public partial class Main : Form
             return;
         }
 
+        if (SaveStateAnalysis.TryAnalyze(input.Span, path) is { HasAnything: true } analysis) // PKHaX: emulator save states
+        {
+            using var picker = new SAV_SaveState(analysis);
+            if (picker.ShowDialog() != DialogResult.OK || picker.Result is not { } session)
+                return;
+            StateSession = session;
+            OpenSAV(session.Save, path);
+            return;
+        }
+
         WinFormsUtil.Error(GetHintInvalidFile(input.Span, path),
             $"{MsgFileLoad}{Environment.NewLine}{path}",
             $"{string.Format(MsgFileSize, input.Length)}{Environment.NewLine}{input.Length} bytes (0x{input.Length:X4})");
@@ -1380,10 +1390,38 @@ public partial class Main : Form
 
     #region //// SAVE FILE FUNCTIONS ////
 
+    private SaveStateSession? StateSession; // PKHaX: pending save-state writeback for the currently open SAV
+
     private void ClickExportSAV(object sender, EventArgs e)
     {
         if (!Menu_ExportSAV.Enabled)
             return; // hot-keys can't cheat the system!
+
+        if (StateSession is { } session && ReferenceEquals(session.Save, C_SAV.SAV)) // PKHaX: offer to write back into the state file
+        {
+            var choice = WinFormsUtil.Prompt(MessageBoxButtons.YesNoCancel,
+                "This save came from an emulator save state.",
+                $"Yes: write the changes back into the state file\n({session.StatePath})\n\nNo: export a regular save file instead.");
+            if (choice == DialogResult.Cancel)
+                return;
+            if (choice == DialogResult.Yes)
+            {
+                try
+                {
+                    var output = session.WriteBack();
+                    var target = session.StatePath;
+                    if (System.IO.File.Exists(target) && !System.IO.File.Exists(target + ".bak"))
+                        System.IO.File.Copy(target, target + ".bak");
+                    System.IO.File.WriteAllBytes(target, output);
+                    WinFormsUtil.Alert("Save state updated.", target);
+                }
+                catch (Exception ex)
+                {
+                    WinFormsUtil.Error("Failed to write the save state.", ex.Message);
+                }
+                return;
+            }
+        }
 
         if (Settings.Advanced.SaveExportCheckUnsavedEntity && PKME_Tabs.PKMIsUnsaved)
         {

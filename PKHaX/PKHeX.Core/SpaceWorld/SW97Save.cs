@@ -34,12 +34,14 @@ public sealed class SW97Save
     public int PartyOffset { get; }
     public bool IsBattery { get; }
     public string FilePath { get; set; } = string.Empty;
+    public SaveStateFile? Container { get; }
 
-    private SW97Save(byte[] data, int partyOffset, bool battery)
+    private SW97Save(byte[] data, int partyOffset, bool battery, SaveStateFile? container = null)
     {
         Data = data;
         PartyOffset = partyOffset;
         IsBattery = battery;
+        Container = container;
     }
 
     public static bool TryLoad(ReadOnlySpan<byte> input, string path, out SW97Save? result)
@@ -48,15 +50,30 @@ public sealed class SW97Save
         if (input.Length < BatteryParty + BatteryPartyLength)
             return false;
 
-        var data = input.ToArray();
-        if (data.Length == BatterySize)
+        if (input.Length == BatterySize && IsBatteryValid(input))
         {
-            if (!IsBatteryValid(data))
-                return false;
-            result = new SW97Save(data, BatteryParty, true) { FilePath = path };
+            result = new SW97Save(input.ToArray(), BatteryParty, true) { FilePath = path };
             return true;
         }
 
+        if (SaveStateFile.TryParse(input, path, out var container) && container is not null && container.Kind != SaveStateKind.RawMemory)
+        {
+            if (container.WramOffset < 0)
+                return false;
+            int partyBase = container.GetGBOffset(AddressPartyCount);
+            if (partyBase < 0 || !IsPartyShaped(container.State, partyBase))
+                return false;
+            var save = new SW97Save(container.State, partyBase, false, container) { FilePath = path };
+            if (!save.IsWramAnchorValid)
+                return false;
+            result = save;
+            return true;
+        }
+
+        if (SaveStateFile.IsCompressedContainer(input))
+            return false;
+
+        var data = input.ToArray();
         int offset = FindParty(data);
         if (offset < 0)
             return false;
@@ -187,8 +204,7 @@ public sealed class SW97Save
             int offset = GetWramOffset(AddressPlayerName);
             if (offset < 0)
                 return false;
-            var name = SW97Data.DecodeName(Data.AsSpan(offset, NameLength));
-            return name.Length != 0 && !name.Contains('?');
+            return SW97Data.IsCleanName(Data.AsSpan(offset, NameLength));
         }
     }
 
@@ -243,15 +259,14 @@ public sealed class SW97Save
     {
         SyncSpeciesList();
         FixChecksums();
-        return Data;
+        return Container?.Serialize() ?? Data;
     }
 
     public void Export(string path)
     {
-        SyncSpeciesList();
-        FixChecksums();
+        var output = PrepareForWrite();
         if (path == FilePath && !File.Exists(path + ".bak"))
             File.Copy(path, path + ".bak");
-        File.WriteAllBytes(path, Data);
+        File.WriteAllBytes(path, output);
     }
 }
