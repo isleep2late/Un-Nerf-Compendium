@@ -20,6 +20,8 @@ public sealed class SW97Mon(byte[] data, int offset, int otOffset, int nicknameO
     public const int OffsetMaxHP = 0x24;
     public const int OffsetStats = 0x26;
 
+    public bool English { get; init; }
+
     private Span<byte> Raw => data.AsSpan(offset, SW97Save.MonSize);
     public Span<byte> OTNameRaw => data.AsSpan(otOffset, SW97Save.NameLength);
     public Span<byte> NicknameRaw => data.AsSpan(nicknameOffset, SW97Save.NameLength);
@@ -75,14 +77,14 @@ public sealed class SW97Mon(byte[] data, int offset, int otOffset, int nicknameO
 
     public string Nickname
     {
-        get => SW97Data.DecodeName(NicknameRaw);
-        set => SW97Data.TryEncodeName(value, NicknameRaw);
+        get => SW97Data.DecodeName(NicknameRaw, English);
+        set => SW97Data.TryEncodeName(value, NicknameRaw, English);
     }
 
     public string OTName
     {
-        get => SW97Data.DecodeName(OTNameRaw);
-        set => SW97Data.TryEncodeName(value, OTNameRaw);
+        get => SW97Data.DecodeName(OTNameRaw, English);
+        set => SW97Data.TryEncodeName(value, OTNameRaw, English);
     }
 
     public int Type1 => SW97Data.SpeciesTypes[Species * 2];
@@ -95,9 +97,9 @@ public sealed class SW97Mon(byte[] data, int offset, int otOffset, int nicknameO
         Species = species;
         if (!renameToSpecies)
             return;
-        var name = SW97Data.SpeciesNamesJapanese[species];
+        var name = English ? SW97Data.SpeciesNames[species] : SW97Data.SpeciesNamesJapanese[species];
         if (name.Length != 0)
-            SW97Data.TryEncodeName(name, NicknameRaw);
+            SW97Data.TryEncodeName(name, NicknameRaw, English);
     }
 
     public int[] CalculateStats()

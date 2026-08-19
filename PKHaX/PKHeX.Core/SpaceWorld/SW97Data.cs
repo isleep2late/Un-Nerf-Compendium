@@ -413,26 +413,96 @@ public static class SW97Data
 
     public static bool IsPhysicalType(int type) => type < 0x0A;
 
-    public static bool IsCleanName(ReadOnlySpan<byte> raw)
+    public static bool IsCleanName(ReadOnlySpan<byte> raw) => IsCleanName(raw, false) || IsCleanName(raw, true);
+
+    public static bool IsCleanName(ReadOnlySpan<byte> raw, bool english)
     {
         int chars = 0;
         foreach (var b in raw)
         {
             if (b == 0x50)
                 break;
-            var ch = Charmap[b];
-            if (ch.Length == 0 || ch[0] == '<')
-                return false;
+            if (english)
+            {
+                if (DecodeLatin(b) == '?')
+                    return false;
+            }
+            else
+            {
+                var ch = Charmap[b];
+                if (ch.Length == 0 || ch[0] == '<')
+                    return false;
+            }
             chars++;
         }
         return chars != 0;
     }
 
-    public static string DecodeName(ReadOnlySpan<byte> raw)
+    /// The English translation patches use the retail Gen 2 Latin charset instead of the demo's Japanese one.
+    public static bool IsLatinName(ReadOnlySpan<byte> raw)
+    {
+        int letters = 0;
+        foreach (var b in raw)
+        {
+            if (b == 0x50)
+                break;
+            if (DecodeLatin(b) == '?')
+                return false;
+            if (b is >= 0x80 and <= 0xB9)
+                letters++;
+        }
+        return letters != 0;
+    }
+
+    private static char DecodeLatin(byte b) => b switch
+    {
+        >= 0x80 and <= 0x99 => (char)('A' + b - 0x80),
+        >= 0xA0 and <= 0xB9 => (char)('a' + b - 0xA0),
+        >= 0xF6 and <= 0xFF => (char)('0' + b - 0xF6),
+        0x7F => ' ',
+        0x9A => '(',
+        0x9B => ')',
+        0x9C => ':',
+        0x9D => ';',
+        0xE0 => '\'',
+        0xE3 => '-',
+        0xE6 => '?',
+        0xE7 => '!',
+        0xE8 => '.',
+        _ => '?',
+    };
+
+    private static byte EncodeLatin(char c) => c switch
+    {
+        >= 'A' and <= 'Z' => (byte)(0x80 + c - 'A'),
+        >= 'a' and <= 'z' => (byte)(0xA0 + c - 'a'),
+        >= '0' and <= '9' => (byte)(0xF6 + c - '0'),
+        ' ' => 0x7F,
+        '(' => 0x9A,
+        ')' => 0x9B,
+        ':' => 0x9C,
+        ';' => 0x9D,
+        '\'' => 0xE0,
+        '-' => 0xE3,
+        '!' => 0xE7,
+        '.' => 0xE8,
+        _ => 0,
+    };
+
+    public static string DecodeName(ReadOnlySpan<byte> raw) => DecodeName(raw, false);
+
+    public static string DecodeName(ReadOnlySpan<byte> raw, bool english)
     {
         var sb = new System.Text.StringBuilder(raw.Length);
         foreach (var b in raw)
         {
+            if (english)
+            {
+                if (b == 0x50)
+                    break;
+                sb.Append(DecodeLatin(b));
+                continue;
+            }
             var ch = Charmap[b];
             if (ch == "@")
                 break;
@@ -441,7 +511,9 @@ public static class SW97Data
         return sb.ToString();
     }
 
-    public static bool TryEncodeName(string text, Span<byte> dest)
+    public static bool TryEncodeName(string text, Span<byte> dest) => TryEncodeName(text, dest, false);
+
+    public static bool TryEncodeName(string text, Span<byte> dest, bool english)
     {
         dest.Fill(0x50);
         int i = 0;
@@ -451,10 +523,19 @@ public static class SW97Data
                 break;
             var s = rune.ToString();
             int index = -1;
-            for (int c = 0; c < 256; c++)
+            if (english)
             {
-                if (Charmap[c] == s)
-                { index = c; break; }
+                var encoded = EncodeLatin(s.Length == 1 ? s[0] : '\0');
+                if (encoded != 0)
+                    index = encoded;
+            }
+            else
+            {
+                for (int c = 0; c < 256; c++)
+                {
+                    if (Charmap[c] == s)
+                    { index = c; break; }
+                }
             }
             if (index < 0)
                 return false;
@@ -465,3 +546,6 @@ public static class SW97Data
         return true;
     }
 }
+
+
+
