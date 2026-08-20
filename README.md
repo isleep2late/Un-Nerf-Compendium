@@ -3,108 +3,14 @@
 A one-stop collection of patches that restore Pokemon games to how a lot of us wish they still played:
 un-nerfed abilities and items, lifted Battle Frontier / Subway / Maison / Tree / Tower ban lists and
 clauses, form-driven typing, and permanent alternate formes, across **Generations 3 through 9 plus
-BDSP** (with bonus Gen 1/2 and Gen 3 save-editing support in PKHaX, plus Space World '97 save-state
-editing).
+BDSP**. The included **PKHaX** save editor (desktop and mobile) adds Gen 1-2 save editing, an all-games
+level-255 cap, and **emulator save-state editing for Gens 1-7** — including the Space World '97
+prototype and live in-battle typing edits.
 
 > You supply your own **legally-dumped** games. **Nothing copyrighted is distributed here, so do NOT
 > ask for ROMs, CIAs, or saves** - only small patch tools and patch files.
 
 Join our Discord: https://discord.gg/hackmons
-
----
-
-## August 2026 update (v6)
-
-- **Xerneas can finally keep a hacked Ability (ORAS).** New `gen6_oras/oras_xerneas_ability.py`.
-  Xerneas was the last Pokemon in Gen 6 whose Ability could not be edited — set anything other than
-  Fairy Aura and the game put Fairy Aura straight back. It turns out this was never a legality check
-  and never the Ability slots on their own: the engine re-derives the Ability from the personal table
-  on a forme change, Xerneas is forced through one on the way into battle, and its three Ability
-  slots are all Fairy Aura, so the re-derivation is always destructive. The patch makes the *write*
-  conditional so it is skipped for Xerneas alone. Xerneas still gets Fairy Aura by default; only an
-  Ability you deliberately edited now survives. Confirmed working in the Battle Maison.
-
-- **Gen 8/9 has been "de-nerfed" with all the pre-update goodies.** New `gen9_sv/` folder: a
-  self-validating patcher restores the **version 1.0.0 Treasures of Ruin stats** that the
-  Scarlet/Violet day-one update nerfed (Wo-Chien 90 Atk/100 SpA, Chien-Pao 130 Atk, Ting-Lu
-  165 HP/130 Def, Chi-Yu 145 SpA — the only base-stat patch nerfs in series history), with an
-  optional `--gen8-legends` restore of the Gen 8 Zacian / Zamazenta / Cresselia stats that the
-  Gen 9 transition lowered. Fact check inside: no Sword/Shield update ever changed a base stat —
-  these all live in SV — and the Neutralizing Gas behavior change (SV 3.0.0) is code-side, so the
-  folder documents your real options instead of pretending to patch it.
-- **PKHaX user interface updated/enhanced** — see the PKHaX section: Gen 6/7 **battle team
-  editing** (team-locked slots are now editable, plus a battle-team manager), and a new
-  **pop-out Team + PC window** for every generation that shows your party, battle teams (where
-  the save has them), and PC boxes side by side with free click-and-drag between all of them.
-- **RAM editing arrives: PKHaX opens emulator save states — Space World '97 and retail Gens 1-7.**
-  Drop an mGBA / BGB / SameBoy / VBA-M / melonDS / DeSmuME / Citra-Azahar state on PKHaX (desktop or
-  mobile) and edit what is inside: the embedded cartridge save in the full editor (boxes and all,
-  written back into the state), the live in-RAM party (Gens 1-7, found via the pret disassemblies'
-  addresses or by checksum scanning), Gen 1 per-Pokémon typing and sprite desyncs persistently, and
-  battle typing for Gens 2-5 on states taken mid-battle — proven in-game (a Ghost-typed wild
-  Zigzagoon shrugs off Scratch). Nintendo Switch emulators have no save states at all, so Gens 8/9
-  stop at the save-file editor. See "Emulator save states" in the PKHaX section.
-- **PKHaX opens Space World '97 save states.** The 1997 Gold/Silver prototype is the
-  one game where save editing cannot work — its save routine runs and writes a valid battery file, but the
-  main menu clobbers the save-file check before it is used, so `Continue` is unreachable dead code and the
-  game can never load what it wrote. Editing the **save state** is the only way a hacked party survives. Drop
-  one on `PKHaX.exe`, or pick it in PKHaX Mobile on **Android and iOS**, and you get the party: species,
-  level up to 255, DVs, stat experience, moves, Japanese nickname/OT, **persistent disguises**, and the
-  **volatile battle typing**. Data comes from the pret `pokegold-spaceworld` disassembly. See the PKHaX
-  section for what "persistent" and "volatile" mean here — the prototype splits them in a way no retail game
-  does.
-
-- **PKHaX now has a mobile app, for iOS and Android.** `PKHaX-Mobile/` is a .NET MAUI app built on
-  this repo's own `PKHeX.Core`, so it carries every PKHaX feature — Gen-3 any-ability, the Gen-1
-  sprite/type desync, Deoxys forms, "No Move", level 255 — and edits your emulator's save **in
-  place** on the phone. Touch-friendly box grid and editor, illegal-edit mode on by default.
-  Download `PKHaX.apk` / `PKHaX-unsigned.ipa` from the release assets; details in the PKHaX section.
-
-## July 2026 update (v5)
-
-- **Pokéstar Studios "props" are now usable Pokémon in Black 2 / White 2.** The 33 internal Pokéstar
-  opponent species (BW2 indices 652–684) can be placed in your party and no longer turn into **Bad Eggs**.
-  The fix is a tiny, targeted arm9 patch (a species-aware skip in the per-mon checksum validator); the
-  Bad Egg was proven to be a non-deterministic checksum-desync race, not a species gate — see
-  **"Pokéstar Studios props"** below and `POKESTAR.md`. PKHaX gained full prop support: the 17
-  user-facing props import/export under their exact Showdown names, appear in the B2W2 species
-  dropdown/search, carry BST 100 (Smeargle keeps real stats), show the correct prop name on hover
-  (not the colliding Gen-6 dex name), and preview their extracted sprite.
-
-## June 2026 update (v4)
-
-- **Arceus form-driven typing is final** across gens 4-7: hold the Plate -> Multitype type as in
-  vanilla; hold no Plate -> the PKHeX form's type (Ghost form reads Ghost, etc.); the form persists.
-  Length-neutral code patch for ORAS and USUM (USUM also covers **Silvally**), a source patch for
-  Platinum, and a personal-data fix for Black 2 / White 2.
-- **Protean on Arceus and Silvally now works in USUM** (gen 7): the type-lock species list
-  `{Arceus, Silvally}` in the battle module is cleared, so Protean re-types them. **In ORAS (gen 6)
-  this is NOT possible** - Arceus's type is re-derived from its form every move inside the move
-  pipeline; it could not be removed without breaking move processing. Castform and Kecleon Protean
-  work in ORAS (no species block on them). See **Features / how to disable each one** below and the project notes.
-- **Hoopa-Unbound persistence is correctly fixed.** Earlier versions claimed it persisted via the
-  single `ChangeFormNo` NOP; it did not. Hoopa reverts via a destructive multi-call reset block; the
-  tool now auto-detects those (AS/OR: 11, US/UM: 6).
-- **Emerald is feature-complete**: any-ability (PK3 0x1E), fully playable **Deoxys forms**, 6-Pokemon
-  Battle Tower, Soul Dew un-nerf, full Frontier unban.
-- **Platinum** adds 6-Pokemon Tower, permanent Giratina-Origin / Sky Shaymin, Arceus typing in
-  doubles, and **AbilityLock** (hacked abilities survive forme changes).
-- **PKHaX** now also allows the **Gen-1 RBY sprite/type "desync"** combinations (the mismatched
-  species-sprite/type pairings the stock editor blocks), an **all-games level-255 cap** (set any
-  Pokemon's stored party level up to 255 in every generation Gen 1-9/LGPE/BDSP/LA; the game reads the
-  party level byte directly and never clamps it to 100 on load — party-only and volatile),
-  and the **Gen-1 "No Move" glitch move** (move ID `0x00` — Fissure's animation, 102 power, glitch type,
-  ~31.6% accuracy on Yellow) as a selectable move distinct from `(None)`, written to the save with real
-  PP so it is usable from the FIGHT menu on cartridge. **Slot 1 only:** the Gen 1 menu treats `0x00`
-  as the move-list terminator, so in any other slot it is unreachable and hides the moves after it;
-  in slot 1 all rows show `-` and the first row uses the corrupted move (save first — it can freeze
-  the game if the hit doesn't KO).
-- **Repo reorg:** the USUM tooling (the `.bat` runners + `unnerf.py` + `gametext.py`) now lives in
-  `gen7_usum/`; the old `gen67_formepersist/` is folded into `gen6_oras/` and `gen7_usum/` as
-  `formepersist.py` in each.
-- **Known-not-done:** Protean-on-Arceus in ORAS (above); 6-Pokemon facility teams in BW2 and USUM
-  (raising the party-size limit above legal crashes on team confirm - the team buffer is fixed-size,
-  and only the decomp games could rebuild it); permanent Giratina-O / Shaymin-Sky in BW2 (binary-RE).
 
 ---
 
@@ -126,6 +32,12 @@ Join our Discord: https://discord.gg/hackmons
 | 9 | Scarlet / Violet | **v1.0.0 Treasures of Ruin stats restored** (the day-one 1.0.1 nerf undone), optional Gen 8 Zacian/Zamazenta/Cresselia stats; **level up to 255** in the save editor | Python (extracted romfs personal data) + PKHaX | `gen9_sv/` |
 
 *Please note that lvl 255 is an experimental feature across all games. YMMV.*
+
+*On the Gen 9 stat restore: no Sword/Shield update ever changed a base stat — the Treasures of Ruin
+and the Zacian/Zamazenta/Cresselia values all changed inside Scarlet/Violet (the day-one 1.0.1 patch
+and the Gen 8→9 transition respectively), so `gen9_sv/` restores those. The Neutralizing Gas behavior
+change (SV 3.0.0) is code-side rather than a stat, so the folder documents your options instead of
+pretending to patch it.*
 
 PKHaX (a patched PKHeX save editor) lives in `PKHaX/`; the built `PKHeX.exe` is included and is what
 you attach as a GitHub Release.
@@ -159,7 +71,7 @@ a lower-left clickable icon for Gen 3+ — see "Status condition editing" below)
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
 committed `PKHeX.exe` is the current build.
 
-### Emulator save states — Gens 1-7 (new in v6)
+### Emulator save states — Gens 1-7
 
 Save-state editing is no longer SpaceWorld-only. PKHaX opens **emulator save states** for the retail
 Gen 1-7 games and finds every piece of Pokémon data inside:
@@ -213,7 +125,7 @@ The scan never runs over compressed data (a PNG-wrapped state is properly unpack
 garbage-party false positives of build 2026-08-18 are structurally impossible now. BizHawk `.State`
 files are zip+zstd archives and are refused with a clear message rather than misread.
 
-### Space World '97 save states — RAM editing (new in v6)
+### Space World '97 save states — RAM editing
 
 PKHaX opens **emulator save states** for the 1997 Space World Gold/Silver prototype. Drop one on
 `PKHaX.exe` and a SpaceWorld party editor opens: species, level (up to 255), DVs, stat experience,
@@ -248,7 +160,7 @@ a battle. The PC-box, battle-team, bag and trainer pages hide themselves for a S
 prototype has none of those in a form PKHeX models — the party is the whole product (its PC save routine is
 dummied out with an unconditional `ret`).
 
-### PKHaX Mobile — iOS and Android (new in v6)
+### PKHaX Mobile — iOS and Android
 
 PKHaX now runs on your phone. `PKHaX-Mobile/` is a **.NET MAUI** app that references this repo's own
 `PKHaX/PKHeX.Core` directly, so it inherits **every** fork feature above — Gen-3 any-ability, the Gen-1
@@ -276,7 +188,7 @@ iOS binaries can only be produced on macOS (Apple's rule), so the included GitHu
 `.github/workflows/build-mobile.yml` builds both platforms on a hosted macOS runner — no Mac of your own
 required. Full notes in `PKHaX-Mobile/README.md`.
 
-### Team + PC pop-out, and battle team editing (new in v6)
+### Team + PC pop-out, and battle team editing
 
 Two long-standing PKHeX limitations are gone.
 
@@ -446,6 +358,26 @@ feature; omit it to keep stock.
 > (`.ips`/`.xdelta`) is just "write these bytes here" - there's no text to comment. So the binary games
 > get feature granularity as **separate single-purpose patches** (above), while the decomp games
 > (Emerald, Platinum) carry the inline `// UN-NERF` / `// PKHaX` tags you delete to drop a feature.
+
+---
+
+## Known limitations
+
+A few things are deliberately not done, because the game engine fights back harder than a patch can
+reach:
+
+- **Protean on Arceus/Silvally works in USUM but not ORAS.** In Gen 6 the Arceus type is re-derived
+  from its forme *inside the move pipeline* on every move, so it cannot be removed without breaking
+  move processing; Gen 7 keeps the re-derivation out of that path, so clearing the `{Arceus, Silvally}`
+  type-lock list is enough there. Castform and Kecleon Protean work in ORAS (no species block on them).
+- **6-Pokémon facility teams are Emerald/Platinum only.** Raising the party-size limit above the legal
+  cap in **BW2 and USUM** crashes on team confirm — the team buffer is fixed-size, and only the decomp
+  games (Emerald, Platinum) can rebuild it.
+- **Permanent Giratina-Origin / Sky-Shaymin in BW2** is not done (it needs binary reverse-engineering
+  of the forme-revert path that the decomp Platinum patch handles in source).
+- **Nintendo Switch save states do not exist.** No Switch emulator (Ryujinx and its continuations, or
+  yuzu and its forks) implements save states, so Gens 8/9 and Let's Go stop at the save-file editor;
+  their live-RAM route on real hardware is sys-botbase + LiveHeX. See "Emulator save states".
 
 ---
 
