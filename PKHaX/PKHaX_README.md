@@ -20,7 +20,7 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
   move hits without KOing the target, the game may freeze (its garbage effect byte jumps into
   Echo RAM) — save first.
 
-Built on **upstream PKHeX `master` @ `90b265a8f` (2026-08-16)**. Every PKHaX edit is tagged with
+Built on **upstream PKHeX `master` @ `c0e1cc86b` (2026-08-20)**. Every PKHaX edit is tagged with
 a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
 
 ## What's in this folder
