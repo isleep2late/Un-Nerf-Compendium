@@ -80,6 +80,20 @@ public static class Ui
 		return (grid, entry);
 	}
 
+	/// <summary>A full-width multi-line box, for a block of text that is pasted or typed in.</summary>
+	public static Editor TextArea(string value, string placeholder = "", int height = 150) => new()
+	{
+		Text = value,
+		Placeholder = placeholder,
+		PlaceholderColor = Muted,
+		FontSize = 13,
+		TextColor = Text,
+		BackgroundColor = SurfaceAlt,
+		HeightRequest = height,
+		AutoSize = EditorAutoSizeOption.Disabled,
+		Margin = new Thickness(0, 6),
+	};
+
 	/// <summary>A label and an on/off switch.</summary>
 	public static (Grid Row, Switch Toggle) SwitchRow(string label, bool value)
 	{
