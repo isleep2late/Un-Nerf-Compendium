@@ -20,7 +20,7 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
   move hits without KOing the target, the game may freeze (its garbage effect byte jumps into
   Echo RAM) — save first.
 
-Built on **upstream PKHeX `master` @ `74b88906e` (2026-08-27)**. Every PKHaX edit is tagged with
+Built on **upstream PKHeX `master` @ `e15d2467b` (2026-08-28)**. Every PKHaX edit is tagged with
 a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
 
 ## What's in this folder
@@ -52,9 +52,14 @@ diff-apply: take the base commit recorded in the "Built on" line above, then
 
 ```
 git fetch upstream
-git diff <recorded-base>..upstream/master | git apply --3way --directory=PKHaX
+git diff --binary <recorded-base>..upstream/master | git apply --3way --directory=PKHaX
 bash build_pkhax.sh            # rebuild; produces PKHaX.exe
 ```
+
+`--binary` is required, not optional. Without it a commit that only touches binary resources -- the
+`.pkl` encounter tables upstream refreshes regularly -- produces a patch with no blob data, and
+`git apply` fails with "cannot apply binary patch ... without full index line" while still exiting 0,
+so the sync looks like it worked and silently applies nothing.
 
 Afterwards verify every `// PKHaX` tag survived (`git grep -c "// PKHaX" -- '*.cs'` before and
 after should match), run the Core tests, and update the "Built on" line above to the new upstream
