@@ -47,6 +47,7 @@ public sealed partial class EntityEditorPage : ContentPage
 	{
 		root.Clear();
 		BuildHeader();
+		BuildShowdown();
 		BuildMain();
 		BuildStats();
 		BuildMoves();
