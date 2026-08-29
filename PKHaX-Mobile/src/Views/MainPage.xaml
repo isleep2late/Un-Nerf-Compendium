@@ -53,6 +53,9 @@
                     <Button x:Name="BagButton" Text="Bag / items" Clicked="OnBagClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
+                    <Button x:Name="TransferButton" Text="Two saves / transfer" Clicked="OnTransferClicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
                     <Button x:Name="TrainerButton" Text="Trainer info" Clicked="OnTrainerClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Text}" />
