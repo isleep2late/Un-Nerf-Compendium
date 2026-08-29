@@ -11,13 +11,19 @@ public partial class MainPage : ContentPage
 	private UpdateInfo? pendingUpdate;
 	private bool checkedForUpdate;
 
-	public MainPage(SaveManager saves, UpdateService updates, GameLists lists)
+	public MainPage(SaveManager saves, UpdateService updates, GameLists lists, ISaveFileGateway gateway)
 	{
 		InitializeComponent();
 		this.saves = saves;
 		this.updates = updates;
 		this.lists = lists;
+		this.gateway = gateway;
 	}
+
+	private readonly ISaveFileGateway gateway;
+
+	private async void OnTransferClicked(object? sender, EventArgs e) =>
+		await Shell.Current.Navigation.PushAsync(new TransferPage(saves, gateway));
 
 	protected override void OnAppearing()
 	{
@@ -196,6 +202,7 @@ public partial class MainPage : ContentPage
 		TeamsButton.IsVisible = visible;
 		BoxToolsButton.IsVisible = visible;
 		BagButton.IsVisible = visible;
+		TransferButton.IsVisible = visible;
 		TrainerButton.IsVisible = visible;
 	}
 }

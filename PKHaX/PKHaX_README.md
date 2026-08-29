@@ -20,7 +20,7 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
   move hits without KOing the target, the game may freeze (its garbage effect byte jumps into
   Echo RAM) — save first.
 
-Built on **upstream PKHeX `master` @ `e15d2467b` (2026-08-28)**. Every PKHaX edit is tagged with
+Built on **upstream PKHeX `master` @ `e15d2467b` (2026-08-29)**. Every PKHaX edit is tagged with
 a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
 
 ## What's in this folder
@@ -56,10 +56,22 @@ git diff --binary <recorded-base>..upstream/master | git apply --3way --director
 bash build_pkhax.sh            # rebuild; produces PKHaX.exe
 ```
 
-`--binary` is required, not optional. Without it a commit that only touches binary resources -- the
-`.pkl` encounter tables upstream refreshes regularly -- produces a patch with no blob data, and
-`git apply` fails with "cannot apply binary patch ... without full index line" while still exiting 0,
-so the sync looks like it worked and silently applies nothing.
+**`--binary` is not optional.** A plain `git diff` describes a binary file only as
+`Bin 3410 -> 3472 bytes` with no blob data, so `git apply` refuses it with *"cannot apply binary
+patch ... without full index line"* and changes NOTHING. `git apply` does return 1, but the failure
+is silent in EFFECT: the tree is untouched, so the `// PKHaX` tag count still matches, the tests
+still pass, and the sync looks complete when nothing happened. The 2026-08-29 sync
+(`74b88906e` -> `e15d2467b`) was **entirely** two `.pkl` resources, so without `--binary` it would
+have applied nothing at all. Always confirm the sync moved something:
+
+```
+git status --porcelain          # must list the files the upstream diff claimed
+```
+
+A second trap worth knowing: changing a `.pkl` resource under an incremental build can leave the
+test assembly stale, which produced one non-reproducing `SimulatorGetEncounters` failure here.
+If a test fails right after a resource sync, delete `Tests/PKHeX.Core.Tests/{bin,obj}` and re-run
+before believing it.
 
 Afterwards verify every `// PKHaX` tag survived (`git grep -c "// PKHaX" -- '*.cs'` before and
 after should match), run the Core tests, and update the "Built on" line above to the new upstream
