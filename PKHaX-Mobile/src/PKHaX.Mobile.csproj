@@ -41,7 +41,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.*" />
+		<!-- PKHaX: pinned to the MAUI version the proven local APK build resolves (10.0.100). With "10.0.*" the
+		     GitHub macOS runner pulled 10.0.101, whose Resizetizer (Svg.Skia) crashes on the app icon with
+		     MissingMethodException SkiaSharp.SKTextBlobBuilder.AddPositionedRun (MAUIR0001) - every build-mobile.yml
+		     run has failed that way since 2026-09-07 20:52 UTC, on a commit that had passed three times that morning. -->
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.100" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.*" />
 	</ItemGroup>
 
