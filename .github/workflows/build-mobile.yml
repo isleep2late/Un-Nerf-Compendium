@@ -65,7 +65,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Install MAUI workloads (adds the ios and android build packs)
-        run: dotnet workload install maui
+        # Pinned to the workload set the proven local build uses (dotnet 10.0.302, "Workload version: 10.0.303.1").
+        # An unpinned install took the newest MAUI (10.0.101) and its Resizetizer crashed on the app icon
+        # (MAUIR0001, SkiaSharp MissingMethodException) on every run since 2026-09-07 20:52 UTC.
+        run: dotnet workload install maui --version 10.0.303.1
 
       - name: Restore
         run: dotnet restore "$PROJECT"
