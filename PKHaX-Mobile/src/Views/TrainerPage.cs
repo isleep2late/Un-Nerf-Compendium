@@ -38,14 +38,14 @@ public sealed class TrainerPage : ContentPage
 		var v = new VerticalStackLayout { Spacing = 0 };
 
 		var (otRow, otEntry) = Ui.EntryRow("Name", sav.OT, maxLength: sav.MaxStringLengthTrainer);
-		otEntry.Unfocused += (_, _) => sav.OT = otEntry.Text ?? sav.OT;
+		otEntry.Unfocused += (_, _) => { sav.OT = otEntry.Text ?? sav.OT; saves.MarkEdited(); }; // PKHaX: flag the edit
 		v.Add(otRow);
 
 		var (tidRow, tidEntry) = Ui.NumberRow("Trainer ID", (int)sav.DisplayTID, "");
 		tidEntry.Unfocused += (_, _) =>
 		{
 			var val = Ui.ParseInt(tidEntry.Text, (int)sav.DisplayTID, 0, int.MaxValue);
-			try { sav.DisplayTID = (uint)val; } catch { }
+			try { sav.DisplayTID = (uint)val; saves.MarkEdited(); } catch { } // PKHaX
 			tidEntry.Text = sav.DisplayTID.ToString();
 		};
 		v.Add(tidRow);
@@ -54,7 +54,7 @@ public sealed class TrainerPage : ContentPage
 		sidEntry.Unfocused += (_, _) =>
 		{
 			var val = Ui.ParseInt(sidEntry.Text, (int)sav.DisplaySID, 0, int.MaxValue);
-			try { sav.DisplaySID = (uint)val; } catch { }
+			try { sav.DisplaySID = (uint)val; saves.MarkEdited(); } catch { } // PKHaX
 			sidEntry.Text = sav.DisplaySID.ToString();
 		};
 		if (sav.Generation >= 3) v.Add(sidRow);
@@ -66,6 +66,7 @@ public sealed class TrainerPage : ContentPage
 			var picked = await PickerPage.ShowAsync("Trainer gender", genders, sav.Gender);
 			if (picked is null) return;
 			sav.Gender = (byte)picked.Value.Value;
+			saves.MarkEdited(); // PKHaX
 			Build();
 		};
 		if (sav.Generation >= 2) v.Add(gRow);
@@ -78,7 +79,7 @@ public sealed class TrainerPage : ContentPage
 			{
 				var picked = await PickerPage.ShowAsync("Language", lists.Languages, sav.Language);
 				if (picked is null) return;
-				try { sav.Language = picked.Value.Value; } catch { }
+				try { sav.Language = picked.Value.Value; saves.MarkEdited(); } catch { } // PKHaX
 				Build();
 			};
 			v.Add(lRow);
@@ -94,20 +95,20 @@ public sealed class TrainerPage : ContentPage
 		mEntry.Unfocused += (_, _) =>
 		{
 			var val = Ui.ParseInt(mEntry.Text, (int)Math.Min(sav.Money, int.MaxValue), 0, int.MaxValue);
-			try { sav.Money = (uint)val; } catch { }
+			try { sav.Money = (uint)val; saves.MarkEdited(); } catch { } // PKHaX
 			mEntry.Text = sav.Money.ToString();
 		};
 		p.Add(mRow);
 
 		var maxMoney = Ui.Action("Max money");
-		maxMoney.Clicked += (_, _) => { try { sav.Money = 9_999_999; } catch { } Build(); };
+		maxMoney.Clicked += (_, _) => { try { sav.Money = 9_999_999; saves.MarkEdited(); } catch { } Build(); }; // PKHaX
 		p.Add(maxMoney);
 
 		var (hRow, hEntry) = Ui.NumberRow("Hours played", sav.PlayedHours, "");
 		hEntry.Unfocused += (_, _) =>
 		{
 			var val = Ui.ParseInt(hEntry.Text, sav.PlayedHours, 0, 999999);
-			try { sav.PlayedHours = val; } catch { }
+			try { sav.PlayedHours = val; saves.MarkEdited(); } catch { } // PKHaX
 		};
 		p.Add(hRow);
 
@@ -115,7 +116,7 @@ public sealed class TrainerPage : ContentPage
 		mnEntry.Unfocused += (_, _) =>
 		{
 			var val = Ui.ParseInt(mnEntry.Text, sav.PlayedMinutes, 0, 59);
-			try { sav.PlayedMinutes = val; } catch { }
+			try { sav.PlayedMinutes = val; saves.MarkEdited(); } catch { } // PKHaX
 		};
 		p.Add(mnRow);
 		root.Add(Ui.Card(p));

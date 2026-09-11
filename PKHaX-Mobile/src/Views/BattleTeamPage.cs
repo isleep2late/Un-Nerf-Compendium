@@ -137,6 +137,8 @@ public sealed class BattleTeamPage : ContentPage
 			var idx = Ui.ParseInt(input, 0, 0, sav.SlotCount - 1);
 			if (!ed.SetTeamSlotIndex(team, slot, idx))
 				await DisplayAlertAsync("Rejected", "That slot is already used by this team, or is out of range.", "OK");
+			else
+				saves.MarkEdited(); // PKHaX: flag the edit
 			Build();
 			return;
 		}
@@ -144,6 +146,7 @@ public sealed class BattleTeamPage : ContentPage
 		if (choice == "Clear slot")
 		{
 			ed.ClearTeamSlot(team, slot);
+			saves.MarkEdited(); // PKHaX: flag the edit
 			Build();
 		}
 	}

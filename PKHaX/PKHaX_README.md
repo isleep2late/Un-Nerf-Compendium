@@ -19,8 +19,13 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
   (No Move itself) is selectable; moves in slots 2-4 are hidden while it is equipped. If the
   move hits without KOing the target, the game may freeze (its garbage effect byte jumps into
   Echo RAM) — save first.
+- **Gen 1 save corrupter (Any% 2-swap):** `Tools > Corrupt Gen 1 save (Any% 2-swap)...` writes a
+  timestamped backup, then patches the file exactly as it is on disk (byte-identical to the standalone
+  `corrupt-save-gen1.py`): party count 255, valid checksum — the starting point of the Any% 2-swap route.
+  The Trainer ID is never touched; unsaved editor changes are not included (export first). Desktop,
+  Android and iOS. See below.
 
-Built on **upstream PKHeX `master` @ `e0e63bc87` (2026-09-07)**. Every PKHaX edit is tagged with
+Built on **upstream PKHeX `master` @ `77dcd3a78` (2026-09-10)**. Every PKHaX edit is tagged with
 a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
 
 ## What's in this folder
@@ -44,6 +49,56 @@ a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
   type indices).
 - Known limit: the Gen-1 sprite desync is stored in the save's list header, so it persists in-save
   but not across single `.pk1` export/import (same as PikaSav).
+
+## Gen 1 save corrupter (Any% 2-swap)
+`Tools > Corrupt Gen 1 save (Any% 2-swap)...` (enabled when a Red/Blue/Yellow save that lives as a plain
+raw 32 KiB file on disk is loaded — not one opened out of an emulator save state). It does exactly what the
+standalone `corrupt-save-gen1.py` does, byte for byte, **to the file as it is on disk**, on both the
+international and the Japanese layout:
+
+| | International | Japanese |
+|---|---|---|
+| Party count byte (`SAV1Offsets.Party`) → `0xFF`, and the species-list terminator right after it → `0xFF` | `0x2F2C` / `0x2F2D` | `0x2ED5` / `0x2ED6` |
+| Checksum byte (`SAV1Offsets.ChecksumOfs`) = bitwise NOT of the byte sum over `[OT, ChecksumOfs)` | `0x3523` (sum over `0x2598..0x3522`) | `0x3594` (sum over `0x2598..0x3593`) |
+| Trainer ID (`SAV1Offsets.TID16`) — **never modified** | `0x2605` | `0x25FB` |
+
+- **What gets corrupted is the file exactly as it is on disk** (desktop) / **exactly as it was opened or last
+  saved back** (mobile). The bytes are read from the file, the three bytes above are patched, nothing else is
+  touched — byte-identical to running `corrupt-save-gen1.py` on the same file (measured with `cmp` on a real
+  Blue and a real Yellow save: identical output, identical backups).
+- **Unsaved editor changes are NOT included.** The editor's in-memory save is never serialised by the
+  corrupter. If the editor has unsaved edits the confirmation prompt says so in plain words; cancel, export
+  the save first (`File > Export SAV...` on desktop, "Save changes to file" on mobile), then corrupt.
+  Why: `SaveFile.Write()` re-packs the party and box lists and rewrites the checksum, and its output is not
+  byte-identical to the file even for an unedited save (measured: 6 bytes on a real Blue save, 112 on a real
+  Yellow save, and two consecutive `Write()` calls on that Yellow save differ by 10,922 bytes). Corrupting a
+  re-serialised save would therefore not be "the file with three bytes changed"; corrupting the disk bytes is.
+- **Backup first, always.** Before anything is written, the file on disk is copied to
+  `<file>.bak-YYYYmmdd-HHMMSS` (desktop; never overwrites an existing backup). If the copy fails, nothing is
+  corrupted. On mobile the bytes exactly as opened are written to the app's `backups/` folder and offered
+  through the share sheet.
+- **Sanity check:** the Trainer ID in the file on disk must equal the Trainer ID of the loaded save; if the
+  file has been replaced since it was opened, the corrupter refuses and changes nothing.
+- **The corrupted file is the Any% 2-swap starting point.** In game: CONTINUE, then START > POKEMON,
+  never move the cursor past index 54, swap slot 7 with 21, then 20 with 22, mash B.
+- **TID high byte `$40` is needed for the route — the corrupter does not set it.** Set the Trainer ID
+  on the Trainer Info tab, export the save, and only then corrupt; the corrupter leaves whatever is on disk.
+- **PKHaX cannot reopen the corrupted file** (`SaveUtil` rejects a party count above 20/30 as "not a
+  save"), so after corrupting, the editor keeps the pre-corruption save loaded; the backup is the file
+  to reopen for further editing.
+- Yellow needs no special handling: the Gen 1 layout is identical across Red, Blue and Yellow at every
+  offset touched (verified on a real Yellow save — stored checksum `0x39` matched the computed one, and a
+  full run took party 1 → 255 with a valid checksum). The only gate is the 32 KiB size.
+- Implementation: `PKHeX.Core/Saves/Util/Gen1SaveCorrupter.cs` — `ApplyInPlace(raw, offsets)` is the
+  whole corruption; `CorruptFileOnDisk(path, offsets, expectedTID16)` is what the desktop menu item calls
+  (read, check, backup, patch, write; returns the backup path); mobile calls `ApplyInPlace` on its private
+  copy of the opened bytes. `IsApplied` / `IsChecksumValid` for checks; the checksum routine is
+  `SAV1.GetRBYChecksum`, shared with `SAV1` itself. There is deliberately no "corrupt the `SaveFile`
+  object" API. Tests: `Tests/PKHeX.Core.Tests/Saves/Gen1SaveCorrupterTests.cs` (the expected bytes are
+  computed in the test from the constants above, independently of the corrupter; includes a regression test
+  showing `Write()` re-serialisation differs from the disk bytes while `ApplyInPlace` changes exactly three, and
+  one for the mobile contract: a copy taken before `SaveUtil.GetSaveFile` stays equal to the opened bytes after
+  OT/money/party edits and a `Write()`, which all land in the aliased array).
 
 ## Re-basing onto a newer upstream PKHeX
 This tree carries `upstream` → `https://github.com/kwsch/PKHeX`, but it shares no git history with

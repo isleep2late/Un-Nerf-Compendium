@@ -108,6 +108,11 @@ public partial class Main : Form
         C_SAV.menu.RequestEditorLegality = DisplayLegalityReport;
         components.Add(mnu);
 
+        Menu_Tools.DropDownItems.Add(new ToolStripSeparator()); // PKHaX: Gen 1 save corrupter (Any% 2-swap)
+        Menu_Tools.DropDownItems.Add(Menu_CorruptGen1); // PKHaX
+        Menu_CorruptGen1.Click += ClickCorruptGen1Save; // PKHaX
+        Menu_Tools.DropDownOpening += (_, _) => Menu_CorruptGen1.Enabled = CanCorruptGen1Save(); // PKHaX: only for a Gen 1 save loaded from a file on disk
+
         // Add translatable extra menu controls.
         Menu_Tools.DropDownItems.Add(new ToolStripSeparator());
         Troubleshooting.AddTroubleshootingControls(Menu_Tools, Plugins, true);
@@ -1391,6 +1396,75 @@ public partial class Main : Form
     #region //// SAVE FILE FUNCTIONS ////
 
     private SaveStateSession? StateSession; // PKHaX: pending save-state writeback for the currently open SAV
+
+    private readonly ToolStripMenuItem Menu_CorruptGen1 = new("Corrupt Gen 1 save (Any% 2-swap)...") { Name = "Menu_CorruptGen1", Enabled = false }; // PKHaX: Gen 1 save corrupter
+
+    /// <summary>PKHaX: the corrupter needs a Gen 1 save that lives as a plain file on disk (not inside an emulator save state).</summary>
+    private bool CanCorruptGen1Save() // PKHaX
+    {
+        var sav = C_SAV.SAV;
+        if (sav is not SAV1 || !sav.State.Exportable)
+            return false;
+        if (sav.Metadata.FilePath is not { } path || !File.Exists(path))
+            return false;
+        if (sav.Metadata.HasHeader || sav.Metadata.HasFooter)
+            return false; // emulator container around the SRAM; only raw 32 KiB saves are corrupted in place
+        if (StateSession is { } session && ReferenceEquals(session.Save, sav))
+            return false; // came from a save state; the file on disk is the state, not the save
+        return true;
+    }
+
+    private void ClickCorruptGen1Save(object? sender, EventArgs e) // PKHaX: Gen 1 save corrupter (Any% 2-swap)
+    {
+        if (!CanCorruptGen1Save() || C_SAV.SAV is not SAV1 sav || sav.Metadata.FilePath is not { } path)
+        {
+            WinFormsUtil.Alert("Load a Gen 1 (Red/Blue/Yellow) save from a file on disk first.", "Saves opened from an emulator save state cannot be corrupted here.");
+            return;
+        }
+
+        // The file is corrupted exactly as it is on disk (byte-identical to the standalone corrupt-save-gen1.py):
+        // the editor's buffer is never serialized, so unsaved edits are not part of it. Say so in plain words.
+        bool unsaved = sav.State.Edited || PKME_Tabs.PKMIsUnsaved; // same check as the close/export warnings
+        var now = DateTime.Now;
+        var backup = Gen1SaveCorrupter.GetBackupName(path, now);
+        var prompt = WinFormsUtil.Prompt(MessageBoxButtons.YesNo,
+            "Corrupt this Gen 1 save for the Any% 2-swap route?",
+            $"File: {path}",
+            unsaved ? Gen1SaveCorrupter.UnsavedEditsWarning + "\n(File > Export SAV... writes them to disk; then run this again.)" : "What will happen:",
+            "- The file is corrupted EXACTLY AS IT IS ON DISK right now, byte for byte the same as the standalone corrupt-save-gen1.py: " +
+            "the party count byte becomes 255 (0xFF), the species-list terminator after it becomes 0xFF, and the checksum is recomputed so CONTINUE still loads the file.",
+            "- Every other byte, the Trainer ID included, is left untouched. Nothing in this editor is written to the file.",
+            $"- A backup of the file as it is now is written first, always:\n  {backup}\n  If the backup cannot be written, nothing is corrupted.",
+            "PKHaX cannot reopen a party-count-255 file, so the editor keeps the current (pre-corruption) save loaded; open the backup for further editing.");
+        if (prompt != DialogResult.Yes)
+            return;
+
+        try
+        {
+            backup = Gen1SaveCorrupter.CorruptFileOnDisk(path, Gen1SaveCorrupter.GetOffsets(sav), sav.TID16, now);
+        }
+        catch (InvalidDataException ex)
+        {
+            WinFormsUtil.Error("This file cannot be corrupted; nothing was changed.", ex.Message);
+            return;
+        }
+        catch (Exception ex) when (!File.Exists(backup))
+        {
+            WinFormsUtil.Error("The backup could not be written, so nothing was corrupted.", ex);
+            return;
+        }
+        catch (Exception ex)
+        {
+            WinFormsUtil.Error($"Failed to write the corrupted save. Your backup is at:\n{backup}", ex);
+            return;
+        }
+
+        WinFormsUtil.Alert("Save corrupted for the Any% 2-swap route.",
+            $"Written: {path}",
+            $"Backup (reopen this one for further editing): {backup}",
+            "The editor still shows the pre-corruption save; PKHaX cannot reload a party-count-255 file.",
+            Gen1SaveCorrupter.RouteReminder);
+    }
 
     private void ClickExportSAV(object sender, EventArgs e)
     {
