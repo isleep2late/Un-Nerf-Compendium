@@ -167,6 +167,7 @@ public sealed class BoxToolsPage : ContentPage
 		try
 		{
 			var n = op();
+			saves.MarkEdited(); // PKHaX: flag the edit
 			Toast($"{verb} {n} Pokemon");
 		}
 		catch (Exception ex) { Toast($"failed: {ex.Message}"); }

@@ -18,7 +18,7 @@ Join our Discord: https://discord.gg/hackmons
 
 | Gen | Game(s) | What it removes / restores | Delivered as | Folder |
 |-----|---------|----------------------------|--------------|--------|
-| 1 | Red/Blue/Yellow | RBY sprite/type "desync" combos; **level up to 255**; **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
+| 1 | Red/Blue/Yellow | RBY sprite/type "desync" combos; **level up to 255**; **"No Move" glitch move (0x00)**; **Any% 2-swap save corrupter** (patches the save file exactly as it is on disk: party count 255 + valid checksum, timestamped backup first, Trainer ID untouched, unsaved editor changes not included — desktop and mobile) | PKHaX | `PKHaX/` |
 | 2 | Gold/Silver/Crystal | **level up to 255** in the save editor;  **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
 | 2 proto | **Space World '97 demo** (Gold/Silver prototype) | **save-state (RAM) editing**: party, level 255, DVs, moves, **persistent disguises**, **volatile battle typing** — the prototype cannot reload its own save, so RAM is the only place edits survive | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
 | 1-7 | Retail games in an emulator | **save-state editing** (mGBA, BGB, SameBoy, VBA-M, melonDS, DeSmuME, Citra/Azahar): the embedded cartridge save opens in the full editor and writes back into the state; the live in-RAM party is editable directly — incl. persistent Gen 1 typing/sprite desyncs and mid-battle typing edits for Gens 2-5 | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
@@ -65,7 +65,10 @@ A patched PKHeX. On top of stock it adds: Gen-1 RBY sprite/type desync combos; a
 cap** (HaX mode lets you set any Pokemon's stored party level up to 255 in every generation and it
 persists in-game — see "Level 255" below); the **Gen-1 "No Move" glitch move** (a dropdown entry for move `0x00`,
 separate from `(None)`, that keeps its PP and slot so the corrupted move is selectable in battle on
-real hardware); a Gen-3 any-ability dropdown (all 78, written to PK3 0x1E for the patched
+real hardware); the **Gen-1 Any% 2-swap save corrupter** (`Tools > Corrupt Gen 1 save...` on desktop, a
+button on mobile: always writes a timestamped backup first, then patches the file exactly as it is on disk — party
+count 255, checksum recomputed so CONTINUE loads it, the Trainer ID never touched, unsaved editor changes not
+included; byte-identical to the standalone `corrupt-save-gen1.py`); a Gen-3 any-ability dropdown (all 78, written to PK3 0x1E for the patched
 Emerald); **Space World '97 save-state (RAM) editing** (party, disguises, battle typing — desktop and mobile); Deoxys form box icons; status-condition editing in every generation (a dropdown for Gen 1/2,
 a lower-left clickable icon for Gen 3+ — see "Status condition editing" below); and loosened legality
 where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The

@@ -50,6 +50,21 @@ the fork's core is at.
   but never blocks the write.
 - **Save back to file**: serialises through `PKHeX.Core` (`SaveFile.Write()`) and overwrites the original
   file in place (Android SAF `rwt`; iOS security-scoped bookmark).
+- **Gen 1 save corrupter (Any% 2-swap)**: a "Corrupt save (Gen 1 Any% 2-swap)" button appears for a
+  Red/Blue/Yellow raw 32 KiB save file (never for one opened out of a save state). `SaveManager` keeps a
+  private copy of the bytes exactly as the file was opened (or as last saved back) — `SaveFile` aliases the
+  array it is given, so the copy is taken before PKHeX.Core sees the array and edits can never leak into it.
+  The button first writes that copy to `<AppDataDirectory>/backups/<name>.bak-yyyyMMdd-HHmmss` and offers
+  the backup through the system share sheet (put it in Files / Drive; if you dismiss the sheet the app-local
+  copy still exists and its path is shown in the status line). Only then does it patch those same bytes —
+  party count 255 + species-list terminator `0xFF` + recomputed checksum, every other byte (Trainer ID
+  included) untouched — and write them back in place: byte-identical to the desktop build and to the
+  standalone `corrupt-save-gen1.py` run on the same file. **Unsaved edits in the app are NOT included**; the
+  confirmation says so — tap "Save changes to file" first if you want them. That warning is driven by the
+  editor's own edit flag (`SaveFile.State.Edited`, set by every mobile edit path and cleared on load / save back),
+  not by comparing `Write()` against the file: `SAV1.Write()` re-packs even an unedited save into different
+  bytes, so a byte compare would warn about edits that were never made. PKHeX cannot reload a
+  party-count-255 file, so the app keeps the pre-corruption save loaded; reopen the backup for further edits.
 
 The illegal-edit toggle on the main screen is **on by default** — that is the PKHaX behaviour.
 

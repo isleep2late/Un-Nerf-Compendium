@@ -57,6 +57,7 @@ public sealed class BagPage : ContentPage
 		apply.Clicked += async (_, _) =>
 		{
 			bag.CopyTo(saves.Save!);
+			saves.MarkEdited(); // PKHaX: flag the edit
 			await Shell.Current.Navigation.PopAsync();
 		};
 		root.Add(apply);

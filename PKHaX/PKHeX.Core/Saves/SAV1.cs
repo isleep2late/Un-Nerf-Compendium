@@ -249,15 +249,19 @@ public sealed class SAV1 : SaveFile, ILangDeviantSave, IEventFlagArray, IEventWo
     public override bool IsPKMPresent(ReadOnlySpan<byte> data) => EntityDetection.IsPresentGB(data);
 
     // Checksums
-    protected override void SetChecksums() => Data[Offsets.ChecksumOfs] = GetRBYChecksum(Offsets.OT, Offsets.ChecksumOfs);
-    public override bool ChecksumsValid => Data[Offsets.ChecksumOfs] == GetRBYChecksum(Offsets.OT, Offsets.ChecksumOfs);
+    protected override void SetChecksums() => Data[Offsets.ChecksumOfs] = GetRBYChecksum(Data, Offsets.OT, Offsets.ChecksumOfs); // PKHaX: shared static checksum routine
+    public override bool ChecksumsValid => Data[Offsets.ChecksumOfs] == GetRBYChecksum(Data, Offsets.OT, Offsets.ChecksumOfs); // PKHaX: shared static checksum routine
     public override string ChecksumInfo => ChecksumsValid ? "Checksum valid." : "Checksum invalid";
 
-    private byte GetRBYChecksum(int start, int end)
+    /// <summary>
+    /// Gen 1 main-data checksum: byte sum over [<paramref name="start"/>, <paramref name="end"/>) then bitwise NOT.
+    /// </summary>
+    /// <remarks>Static so <see cref="Gen1SaveCorrupter"/> reuses the exact same routine on raw bytes.</remarks>
+    internal static byte GetRBYChecksum(ReadOnlySpan<byte> data, int start, int end) // PKHaX: static + span-based, shared with Gen1SaveCorrupter
     {
-        var span = Data[start..end];
+        var span = data[start..end];
         byte result = 0;
-        foreach (ref var b in span)
+        foreach (var b in span)
             result += b;
         return (byte)~result;
     }

@@ -68,6 +68,10 @@
                     <Button x:Name="SaveButton" Text="Save changes to file" Clicked="OnSaveClicked"
                             HeightRequest="50" CornerRadius="12"
                             BackgroundColor="{StaticResource Positive}" TextColor="White" />
+                    <!-- PKHaX: Gen 1 save corrupter (Any% 2-swap) - only for a plain Gen 1 save file -->
+                    <Button x:Name="CorruptGen1Button" IsVisible="False" Text="Corrupt save (Gen 1 Any% 2-swap)" Clicked="OnCorruptGen1Clicked"
+                            HeightRequest="50" CornerRadius="12"
+                            BackgroundColor="{StaticResource SurfaceAlt}" TextColor="{StaticResource Accent}" />
                 </VerticalStackLayout>
             </Border>
 
