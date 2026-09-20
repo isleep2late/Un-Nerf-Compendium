@@ -17,10 +17,25 @@ public partial class SAV_Misc2 : Form
 
         B_VirtualConsoleGSBall.Visible = SAV.Version is GameVersion.C;
         B_VirtualConsoleGSBall.Enabled = !SAV.IsEnabledGSBallMobileEvent;
+
+        // PKHaX: Lucky Number Show. Shown only where the offsets resolve, so a save whose layout this build
+        // does not know is left alone rather than offered a control that would write into the wrong bytes.
+        GB_LuckyNumber.Visible = SAV.HasLuckyNumber;
+        if (SAV.HasLuckyNumber)
+        {
+            NUD_LuckyID.Value = SAV.LuckyID;
+            NUD_LuckyDay.Value = SAV.LuckyNumberDay;
+        }
     }
 
     private void B_Save_Click(object sender, EventArgs e)
     {
+        // PKHaX: written on save rather than on every keystroke, so a half-typed number never reaches the save
+        if (SAV.HasLuckyNumber)
+        {
+            SAV.LuckyID = (ushort)NUD_LuckyID.Value;
+            SAV.LuckyNumberDay = (byte)NUD_LuckyDay.Value;
+        }
         Origin.CopyChangesFrom(SAV);
         Close();
     }

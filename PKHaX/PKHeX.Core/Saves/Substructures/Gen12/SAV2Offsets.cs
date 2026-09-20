@@ -17,9 +17,25 @@ public sealed class SAV2Offsets
             LoadOffsetsInternational(sav.Version);
         Daycare = PokedexSeen + 0x1F + 28 + 1; // right after first Unown seen
         EventWork = EventFlag - 0x100;
+        // PKHaX: the Lucky Number Show's stored number, derived from RTCFlags rather than tabulated per
+        // language. pokegold and pokecrystal lay the block out identically - sRTCStatusFlags, 7 bytes of
+        // padding, sLuckyNumberDay (1 byte), sLuckyIDNumber (2 bytes) - and every field after
+        // sRTCStatusFlags is fixed size, so only the anchor moves between localisations. Checked against two
+        // real international Crystal saves: the 7 pad bytes read FF and the day byte reads 01, which is
+        // wCurDay + 1 on a save whose day counter is still zero, exactly as LoadOrRegenerateLuckyIDNumber
+        // writes it.
+        if (RTCFlags >= 0)
+        {
+            LuckyNumberDay = RTCFlags + 8;
+            LuckyIDNumber = RTCFlags + 9;
+        }
     }
 
     public int RTCFlags { get; private set; } = -1;
+
+    // PKHaX: Lucky Number Show. Day the number was last rolled, and the number itself (2 bytes, big endian).
+    public int LuckyNumberDay { get; private set; } = -1;
+    public int LuckyIDNumber { get; private set; } = -1;
 
     public int Options { get; }
     public int Trainer1 { get; }
