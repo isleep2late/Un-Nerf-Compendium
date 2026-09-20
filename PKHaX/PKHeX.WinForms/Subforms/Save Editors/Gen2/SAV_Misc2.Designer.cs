@@ -31,6 +31,16 @@ namespace PKHeX.WinForms
             B_Save = new System.Windows.Forms.Button();
             B_Cancel = new System.Windows.Forms.Button();
             B_VirtualConsoleGSBall = new System.Windows.Forms.Button();
+            // PKHaX: Lucky Number Show group
+            GB_LuckyNumber = new System.Windows.Forms.GroupBox();
+            L_LuckyID = new System.Windows.Forms.Label();
+            NUD_LuckyID = new System.Windows.Forms.NumericUpDown();
+            L_LuckyDay = new System.Windows.Forms.Label();
+            NUD_LuckyDay = new System.Windows.Forms.NumericUpDown();
+            L_LuckyNote = new System.Windows.Forms.Label();
+            GB_LuckyNumber.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)NUD_LuckyID).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)NUD_LuckyDay).BeginInit();
             SuspendLayout();
             // 
             // B_Save
@@ -67,11 +77,68 @@ namespace PKHeX.WinForms
             B_VirtualConsoleGSBall.UseVisualStyleBackColor = true;
             B_VirtualConsoleGSBall.Click += B_VirtualConsoleGSBall_Click;
             // 
+            // GB_LuckyNumber (PKHaX)
+            // 
+            GB_LuckyNumber.Controls.Add(L_LuckyID);
+            GB_LuckyNumber.Controls.Add(NUD_LuckyID);
+            GB_LuckyNumber.Controls.Add(L_LuckyDay);
+            GB_LuckyNumber.Controls.Add(NUD_LuckyDay);
+            GB_LuckyNumber.Controls.Add(L_LuckyNote);
+            GB_LuckyNumber.Location = new System.Drawing.Point(12, 84);
+            GB_LuckyNumber.Name = "GB_LuckyNumber";
+            GB_LuckyNumber.Size = new System.Drawing.Size(324, 126);
+            GB_LuckyNumber.TabIndex = 75;
+            GB_LuckyNumber.TabStop = false;
+            GB_LuckyNumber.Text = "Lucky Number Show";
+            // 
+            // L_LuckyID
+            // 
+            L_LuckyID.AutoSize = true;
+            L_LuckyID.Location = new System.Drawing.Point(12, 26);
+            L_LuckyID.Name = "L_LuckyID";
+            L_LuckyID.Size = new System.Drawing.Size(60, 15);
+            L_LuckyID.TabIndex = 0;
+            L_LuckyID.Text = "Lucky ID:";
+            // 
+            // NUD_LuckyID
+            // 
+            NUD_LuckyID.Location = new System.Drawing.Point(96, 24);
+            NUD_LuckyID.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
+            NUD_LuckyID.Name = "NUD_LuckyID";
+            NUD_LuckyID.Size = new System.Drawing.Size(88, 23);
+            NUD_LuckyID.TabIndex = 1;
+            // 
+            // L_LuckyDay
+            // 
+            L_LuckyDay.AutoSize = true;
+            L_LuckyDay.Location = new System.Drawing.Point(12, 56);
+            L_LuckyDay.Name = "L_LuckyDay";
+            L_LuckyDay.Size = new System.Drawing.Size(70, 15);
+            L_LuckyDay.TabIndex = 2;
+            L_LuckyDay.Text = "Rolled on day:";
+            // 
+            // NUD_LuckyDay
+            // 
+            NUD_LuckyDay.Location = new System.Drawing.Point(96, 54);
+            NUD_LuckyDay.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
+            NUD_LuckyDay.Name = "NUD_LuckyDay";
+            NUD_LuckyDay.Size = new System.Drawing.Size(88, 23);
+            NUD_LuckyDay.TabIndex = 3;
+            // 
+            // L_LuckyNote
+            // 
+            L_LuckyNote.Location = new System.Drawing.Point(12, 82);
+            L_LuckyNote.Name = "L_LuckyNote";
+            L_LuckyNote.Size = new System.Drawing.Size(300, 38);
+            L_LuckyNote.TabIndex = 4;
+            L_LuckyNote.Text = "Match the last digits of a Pokemon's ID No. for a prize. The game re-rolls this number when the day counter moves past the day above.";
+            // 
             // SAV_Misc2
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             ClientSize = new System.Drawing.Size(344, 261);
             Controls.Add(B_VirtualConsoleGSBall);
+            Controls.Add(GB_LuckyNumber);
             Controls.Add(B_Save);
             Controls.Add(B_Cancel);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -82,6 +149,10 @@ namespace PKHeX.WinForms
             Name = "SAV_Misc2";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "Misc Editor";
+            GB_LuckyNumber.ResumeLayout(false);
+            GB_LuckyNumber.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)NUD_LuckyID).EndInit();
+            ((System.ComponentModel.ISupportInitialize)NUD_LuckyDay).EndInit();
             ResumeLayout(false);
         }
 
@@ -89,5 +160,12 @@ namespace PKHeX.WinForms
         private System.Windows.Forms.Button B_Save;
         private System.Windows.Forms.Button B_Cancel;
         private System.Windows.Forms.Button B_VirtualConsoleGSBall;
+        // PKHaX: Lucky Number Show
+        private System.Windows.Forms.GroupBox GB_LuckyNumber;
+        private System.Windows.Forms.Label L_LuckyID;
+        private System.Windows.Forms.NumericUpDown NUD_LuckyID;
+        private System.Windows.Forms.Label L_LuckyDay;
+        private System.Windows.Forms.NumericUpDown NUD_LuckyDay;
+        private System.Windows.Forms.Label L_LuckyNote;
     }
 }

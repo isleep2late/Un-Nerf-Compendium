@@ -369,6 +369,43 @@ public sealed class SAV2 : SaveFile, ILangDeviantSave, IEventFlagArray, IEventWo
 
     public override ushort SID16 { get => 0; set { } }
 
+    // PKHaX: the Lucky Number Show's number (Radio Tower, Goldenrod). Rolled from the same RNG stream as the
+    // Trainer ID when a new game starts, and re-rolled whenever the day counter moves on - the game compares
+    // sLuckyNumberDay against wCurDay + 1 and calls Random twice when they differ. Stored big endian, like the
+    // Trainer ID above: _PrintNum loads the first byte into the more significant half of its buffer, so the
+    // number the Lucky Number Man reads out is byte0 * 256 + byte1.
+    //
+    // Matching the last digits of a Pokemon's ID No. against it wins a prize: all five digits a Master Ball,
+    // three or four an Exp. Share, two a PP Up. Nothing else in the save is affected by it.
+    public bool HasLuckyNumber => Offsets.LuckyIDNumber >= 0;
+
+    /// <summary>Offset of the two-byte <see cref="LuckyID"/>, or -1 where this layout has none.</summary>
+    public int LuckyIDOffset => Offsets.LuckyIDNumber;
+
+    /// <summary>Offset of the one-byte <see cref="LuckyNumberDay"/>, or -1 where this layout has none.</summary>
+    public int LuckyNumberDayOffset => Offsets.LuckyNumberDay;
+
+    public ushort LuckyID
+    {
+        get => HasLuckyNumber ? ReadUInt16BigEndian(Data[Offsets.LuckyIDNumber..]) : (ushort)0;
+        set { if (HasLuckyNumber) WriteUInt16BigEndian(Data[Offsets.LuckyIDNumber..], value); }
+    }
+
+    /// <summary>
+    /// Day counter the stored <see cref="LuckyID"/> was rolled on, as wCurDay + 1.
+    /// </summary>
+    /// <remarks>
+    /// An edited <see cref="LuckyID"/> only survives while this still matches the game's own day counter (it
+    /// holds wCurDay + 1); when it does not, the next check re-rolls the number. Leaving the value the game
+    /// itself wrote is what keeps an edit alive for the day the save was made.
+    /// </remarks>
+    public byte LuckyNumberDay
+    {
+        get => HasLuckyNumber ? Data[Offsets.LuckyNumberDay] : (byte)0;
+        set { if (HasLuckyNumber) Data[Offsets.LuckyNumberDay] = value; }
+    }
+
+
     public override int PlayedHours
     {
         get => ReadUInt16BigEndian(Data[Offsets.TimePlayed..]);
