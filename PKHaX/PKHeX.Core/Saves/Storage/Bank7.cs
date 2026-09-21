@@ -323,10 +323,6 @@ public sealed class Bank7 : BulkStorage, IBoxDetailName
         pk.HeldItem = 0;
         base.SetPKM(pk, isParty);
     }
-    // PKHaX: upstream c040dac24 shipped a dangling `override ` token here, which is not valid C#
-    // and makes PKHeX.Core fail to build (CS1519). Nothing else in this file is changed, and the
-    // token declares no member, so deleting it cannot alter behaviour. Drop this line the moment
-    // upstream fixes it themselves.
 }
 
 public enum BankRevision : ushort
