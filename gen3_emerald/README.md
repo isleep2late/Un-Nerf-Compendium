@@ -49,3 +49,7 @@ Reserved: ability IDs 0 (None) and 1 (Stench) act as the slot markers and can't 
 
 ## PKHeX source (`PKHeX/src/`)
 Modified files from PKHeX master (net10): `PK3.cs`, `G3PKM.cs`, `EditPK3.cs`, `PKMEditor.cs`. See `PKHeX_CHANGES.md` for the exact edits.
+
+## BPS keyed to the No-Intro dump
+
+`bps/Emerald_UnNerf_Full.bps` is `Emerald_UnNerf_Full.xdelta` re-keyed to `Pokemon - Emerald Version (USA, Europe).gba` (CRC32 `1F1C08FB`), plus an xdelta without secondary compression; expected dump and target hashes are in `bps/SOURCES.md`.

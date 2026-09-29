@@ -4,6 +4,8 @@
 #   - iOS     : net10.0-ios     -> PKHaX.ipa                     (ad-hoc signed for your registered iPhone)
 #
 # This is the "eas build --platform all" equivalent: push (or click Run workflow) -> both apps come out.
+# A build meant for phones must be dispatched WITH a build number (the publish script does this):
+#   gh workflow run build-mobile.yml -R isleep2late/Un-Nerf-Compendium -f build=$(cat ~/.config/phnn/pkhax-build-number)
 # iOS is built here because Apple only allows iOS binaries to be produced on macOS; you never need a Mac
 # of your own. See PKHaX-Mobile/docs/ios-cloud-build.md for the one-time signing setup and the secrets.
 #
@@ -17,24 +19,41 @@
 #  builds, add a keystore — see the docs — but the recommended Android path is the local build script.)
 
 name: Build PKHaX Mobile
+# A stamped run is titled "PKHaX Mobile build N"; PKHaX_Mobile_Publish.sh --collect-ios collects
+# only runs with that title, so an unstamped IPA (which reports build 1) can never be published.
+# Empty on a push or an unnumbered dispatch, so those runs keep the commit message as title.
+run-name: ${{ inputs.build && format('PKHaX Mobile build {0}', inputs.build) || '' }}
 
 on:
   push:
     branches: [ main ]
     paths: [ 'PKHaX-Mobile/**', 'PKHaX/PKHeX.Core/**', '.github/workflows/build-mobile.yml' ]
   workflow_dispatch:
+    inputs:
+      build:
+        # The publish script passes the number of the Android build it has just published, so the
+        # IPA reports the same one. The app asks 'is the published build greater than mine?'; an IPA
+        # that always reports 1 answers yes for ever and offers an update on every launch.
+        description: 'Build number to stamp into both apps. Empty keeps the numbers in the project.'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
 
 concurrency:
-  # Do NOT cancel in progress: a push and a manual dispatch on the same ref share this group, so
-  # cancel-in-progress made them kill each other and lose the release artifacts mid-build.
-  group: build-mobile-${{ github.ref }}
+  # Do NOT cancel in progress: a push and a manual dispatch on the same ref used to share one
+  # group, so cancel-in-progress made them kill each other and lose the release artifacts
+  # mid-build. Stamped runs now have their own group as well: only one PENDING run per group is
+  # kept, so a push arriving while a numbered build waited its turn used to cancel that build.
+  group: build-mobile-${{ github.ref }}-${{ inputs.build && 'stamped' || 'unstamped' }}
   cancel-in-progress: false
 
 env:
   PROJECT: PKHaX-Mobile/src/PKHaX.Mobile.csproj
+  # Empty on a push, and on a manual run that gave no number.
+  BUILD_NUMBER: ${{ inputs.build }}
   DOTNET_CLI_TELEMETRY_OPTOUT: '1'
   DOTNET_NOLOGO: 'true'
 
@@ -70,6 +89,33 @@ jobs:
         # (MAUIR0001, SkiaSharp MissingMethodException) on every run since 2026-09-07 20:52 UTC.
         run: dotnet workload install maui --version 10.0.303.1
 
+      - name: Stamp the build number (only when one was given)
+        run: |
+          if [ -z "$BUILD_NUMBER" ]; then
+            echo "No build number given: both apps keep the numbers in the project."
+            echo "VERSION_ARGS=" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          case "$BUILD_NUMBER" in
+            *[!0-9]*|0*|??????*) echo "::error::build must be a whole number from 1 to 65534, got '$BUILD_NUMBER'"; exit 1 ;;
+          esac
+          if [ "$BUILD_NUMBER" -gt 65534 ]; then
+            echo "::error::build must be a whole number from 1 to 65534, got '$BUILD_NUMBER'"; exit 1
+          fi
+          # On iOS the plist wins: the SDK takes CFBundleVersion and CFBundleShortVersionString from
+          # ApplicationVersion / ApplicationDisplayVersion only when Info.plist does not already have
+          # them (CompileAppManifest uses SetIfNotPresent), and ours has both. So the numbers are
+          # written into the plist of this checkout; the properties below are what Android reads.
+          PLIST=PKHaX-Mobile/src/Platforms/iOS/Info.plist
+          if [ ! -f "$PLIST" ]; then echo "::error::$PLIST is missing; nothing to stamp"; exit 1; fi
+          # Set changes a key that exists; Add creates one that does not. Either way the plist ends
+          # up with the number, whether or not someone has since removed the keys from the project.
+          PB=/usr/libexec/PlistBuddy
+          "$PB" -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" || "$PB" -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
+          "$PB" -c "Set :CFBundleShortVersionString 1.0.$BUILD_NUMBER" "$PLIST" || "$PB" -c "Add :CFBundleShortVersionString string 1.0.$BUILD_NUMBER" "$PLIST"
+          echo "VERSION_ARGS=-p:ApplicationVersion=$BUILD_NUMBER -p:ApplicationDisplayVersion=1.0.$BUILD_NUMBER" >> "$GITHUB_ENV"
+          echo "Stamped build $BUILD_NUMBER, version 1.0.$BUILD_NUMBER."
+
       - name: Restore
         run: dotnet restore "$PROJECT"
 
@@ -77,7 +123,7 @@ jobs:
       - name: Build Android APK (debug-key signed)
         run: |
           dotnet publish "$PROJECT" -f net10.0-android -c Release \
-            -p:AndroidPackageFormats=apk
+            -p:AndroidPackageFormats=apk $VERSION_ARGS
           mkdir -p artifacts/android
           find PKHaX-Mobile/src/bin/Release/net10.0-android -name '*-Signed.apk' -exec cp {} artifacts/android/ \;
           ls -l artifacts/android
@@ -138,7 +184,7 @@ jobs:
             -p:RuntimeIdentifier=ios-arm64 \
             -p:ArchiveOnBuild=true \
             -p:CodesignKey="${{ secrets.IOS_SIGNING_IDENTITY }}" \
-            -p:CodesignProvision="${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}"
+            -p:CodesignProvision="${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}" $VERSION_ARGS
           mkdir -p artifacts/ios
           find PKHaX-Mobile/src/bin/Release/net10.0-ios -name '*.ipa' -exec cp {} artifacts/ios/ \;
           ls -l artifacts/ios
@@ -153,7 +199,7 @@ jobs:
             -p:CodesignKey="" \
             -p:CodesignProvision="" \
             -p:CodesignEntitlements="" \
-            -p:DisableCodesignVerification=true
+            -p:DisableCodesignVerification=true $VERSION_ARGS
           APP="$(find PKHaX-Mobile/src/bin/Release/net10.0-ios -maxdepth 3 -name '*.app' -type d | head -1)"
           if [ -z "$APP" ]; then echo "no .app produced"; exit 1; fi
           echo "packaging $APP"
@@ -162,6 +208,24 @@ jobs:
           mkdir -p artifacts/ios
           ( cd "$RUNNER_TEMP" && zip -qr "$GITHUB_WORKSPACE/artifacts/ios/PKHaX-unsigned.ipa" Payload )
           ls -l artifacts/ios
+
+      # A build log is not a gate. Read the number back out of the artifact that ships.
+      - name: Check the IPA carries the build number it was asked to
+        run: |
+          for IPA in artifacts/ios/*.ipa; do
+            if [ ! -e "$IPA" ]; then echo "::error::no IPA in artifacts/ios to check"; exit 1; fi
+            rm -rf "$RUNNER_TEMP/ipa-check" && mkdir -p "$RUNNER_TEMP/ipa-check"
+            unzip -q "$IPA" -d "$RUNNER_TEMP/ipa-check"
+            PL="$(find "$RUNNER_TEMP/ipa-check/Payload" -maxdepth 2 -name Info.plist | head -1)"
+            if [ -z "$PL" ]; then echo "::error::no Payload/<app>/Info.plist inside $IPA"; exit 1; fi
+            GOT_BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$PL")"
+            GOT_SHORT="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$PL")"
+            echo "$IPA reports build $GOT_BUILD, version $GOT_SHORT."
+            if [ -n "$BUILD_NUMBER" ] && { [ "$GOT_BUILD" != "$BUILD_NUMBER" ] || [ "$GOT_SHORT" != "1.0.$BUILD_NUMBER" ]; }; then
+              echo "::error::$IPA carries build $GOT_BUILD, version $GOT_SHORT - not the requested $BUILD_NUMBER, 1.0.$BUILD_NUMBER"
+              exit 1
+            fi
+          done
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4

@@ -442,3 +442,11 @@ MeroMero (gen-5 Subway/PWT regulation offsets), theSLAYER’s prior work on Gen 
 Kurt (kwsch) for creating and maintaining [PKHeX](https://github.com/kwsch/PKHeX) — the save editor
 our PKHaX build is based on — and the broader projectpokemon.org and hackmons.com
 research threads.
+
+## Load-time patch sets (added 2026-09)
+
+The whole-ROM xdeltas are also available as BPS keyed to the No-Intro dumps, with a `SOURCES.md` naming the expected dump (name, size, SHA-1, CRC32): `gen3_emerald/bps/`, `gen4_platinum/bps/`, `gen5_bw2/bps/`. The 3DS un-nerfs are available as Azahar `load/mods` IPS/BPS sets that patch the untouched game at load time instead of rewriting the dump: `gen6_oras/azahar-mods/` and `gen7_usum/azahar-mods/`, each with a README covering layout, base-file hashes and the update caveat. These were derived from the existing xdeltas and scripts and add no new features.
+
+## Live (in-place) patches (added 2026-09)
+
+Some of the un-nerfs are same-size, in-place edits and can be applied to a game that is already running; others are rebuilt ROMs and cannot. Each folder now says which: `gen5_bw2/live/` holds the Black 2 / White 2 ban-list + clause removal as length-preserving IPS32 and BPS patches (the Arceus and Pokéstar parts stay whole-ROM), and `gen3_emerald/LIVE.md`, `gen4_platinum/LIVE.md`, `gen6_oras/azahar-mods/LIVE.md`, `gen7_usum/azahar-mods/LIVE.md` state what is live-safe there and what a running game would see. No new features; the same edits, classified.
