@@ -42,11 +42,13 @@ live. To toggle on a running game:
 The state carries memory, not the RomFS, so reads made after the load-state see the new files. What that
 means per file:
 
-* **`Battle.cro`** (`prankster` 1 byte, `galewings` 4, `parentalbond` 1, `souldew` 157, `arceus` 4;
-  merged 6 records, 196 bytes, highest byte `0x102674`). A CRO is loaded into memory when a battle starts
+* **`Battle.cro`** (`prankster` 1 byte, `galewings` 4, `parentalbond` 1, `souldew` 157, `arceus` 4,
+  `hyperspacefury` 1, `darkvoid` 1; merged 8 records, 198 bytes, highest byte `0x102674`). A CRO is loaded into memory when a battle starts
   and unloaded when it ends. **A `Battle.cro` that is already loaded stays the old one until the next battle
   loads it**: a Soul Dew toggle made during a Battle Tree run applies from the next battle, not the current
   turn. (A save state taken mid-battle carries the old CRO in memory for the same reason.)
+* **`a/1/4/1`** and **`a/0/3/2`** sit in sub-folders of `romfs_ext/`, which Azahar does not apply at all (see
+  `README.md`); what follows describes them for a loader that does.
 * **`a/1/4/1`** (`nbl`, 171 bytes) is the Battle Tree rule table, read when the Tree is entered: leave and
   re-enter after the reset.
 * **`a/0/3/2`** (`galewings` / `souldew` text, or the `all/` repack) is the English text archive; the

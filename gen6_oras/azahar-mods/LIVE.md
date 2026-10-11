@@ -1,7 +1,7 @@
 # Omega Ruby / Alpha Sapphire — which of these patches can take effect on a running game
 
 Every patch in this folder is the same size in as out (checked from each `.bps` header: source size equals
-target size for `.code` at 5439488 bytes and `a/1/7/0` at 33136 bytes), and every IPS record overwrites
+target size for `.code` at 5439488 bytes, `a/1/7/0` at 33136 bytes and `DllBattle.cro` at 1089536 bytes), and every IPS record overwrites
 existing bytes rather than appending. That makes two different runtime stories, one per target.
 
 ## `exefs/code.*` — live-writable into the running process
@@ -35,6 +35,9 @@ facility eligibility check. A function already executing keeps its old instructi
 
 ## `romfs_ext/a/1/7/0.*` — takes effect after a LayeredFS rebuild
 
+Azahar does not apply this file from `load/mods` at all: its `romfs_ext/` handling only reaches files at the
+RomFS root (see `README.md`). What follows describes it for a loader that does.
+
 RomFS patches are applied by Azahar's LayeredFS when the title is **loaded**: the patched file replaces the
 original for every read the game makes through the file-system service from then on. There is no live
 write to make here; the way to toggle it on a running game is
@@ -46,7 +49,15 @@ write to make here; the way to toggle it on a running game is
 The state carries the game's memory, not the RomFS, so everything the game reads after the load-state sees
 the new file. `a/1/7/0` is the Battle Maison rule archive; the game reads it when the Maison is entered, so
 the ban list and the clause flags change on the next entry. The one caveat is generic: any RomFS file the
-game has **already** read into memory stays as it was until the game reads it again. For OR/AS the only
-patched RomFS file is `a/1/7/0`, so that means "leave the Maison and come back".
+game has **already** read into memory stays as it was until the game reads it again. For `a/1/7/0` that
+means "leave the Maison and come back".
 
 Feature on this target: `nobanlist` / `no_restrictions` (`a/1/7/0`, 402 bytes, byte-identical to each other).
+
+## `romfs_ext/DllBattle.cro.*` — from the next battle
+
+`DllBattle.cro` is the battle engine, loaded when a battle starts and unloaded when it ends. After the
+save state / reset / load state cycle above, the patched engine is the one the **next** battle loads; a
+battle already in progress (or a save state taken mid-battle) keeps the engine it loaded.
+
+Feature on this target: `hyperspacefury` (1 byte at `0xBC55F`).

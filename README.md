@@ -25,8 +25,8 @@ Join our Discord: https://discord.gg/hackmons
 | 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower | **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
 | 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock | **level up to 255** in the save editor | xdelta + source patches | `gen4_platinum/` |
 | 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)** | **level up to 255** in the save editor | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
-| 6 | Omega Ruby / Alpha Sapphire | Maison ban list + clauses + team-size + 510 EV cap; forme persistence (full Hoopa); Arceus form-typing; **hacked Abilities stay on Xerneas** | **level up to 255** in the save editor | Python (cia/3ds) | `gen6_oras/`, `gen67_arceus_typefix/` |
-| 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally** | **level up to 255** in the save editor | Python (cia) | `gen7_usum/`, `gen67_arceus_typefix/` |
+| 6 | Omega Ruby / Alpha Sapphire | Maison ban list + clauses + team-size + 510 EV cap; forme persistence (full Hoopa); Arceus form-typing; **hacked Abilities stay on Xerneas**; **any Pokemon can use Hyperspace Fury** | **level up to 255** in the save editor | Python (cia/3ds) + Azahar load/mods + **one complete patch** | `gen6_oras/`, `gen67_arceus_typefix/` |
+| 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally**; **any Pokemon can use Hyperspace Fury and Dark Void** | **level up to 255** in the save editor | Python (cia; complete patch takes .3ds too) + Azahar load/mods + **one complete patch** | `gen7_usum/`, `gen67_arceus_typefix/` |
 | 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock | **level up to 255** in the save editor | LayeredFS pchtxt + Python | `gen8_swsh/` |
 | Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause | **level up to 255** in the save editor| exefs ips/pchtxt + Python | `bdsp/` |
 | 9 | Scarlet / Violet | **v1.0.0 Treasures of Ruin stats restored** (the day-one 1.0.1 nerf undone), optional Gen 8 Zacian/Zamazenta/Cresselia stats; **level up to 255** in the save editor | Python (extracted romfs personal data) + PKHaX | `gen9_sv/` |
@@ -341,6 +341,10 @@ everything (ban list + clauses + Arceus form-typing + Pokéstar props usable + p
   Skip this script to keep the stock behaviour. Details, and why the obvious fixes do not work, are
   in **"Why Xerneas was the one Pokemon you could not re-ability"** below.
 - **Arceus form-typing (getter cave)** -> `gen67_arceus_typefix/`; skip for stock plate-only typing.
+- **Hyperspace Fury for any Pokemon** -> `gen6_oras/oras_hyperspace_fury.py` (one byte in the RomFS
+  `DllBattle.cro`, `0xBC55F`: `1A` -> `EA`); skip it to keep Hyperspace Fury Hoopa-Unbound-only. Dark
+  Void needs nothing in ORAS: Gen 6 never restricted it.
+- **Everything at once** -> `gen6_oras/complete_unnerf.py` (see "One complete patch per generation").
 
 **Gen 7 - USUM (`gen7_usum/`, `gen67_arceus_typefix/`).**
 - **Battle Tree unban / clauses** -> `gen7_usum/unnerf.py --mode nbl`.
@@ -350,6 +354,10 @@ everything (ban list + clauses + Arceus form-typing + Pokéstar props usable + p
 - **Arceus + Silvally form-typing** -> `gen67_arceus_typefix/` (USUM path).
 - **Protean on Arceus/Silvally** -> the Battle.cro species-list clear (`{0x1ED,0x305} -> 0xFFFF` at
   +0x102670); skip that 4-byte edit to keep their type locked.
+- **Hyperspace Fury / Dark Void for any Pokemon** -> `unnerf.py --mode hyperspacefury` / `darkvoid`
+  (both are in `all`); one byte each in `Battle.cro` (`0xC8267` and `0xC45C3`: `1A` -> `EA`). Skip a mode
+  to keep that move locked to Hoopa-Unbound / Darkrai.
+- **Everything at once** -> `gen7_usum/complete_unnerf.py` (see "One complete patch per generation").
 
 **Gen 8 - SwSh (`gen8_swsh/`).** LayeredFS - per title-ID you get `NoTowerClause/`, `FormePersist/`,
 `DynamaxCandyAll/`. Include only the subfolders for the features you want; each is self-contained.
@@ -369,6 +377,9 @@ feature; omit it to keep stock.
 A few things are deliberately not done, because the game engine fights back harder than a patch can
 reach:
 
+- **Arceus cannot change type in ORAS** - neither through Protean nor through Conversion, Conversion 2,
+  Reflect Type or Camouflage, which refuse an Arceus user (an inline species check in `DllBattle.cro`).
+  In USUM the same moves read the `{Arceus, Silvally}` list that the Arceus feature already clears.
 - **Protean on Arceus/Silvally works in USUM but not ORAS.** In Gen 6 the Arceus type is re-derived
   from its forme *inside the move pipeline* on every move, so it cannot be removed without breaking
   move processing; Gen 7 keeps the re-derivation out of that path, so clearing the `{Arceus, Silvally}`
@@ -443,9 +454,74 @@ Kurt (kwsch) for creating and maintaining [PKHeX](https://github.com/kwsch/PKHeX
 our PKHaX build is based on — and the broader projectpokemon.org and hackmons.com
 research threads.
 
+## One complete patch per generation (added 2026-10)
+
+`gen6_oras/complete_unnerf.py` (Omega Ruby / Alpha Sapphire) and `gen7_usum/complete_unnerf.py` (Ultra Sun /
+Ultra Moon) put **every** un-nerf for the game into a new copy of your decrypted dump in one pass. They are
+the same file; each copy reads the patch set that sits next to it, `azahar-mods/<title id>/all/`, so the
+complete patch is always exactly the sum of the per-feature patches in this repo:
+
+- **Omega Ruby / Alpha Sapphire:** Battle Maison ban list + Species/Item Clause + team size + 510 EV cap,
+  forme persistence (full Hoopa), Arceus form-typing, hacked Abilities stay on Xerneas, Hyperspace Fury for
+  any Pokemon.
+- **Ultra Sun / Ultra Moon:** Battle Tree ban list + Species/Item Clause, Prankster / Gale Wings / Parental
+  Bond / Soul Dew un-nerfs and their rewritten descriptions, forme persistence (full Hoopa), the Poke Resort
+  forme fix, Arceus + Silvally form-typing, Protean on Arceus/Silvally, Hyperspace Fury and Dark Void for any
+  Pokemon.
+
+```
+python gen6_oras/complete_unnerf.py "Pokemon Omega Ruby (USA) (En,Ja,Fr,De,Es,It,Ko) (Rev 2).3ds"
+python gen7_usum/complete_unnerf.py "Pokemon Ultra Moon (USA) (En,Ja,Fr,De,Es,It,Zh,Ko).3ds" --out "UM complete.3ds"
+python gen7_usum/complete_unnerf.py game.3ds --verify      (check only, write nothing)
+```
+
+Windows users can drag the dump onto `complete_unnerf.bat`. The input is only read; the result is written
+next to it as `<name> [Un-Nerf Complete].3ds` unless `--out` says otherwise. It takes a decrypted `.3ds` (the
+No-Intro dumps work; a trimmed `.3ds` gives a trimmed result) or a decrypted `.cia` whose `.code` is stored
+flat (all US/UM `.cia`s). Every patch is applied as BPS, so a dump that is not the expected v1.0 file is
+refused before anything is written; the RomFS hash tree of the input is checked first as well. The No-Intro Omega Ruby / Alpha Sapphire dumps store
+`.code` compressed, so the tool stores the patched `.code` uncompressed, clears the compression flag and
+moves the RomFS and the later partitions to make room (an untrimmed dump keeps its size). Every hash a loader can
+check is rewritten: exheader, ExeFS, every touched RomFS hash block at all three levels, both NCCH
+superblock hashes, and for a `.cia` the TMD. (The battle modules' own CRO hash slots are left as they are,
+like every earlier `Battle.cro` un-nerf: emulators do not check them; real hardware needs a custom firmware
+that skips the CRO/CRR check.)
+
+**Do not install the game's update data** (USUM 1.2, ORAS 1.4) for a patched game: the update ships its own
+`.code` and battle engine (`Battle.cro` and the text archive for USUM, `DllBattle.cro` for ORAS), which
+replace the patched ones and switch most un-nerfs off. The patches are for the v1.0 base game only, and the
+`load/mods` IPS files must not be used with an update installed (they would land on moved code).
+
+## Hyperspace Fury and Dark Void (added 2026-10)
+
+From Gen 6, Hyperspace Fury fails unless Hoopa-Unbound uses it ("But X can't use the move!", or "But Hoopa
+can't use it the way it is now!" for Hoopa-Confined), and from Gen 7 Dark Void fails unless Darkrai uses it.
+In the battle engine both are per-move event handlers that run before the move executes: the handler reads
+the user's species (and, for Hyperspace Fury, its forme) and, if it is the wrong Pokemon, writes the failure
+reason the game then prints. The patch turns the handler's first conditional branch into an unconditional
+jump to its own return, so the handler never writes a failure reason, for any user. Nothing else changes:
+the legitimate users already took that exit, the handlers belong to these two moves only, and Hyperspace
+Fury's other handlers (the ones that break through protection) are untouched.
+
+| game | file | handler | patched byte | effect |
+|---|---|---|---|---|
+| Omega Ruby / Alpha Sapphire | RomFS `DllBattle.cro` | `0xBC544` | `0xBC55F`: `1A` -> `EA` | Hyperspace Fury for any Pokemon |
+| Ultra Sun / Ultra Moon | RomFS `Battle.cro` | `0xC824C` | `0xC8267`: `1A` -> `EA` | Hyperspace Fury for any Pokemon |
+| Ultra Sun / Ultra Moon | RomFS `Battle.cro` | `0xC45A8` | `0xC45C3`: `1A` -> `EA` | Dark Void for any Pokemon |
+
+Omega Ruby and Alpha Sapphire carry Dark Void with no user restriction at all, so ORAS needs no Dark Void
+patch. The tools: `gen6_oras/oras_hyperspace_fury.py`, `gen7_usum/unnerf.py --mode hyperspacefury` /
+`--mode darkvoid` (both included in `--mode all`), the `features/` and `all/` load-time patches under each
+`azahar-mods/`, and the complete patches above.
+
 ## Load-time patch sets (added 2026-09)
 
-The whole-ROM xdeltas are also available as BPS keyed to the No-Intro dumps, with a `SOURCES.md` naming the expected dump (name, size, SHA-1, CRC32): `gen3_emerald/bps/`, `gen4_platinum/bps/`, `gen5_bw2/bps/`. The 3DS un-nerfs are available as Azahar `load/mods` IPS/BPS sets that patch the untouched game at load time instead of rewriting the dump: `gen6_oras/azahar-mods/` and `gen7_usum/azahar-mods/`, each with a README covering layout, base-file hashes and the update caveat. These were derived from the existing xdeltas and scripts and add no new features.
+The whole-ROM xdeltas are also available as BPS keyed to the No-Intro dumps, with a `SOURCES.md` naming the expected dump (name, size, SHA-1, CRC32): `gen3_emerald/bps/`, `gen4_platinum/bps/`, `gen5_bw2/bps/`. The 3DS un-nerfs are available as Azahar `load/mods` IPS/BPS sets that patch the untouched game at load time instead of rewriting the dump: `gen6_oras/azahar-mods/` and `gen7_usum/azahar-mods/`, each with a README covering layout, base-file hashes and the update caveat. These were derived from the existing xdeltas and scripts and add no new features. The 2026-10 additions
+(Hyperspace Fury for ORAS and USUM, Dark Void for USUM) were derived the same way: run the tool on a copy of
+the dump, diff the file it changed. **Correction (2026-10-11):** Azahar applies `romfs_ext/` patches only to
+files at the RomFS root, so through `load/mods` the `.code`, `Battle.cro` and `DllBattle.cro` features work
+but the nested `a/1/4/1`, `a/1/7/0` and `a/0/3/2` patches (Battle Tree / Maison ban lists and clauses, the
+USUM descriptions) are silently skipped. The complete patches and the Python tools are not affected.
 
 ## Live (in-place) patches (added 2026-09)
 

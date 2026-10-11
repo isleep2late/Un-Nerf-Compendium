@@ -60,6 +60,12 @@ Taken from the loader source (`core/file_sys/ncch_container.cpp`, `layered_fs.cp
   the executable that makes the game fail to load rather than run mis-patched; for a RomFS file the
   original is used. An IPS is applied blindly, whatever the file underneath is. Azahar also refuses a BPS
   that carries a metadata block; none of these do.
+* **`romfs_ext/` only reaches files at the RomFS root.** Azahar's `LoadExtRelocations` (upstream code, not a
+  fork change) looks at the top level of `romfs_ext/` only and skips sub-folders without a log line. Measured
+  2026-10-11 with this folder's `all/` set installed: the log shows `exefs/code.bps` "patching code.bin" and
+  "LayeredFS patched file /Battle.cro", and nothing at all for `a/1/4/1` and `a/0/3/2`, which are never applied. Through
+  `load/mods` you therefore get the `.code` features and the `Battle.cro` features (Prankster, Gale Wings, Parental Bond, Soul Dew, Protean on Arceus/Silvally, Hyperspace Fury, Dark Void) but **not** the Battle Tree ban list / clause removal (`a/1/4/1`) or the rewritten descriptions (`a/0/3/2`);
+  for those use `../complete_unnerf.py` or the Python tools, which write the patched files into the dump.
 * **Mods also apply to an installed update.** Azahar strips the update bit (`0004000E...` → `00040000...`)
   when it looks for the mods folder, so with the 1.2 update installed these patches are applied to the
   **update's** `.code` and to the update's `Battle.cro` and `a/0/3/2` (the update replaces both; it does
@@ -92,7 +98,7 @@ CRC32 `CE281B2B` (US) / `061A17D2` (UM); `Battle.cro` of 1298432 bytes, CRC32 `B
 2793156 bytes, CRC32 `C2FEF549`. An app can tell a 1.2 executable from a 1.0 one by size alone.
 
 Results after `all/` is applied: US `.code` CRC32 `CD9DBFEE`, UM `.code` CRC32 `C690FA6D`, `Battle.cro`
-`6A62BDFB`, `a/1/4/1` `07491715`, `a/0/3/2` `5749BA1F`.
+`3928F52B` (it was `6A62BDFB` before Hyperspace Fury and Dark Void were added), `a/1/4/1` `07491715`, `a/0/3/2` `5749BA1F`.
 
 ## Features
 
@@ -107,11 +113,14 @@ Offsets are file offsets inside the named file (`.code`: virtual address minus `
 | `souldew` | `Battle.cro` + `a/0/3/2` | 157 + text | `--mode souldew`: a 184-byte handler in the `.text`/`.rodata` padding at `0xFC980` restoring +50 % Sp.Atk/Sp.Def for Latios/Latias, and the Soul Dew handler entry at `0xBBA10` repointed to it; the Soul Dew description (bank 39, line 225) rewritten. |
 | `formepersist` | `code` | 84 | `formepersist.py --full`: NOPs the out-of-battle `ChangeFormNo(base)` revert calls (17 table sites + the Hoopa destructive-reset calls) so altered formes survive save/load. |
 | `resort` | `code` | 4 | `resort_itemform_persist.py`: NOPs the Poké Resort's item-form `ChangeFormNo` call at `0x1E05A0` so item-derived formes are not re-normalised when a Pokémon is placed in the Resort. |
+| `hyperspacefury` | `Battle.cro` | 1 | `unnerf.py --mode hyperspacefury`: the Hyperspace Fury pre-execution handler at `0xC824C` refuses any user that is not Hoopa-Unbound (cause 30, "can't use the move", or 29, "can't use it the way it is now"); `0xC8264` `bne` -> `b` (byte `0xC8267` `1A` -> `EA`) sends every user to the handler's own return, so no failure reason is written. |
+| `darkvoid` | `Battle.cro` | 1 | `unnerf.py --mode darkvoid`: the Gen 7 Dark Void handler at `0xC45A8` refuses any user that is not Darkrai (cause 31); `0xC45C0` `bne` -> `b` (byte `0xC45C3` `1A` -> `EA`), the Gen 6 behaviour. |
 | `arceus` | `code` + `Battle.cro` | 82 + 4 | `s2_arceus_final.py` (UM) / `s2_arceus_port.py` (US): Arceus and Silvally form-driven typing — two handlers in the `.text` cave at `0x4B99F8` (UM) / `0x4B99F0` (US), hooked from both type getters, the Multitype/RKS gates removed, the plate-less form reset at `0x2236D8` changed to `mov r0,r4`; plus the Battle.cro Protean species lock list at `0x102670` cleared (`ed010503` → `ffffffff`) so Protean re-types Arceus/Silvally. |
 
 `all/exefs/code.*` = `formepersist` + `resort` + `arceus` (170 bytes; no overlapping offsets).
-`all/romfs_ext/Battle.cro.*` = `prankster` + `galewings` + `parentalbond` + `souldew` + `arceus`
-(167 bytes; no overlapping offsets). `all/romfs_ext/a/1/4/1.*` = `nbl`.
+`all/romfs_ext/Battle.cro.*` = `prankster` + `galewings` + `parentalbond` + `souldew` + `arceus` +
+`hyperspacefury` + `darkvoid` (169 bytes; no overlapping offsets; regenerated 2026-10, its BPS uses only
+SourceRead/TargetRead actions, which every BPS applier accepts). `all/romfs_ext/a/1/4/1.*` = `nbl`.
 
 **`a/0/3/2` is the one file whose feature patches are not additive.** `gametext.garc_repack` rebuilds the
 whole archive, so `galewings.a-0-3-2` and `souldew.a-0-3-2` are two different whole-file repacks (they
@@ -124,5 +133,7 @@ The `.code` features and the `Battle.cro` features touch disjoint offsets, so an
 `features/*.code.ips` (or `*.Battle.cro.ips`) records can be concatenated into one file.
 
 These correspond to the owner's finished builds
-`UltraSun_UNNERF_ABILITYUNNERFS_HOOPApersist_ARCEUS_SILVALLY_formtype_PROTEAN.3ds` and the Ultra Moon one:
-the same scripts, the same base game.
+`UltraSun_UNNERF_ABILITYUNNERFS_HOOPApersist_ARCEUS_SILVALLY_formtype_PROTEAN.3ds` and the Ultra Moon one,
+plus the 2026-10 Hyperspace Fury and Dark Void patches: the same scripts, the same base game.
+`../complete_unnerf.py` bakes the whole `all/` set into a copy of a `.3ds` or `.cia` for players who do not
+use `load/mods`.

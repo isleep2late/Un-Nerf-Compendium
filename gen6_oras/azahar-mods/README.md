@@ -20,6 +20,8 @@ checked byte-for-byte against a copy that had **every** script run on it in sequ
     exefs/code.bps        the same, as BPS
     romfs_ext/a/1/7/0.ips Battle Maison rule archive (ban list + clauses + team size)
     romfs_ext/a/1/7/0.bps
+    romfs_ext/DllBattle.cro.ips  battle engine (Hyperspace Fury for any Pokemon)
+    romfs_ext/DllBattle.cro.bps
   features/               one patch per feature per file, for selective use
     <feature>.<file>.ips / .bps
 ```
@@ -34,6 +36,7 @@ Copy the **contents** of `<TID>/all/` into Azahar's `load/mods/<TID>/`, so that 
 ```
 <Azahar user dir>/load/mods/000400000011C400/exefs/code.ips
 <Azahar user dir>/load/mods/000400000011C400/romfs_ext/a/1/7/0.ips
+<Azahar user dir>/load/mods/000400000011C400/romfs_ext/DllBattle.cro.ips
 ```
 
 (`000400000011C500` for Alpha Sapphire). The user dir is `~/.local/share/azahar` on Linux,
@@ -54,6 +57,12 @@ Taken from the loader source (`core/file_sys/ncch_container.cpp`, `layered_fs.cp
   the executable that makes the game fail to load rather than run mis-patched; for a RomFS file the
   original is used. An IPS is applied blindly, whatever the file underneath is. Azahar also refuses a BPS
   that carries a metadata block; none of these do.
+* **`romfs_ext/` only reaches files at the RomFS root.** Azahar's `LoadExtRelocations` (upstream code, not a
+  fork change) looks at the top level of `romfs_ext/` only and skips sub-folders without a log line. Measured
+  2026-10-11 with this folder's `all/` set installed: the log shows `exefs/code.bps` "patching code.bin" and
+  "LayeredFS patched file /DllBattle.cro", and nothing at all for `a/1/7/0`, which are never applied. Through
+  `load/mods` you therefore get the `.code` features and the `DllBattle.cro` features (Hyperspace Fury) but **not** the Battle Maison ban list / clauses / team size (`a/1/7/0`);
+  for those use `../complete_unnerf.py` or the Python tools, which write the patched files into the dump.
 * **Mods also apply to an installed update.** Azahar strips the update bit (`0004000E...` → `00040000...`)
   when it looks for the mods folder, so with the 1.4 update installed these patches are applied to the
   **update's** `.code`. That is not the executable they were derived from (see the table below): the BPS
@@ -72,13 +81,21 @@ in all four dumps. One set therefore serves both dump families.
 | OR `000400000011C400` | ExeFS `.code` (decompressed) | 5439488 | `4D9BBCE3` | `f0a007360be0e6ea096bb0518cef52c93cf4e165` |
 | AS `000400000011C500` | ExeFS `.code` (decompressed) | 5439488 | `72B62B7F` | `8819d013d63a184d01954eed2f30eea68b9582c5` |
 | OR and AS | RomFS `a/1/7/0` | 33136 | `A1623931` | `ca155dc5122a796bed745f5e838a281a6c711a28` |
+| OR | RomFS `DllBattle.cro` | 1089536 | `E78107DF` | `d032c148e8553185b24adf6f4f96abf6c64f7416` |
+| AS | RomFS `DllBattle.cro` | 1089536 | `065E1414` | `492124d5e311d58bfe6c5bd4668b7fe92db50be2` |
 
 **Not the same executable** (do not use these patches on it): the 1.4 update's `.code`, decompressed, is
 5439488 bytes with CRC32 `B0AB0BFE` (OR, `0004000E0011C400`) / `DDC6E452` (AS, `0004000E0011C500`).
-The update does not replace `a/1/7/0`.
+The update does not replace `a/1/7/0`. It **does** ship its own `DllBattle.cro` (1089536 bytes, CRC32
+`1457FEBB` OR / `40BCBB0F` AS) with the code moved: at `0xBC55C` it holds a different instruction, so with the
+update installed the `DllBattle.cro` IPS writes into the wrong place and the battle engine crashes, and the
+BPS is refused (the lock stays). Remove the update before using these, as for `.code`. In the base game
+`DllBattle.cro` is the same file in the No-Intro and the owner's dumps; OR and AS differ only in its hash
+header and relocation tables, not in the patched `.text`, so the IPS is shared and the BPS (which checks the
+whole file's CRC32) is per title.
 
 Results after `all/` is applied: OR `.code` CRC32 `5B3445C5`, AS `.code` CRC32 `B721A5D5`, `a/1/7/0`
-CRC32 `0A6B996A` (both).
+CRC32 `0A6B996A` (both), `DllBattle.cro` CRC32 `F1C2F4EB` (OR) / `101DE720` (AS).
 
 ## Features
 
@@ -91,15 +108,19 @@ Offsets below are file offsets inside `.code` (virtual address minus `0x100000`)
 | `evcap` | `code` | 4 | `oras_evcap.py`: the two EV-cap literals only. |
 | `xerneas` | `code` | 34 | `oras_xerneas_ability.py`: makes the two personal-table `SetTokusei` writes conditional on species != 716 (`ChangeFormNo` at `0x2B4334`, `ChangeMonsNoForm` at `0x1F594`), so an edited Ability stays on Xerneas. |
 | `formepersist` | `code` | 107 (OR) / 108 (AS) | `formepersist.py --full`: NOPs the out-of-battle `ChangeFormNo(base)` revert calls (Mega/Primal loop, the per-title table, and the Hoopa destructive-reset blocks) so altered formes survive save/load. |
+| `hyperspacefury` | `DllBattle.cro` | 1 | `oras_hyperspace_fury.py`: the Hyperspace Fury pre-execution handler at `0xBC544` refuses any user that is not Hoopa-Unbound; `0xBC55C` `bne` -> `b` (byte `0xBC55F` `1A` -> `EA`) sends every user to the handler's own return, so no failure reason is written. Dark Void has no user check in ORAS, so there is no Dark Void patch. |
 | `arceus` | `code` | 66 | `s2_oras_build.py`: Arceus form-driven typing. Code cave at `0x479604` (OR) / `0x4795FC` (AS) reached from both type getters (`0x2B3B98`, OR `0x3D3254` / AS `0x3D324C`), the Multitype gates NOPed (`0x2B3B6C`, OR `0x3D3228` / AS `0x3D3220`), and the plate-less form reset NOPed at `0x2B3EB8`. |
 
 `all/exefs/code.*` = `no_restrictions`/`evcap` + `xerneas` + `formepersist` + `arceus` (211 bytes OR,
 212 bytes AS; no overlapping offsets). `all/romfs_ext/a/1/7/0.*` = `nobanlist`/`no_restrictions`.
+`all/romfs_ext/DllBattle.cro.*` = `hyperspacefury` (added 2026-10; its BPS uses only SourceRead/TargetRead
+actions, which every BPS applier accepts).
 
 The `.code` features touch disjoint offsets, so any subset of `features/*.code.ips` can be merged into one
 `exefs/code.ips` by concatenating their records. `a/1/7/0` has one edit, shared by two feature names.
 
 These correspond to the owner's finished build
-`OmegaRuby_UNNERF_HOOPApersist_ARCEUSformtype_XerneasAbility.3ds` (and the Alpha Sapphire one) minus nothing:
-the same scripts, the same dump. Protean on Arceus remains unsolved in ORAS (see the repo's CHANGES notes);
+`OmegaRuby_UNNERF_HOOPApersist_ARCEUSformtype_XerneasAbility.3ds` (and the Alpha Sapphire one) plus the
+2026-10 Hyperspace Fury patch: the same scripts, the same dump. `../complete_unnerf.py` bakes the whole
+`all/` set into a copy of a `.3ds` or `.cia` for players who do not use `load/mods`. Protean on Arceus remains unsolved in ORAS (see the repo's CHANGES notes);
 no patch here claims otherwise.

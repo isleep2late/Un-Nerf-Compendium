@@ -4,7 +4,8 @@ title Un-Nerf Compendium - ALL (Ultra Sun / Ultra Moon)
 echo ============================================================
 echo   THE UN-NERF COMPENDIUM
 echo   ALL : No Ban List + no Species/Item Clause + Prankster +
-echo         Gale Wings + Parental Bond, in one pass
+echo         Gale Wings + Parental Bond + Soul Dew +
+echo         Hyperspace Fury + Dark Void for any Pokemon, in one pass
 echo   Works on Pokemon Ultra Sun OR Ultra Moon (.cia)
 echo ============================================================
 echo.

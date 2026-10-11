@@ -13,6 +13,8 @@ Patches (each works on BOTH Ultra Sun and Ultra Moon):
   * galewings    -- removes Gen-7 Gale Wings' "only at full HP" rule.
   * parentalbond -- restores Gen-6 Parental Bond (2nd hit 0.5x, not the Gen-7 0.25x).
   * souldew      -- restores Gen-6 Soul Dew (+50pct Sp.Atk and Sp.Def for Latios/Latias).
+  * hyperspacefury -- any Pokemon can use Hyperspace Fury (not only Hoopa-Unbound).
+  * darkvoid     -- any Pokemon can use Dark Void again (Gen-6 rule, not only Darkrai).
   * all          -- applies all of the above.
 
 Usage:
@@ -34,6 +36,8 @@ TID_UM = "00040000001b5100"
 PRANKSTER_PATCH    = (0x00024B14, bytes.fromhex("d1ffff0a"), bytes.fromhex("d1ffffea"), "Prankster (no Dark immunity)")
 GALEWINGS_PATCH    = (0x000DA514, bytes.fromhex("0900000a"), bytes.fromhex("00f020e3"), "Gale Wings (priority at any HP)")
 PARENTALBOND_PATCH = (0x00024EAC, bytes.fromhex("010ba013"), bytes.fromhex("020ba013"), "Parental Bond (2nd hit 0.5x)")
+HYPERSPACEFURY_PATCH = (0x000C8264, bytes.fromhex("1100001a"), bytes.fromhex("110000ea"), "Hyperspace Fury (any user)")
+DARKVOID_PATCH     = (0x000C45C0, bytes.fromhex("0a00001a"), bytes.fromhex("0a0000ea"), "Dark Void (any user)")
 
 # ---- Soul Dew: restore Gen-6 +50pct Sp.Atk/Sp.Def for Latios/Latias via code injection ----
 # A 184-byte handler is written into the .text->.rodata page-padding code cave, and Soul Dew's
@@ -152,7 +156,7 @@ def build_edits(info, mode):
             raise SystemExit("Battle Tree rule table a/1/4/1 not found -- cannot remove clauses.")
         for rel in CLAUSE_REL_OFFSETS:
             edits.append((info["a141_abs"]+rel, b"\x01", b"\x00", "Species/Item Clause flag"))
-    if info["battle_abs"] is None and mode in ("prankster","galewings","parentalbond","souldew","all"):
+    if info["battle_abs"] is None and mode in ("prankster","galewings","parentalbond","souldew","hyperspacefury","darkvoid","all"):
         raise SystemExit("Battle.cro not found in RomFS -- cannot apply ability patches.")
     if mode in ("prankster","all"):
         o,old,new,lbl=PRANKSTER_PATCH; edits.append((info["battle_abs"]+o,old,new,lbl))
@@ -160,6 +164,10 @@ def build_edits(info, mode):
         o,old,new,lbl=GALEWINGS_PATCH; edits.append((info["battle_abs"]+o,old,new,lbl))
     if mode in ("parentalbond","all"):
         o,old,new,lbl=PARENTALBOND_PATCH; edits.append((info["battle_abs"]+o,old,new,lbl))
+    if mode in ("hyperspacefury","all"):
+        o,old,new,lbl=HYPERSPACEFURY_PATCH; edits.append((info["battle_abs"]+o,old,new,lbl))
+    if mode in ("darkvoid","all"):
+        o,old,new,lbl=DARKVOID_PATCH; edits.append((info["battle_abs"]+o,old,new,lbl))
     if mode in ("souldew","all"):
         ba=info["battle_abs"]
         edits.append((ba+SOULDEW_CAVE_OFF, b"\x00"*len(SOULDEW_HANDLER), SOULDEW_HANDLER, "Soul Dew handler (code injection)"))
@@ -238,7 +246,7 @@ def run(cia, out, mode, verify, inplace):
 def main():
     ap=argparse.ArgumentParser(description="The Un-Nerf Compendium - USUM patcher")
     ap.add_argument("--cia",required=True,help="path to the Ultra Sun/Moon .cia")
-    ap.add_argument("--mode",required=True,choices=["nbl","prankster","galewings","parentalbond","souldew","all"])
+    ap.add_argument("--mode",required=True,choices=["nbl","prankster","galewings","parentalbond","souldew","hyperspacefury","darkvoid","all"])
     ap.add_argument("--out",help="output .cia (default: <name>_<mode>.cia next to input)")
     ap.add_argument("--verify",action="store_true",help="dry-run: verify only, no writes")
     ap.add_argument("--inplace",action="store_true",help="patch the input file directly (no copy)")
