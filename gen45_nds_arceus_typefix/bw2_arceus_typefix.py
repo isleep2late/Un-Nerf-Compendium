@@ -20,6 +20,17 @@ def find_personal(rom):
             except Exception: pass
     return None,None
 
+def grow(rom, path, want, filler):
+    fid=rom.filenames.idOf(path)
+    n=ndspy.narc.NARC(rom.files[fid])
+    before=len(n.files)
+    files=list(n.files)
+    for k in range(before,want):
+        files.append(filler(files,k))
+    n.files=files
+    rom.files[fid]=n.save()
+    return before,len(files)
+
 def build(inpath, outpath):
     rom=ndspy.rom.NintendoDSRom.fromFile(inpath)
     fid,narc=find_personal(rom)
@@ -37,6 +48,10 @@ def build(inpath, outpath):
         inpath.split('/')[-1],fid,first,fc-1))
     narc.files=[bytes(f) for f in files]
     rom.files[fid]=narc.save()
+    last=first+fc-2
+    lb,la=grow(rom,"a/0/1/8",len(files),lambda t,k: bytes(t[ARCEUS]) if first<=k<=last else bytes(t[0]))
+    eb,ea=grow(rom,"a/0/1/9",len(files),lambda t,k: bytes(t[ARCEUS]) if first<=k<=last else bytes(len(t[ARCEUS])))
+    print("    learnsets a/0/1/8 %d -> %d, evolutions a/0/1/9 %d -> %d (rows %d..%d copy Arceus)"%(lb,la,eb,ea,first,last))
     rom.saveToFile(outpath)
     # verify
     rom2=ndspy.rom.NintendoDSRom.fromFile(outpath)
@@ -44,6 +59,9 @@ def build(inpath, outpath):
     f2=struct.unpack_from("<H",b,FSI)[0]
     line=", ".join(TYPES[n2.files[f2+k-1][T1]] for k in range(1,fc))
     print("    verify -> Arceus forms 1..%d: %s"%(fc-1,line))
+    rows=[len(n2.files)]+[len(ndspy.narc.NARC(rom2.files[rom2.filenames.idOf(q)]).files) for q in ("a/0/1/8","a/0/1/9")]
+    if min(rows[1:])<rows[0]: raise RuntimeError("learnset/evolution rows %d/%d < personal rows %d"%(rows[1],rows[2],rows[0]))
+    print("    verify -> personal %d, learnset %d, evolution %d rows"%tuple(rows))
     print("    wrote",outpath)
 
 if __name__=="__main__":
