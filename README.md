@@ -522,6 +522,11 @@ the dump, diff the file it changed. **Correction (2026-10-11):** Azahar applies 
 files at the RomFS root, so through `load/mods` the `.code`, `Battle.cro` and `DllBattle.cro` features work
 but the nested `a/1/4/1`, `a/1/7/0` and `a/0/3/2` patches (Battle Tree / Maison ban lists and clauses, the
 USUM descriptions) are silently skipped. The complete patches and the Python tools are not affected.
+**Correction (2026-10-14):** the Black 2 / White 2 Arceus form-typing appended 16 personal rows but no
+learnset (`a/0/1/8`) or evolution (`a/0/1/9`) rows for them, so levelling up an Arceus holding a plate
+crashed the game ("An error has occurred"). `gen45_nds_arceus_typefix/bw2_arceus_typefix.py` now adds those
+rows, and the `gen5_bw2/` xdeltas and `gen5_bw2/bps/` files were rebuilt; the new target hashes are in
+`gen5_bw2/bps/SOURCES.md`. The `gen5_bw2/live/` ban-list patches do not touch these files and are unchanged.
 
 ## Live (in-place) patches (added 2026-09)
 

@@ -90,7 +90,8 @@ python3 bw2_nobanlist.py "Black 2.nds"                      # -> Black2_UnNerf_P
 python3 tools/bw2_pokestar_build.py "Black 2.nds" --out Black2_UnNerf_Pokestar.nds   # same thing, explicit
 ```
 
-The full patch = ban-list removal + clause removal (`a/1/0/6`) + Arceus form-typing (`a/0/1/6`) + this
+The full patch = ban-list removal + clause removal (`a/1/0/6`) + Arceus form-typing (`a/0/1/6`, plus the
+typed forms' learnset and evolution rows in `a/0/1/8` / `a/0/1/9` since 2026-10-14) + this
 Pokéstar validator fix (arm9) + the prop back-sprite fix (`a/0/0/4`). `bw2_nobanlist.py` produces a
 byte-identical ROM to the shipped `*_UnNerf_Pokestar.xdelta`. Test from a **clean boot**, not an old save
 state.
