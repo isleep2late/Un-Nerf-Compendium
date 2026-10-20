@@ -9,20 +9,16 @@ public class EffortExpLegalityTests
     private static readonly int[] Empty = new int[6];
 
     [Fact]
-    public void ZeroEVs_ReturnsZero()
+    public void ZeroEVs_AllGainedEXPIsSurplus()
     {
+        // No EVs need training, so every gained EXP point is surplus (negative = legal).
         EffortExpLegality.GetRequiredEffortEXP(
                 Empty,
                 gainedEXP: 999,
                 hasPokerus: false,
                 originFormat: 4,
                 currentFormat: 4)
-            // PKHaX: upstream's assertion of exactly 0 is stale. GetRequiredEffortEXP returns a
-            // DELTA (required - gained), and its own summary documents negative as legal surplus -
-            // which Gen4_SufficientEXP_ReturnsNegativeDelta below asserts as -2. The zero-EV early
-            // return became -(int)gainedEXP upstream without this test following, so it expects 0
-            // and gets -999. Zero EVs need no EXP, so anything non-positive is the legal answer.
-            .Should().BeLessThanOrEqualTo(0);
+            .Should().Be(-999);
     }
 
     [Theory]

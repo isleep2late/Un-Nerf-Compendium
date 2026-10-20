@@ -25,7 +25,7 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
   The Trainer ID is never touched; unsaved editor changes are not included (export first). Desktop,
   Android and iOS. See below.
 
-Built on **upstream PKHeX `master` @ `dcadc3363` (2026-09-21)**. Every PKHaX edit is tagged with
+Built on **upstream PKHeX release `26.10.18` @ `bfe89c74a` (2026-10-18)**. Every PKHaX edit is tagged with
 a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
 
 ## What's in this folder
