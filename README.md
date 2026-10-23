@@ -30,6 +30,49 @@ Join our Discord: https://discord.gg/hackmons
 | 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock | **level up to 255** in the save editor | LayeredFS pchtxt + Python | `gen8_swsh/` |
 | Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause | **level up to 255** in the save editor| exefs ips/pchtxt + Python | `bdsp/` |
 | 9 | Scarlet / Violet | **v1.0.0 Treasures of Ruin stats restored** (the day-one 1.0.1 nerf undone), optional Gen 8 Zacian/Zamazenta/Cresselia stats; **level up to 255** in the save editor | Python (extracted romfs personal data) + PKHaX | `gen9_sv/` |
+| **UNTESTED BETA** 3 | Ruby / Sapphire (rev 0) | Battle Tower ban list + Lv 50 limit + Species/Item Clause; Soul Dew Tower gate; any-ability (PK3 byte 0x1E) | IPS + BPS | `gen3_rs/` |
+| **UNTESTED BETA** 4 | Diamond / Pearl (Rev 5) | Battle Tower ban list + Species/Item Clause + level rules; Soul Dew in the Tower; Arceus form-typing | xdelta + BPS + Python | `gen4_dp/` |
+| **UNTESTED BETA** 4 | HeartGold / SoulSilver | Battle Frontier ban list (all five facilities) + Species/Item Clause; Soul Dew in the Frontier; Arceus form-typing; permanent Giratina-O/Shaymin-Sky/Rotom | xdelta + BPS | `gen4_hgss/` |
+| **UNTESTED BETA** 5 | Black / White | Subway/link ban list + Species/Item Clause; Arceus form-typing | xdelta + BPS + Python | `gen5_bw/` |
+| **UNTESTED BETA** 6 | X / Y | Maison ban list + Soul Dew ban; Maison 510 EV cap; hacked Abilities stay on Xerneas; Arceus form-typing; forme persistence | Python (3ds) + Azahar load/mods (1.0 and 1.5) | `gen6_xy/` |
+| **UNTESTED BETA** 7 | Sun / Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; any Pokemon can use Hyperspace Fury and Dark Void | Python (3ds) + xdelta + Azahar load/mods (1.0 and 1.2) | `gen7_sm/` |
+| **UNTESTED BETA** 3 (hack) | Heart & Soul 2.0.6 (Emerald hack) | Frontier ban list + Species/Item Clause; party-menu duplicate checks | IPS + BPS from the plain hack | `hacks/gen3_emerald/heart-and-soul-2.0.6/` |
+| **UNTESTED BETA** 3 (hack) | Lazarus 2.0 (Emerald hack) | Frontier ban list + Lv 50 limit + Species/Item Clause; party-menu level cap and duplicate checks | IPS + BPS from the plain hack | `hacks/gen3_emerald/lazarus-2/` |
+| **UNTESTED BETA** 3 (hack) | Emerald Seaglass 3.0 (Emerald hack) | Frontier ban list + Lv 50 limit + Species/Item Clause; party-menu level cap and duplicate checks | IPS + BPS from the plain hack | `hacks/gen3_emerald/seaglass-3.0/` |
+| **UNTESTED BETA** 3 (hack) | SoulGold GBA 1.1.4 (Emerald hack) | Frontier ban list + Species/Item Clause; party-menu duplicate checks | IPS + BPS from the plain hack | `hacks/gen3_emerald/soulgold-gba-1.1.4/` |
+| **UNTESTED BETA** 3 (hack) | Gaia 3.2 (FireRed hack) | Union Room Lv 30 limit; any-ability (byte 0x1E, 2..135); FireRed parity edits | IPS + BPS from the plain hack | `hacks/gen3_frlg/gaia-3.2/` |
+| **UNTESTED BETA** 3 (hack) | Odyssey 4.1 (FireRed hack) | Union Room Lv 30 limit; any-ability (byte 0x1E, 2..252); FireRed parity edits | IPS + BPS from the plain hack | `hacks/gen3_frlg/odyssey-4.1/` |
+| **UNTESTED BETA** 3 (hack) | Vega Fairy Edition EX 1.4 (FireRed hack) | Union Room Lv 30 limit; any-ability (byte 0x1E, 2..77); FireRed parity edits | IPS + BPS from the plain hack | `hacks/gen3_frlg/vega-1.4/` |
+| **UNTESTED BETA** 3 (hack) | Ghost Grey 1.03 (FireRed hack) | Union Room Lv 30 limit; any-ability (byte 0x1E, 2..138); FireRed parity edits | IPS + BPS from the plain hack | `hacks/gen3_frlg/ghostgrey-1.03/` |
+| **UNTESTED BETA** 3 (hack) | Unbound 2.1.1.1 (FireRed hack, CFRU) | Union Room Lv 30 invite/accept check only | IPS + BPS from the plain hack | `hacks/gen3_frlg/unbound-2.1.1.1/` |
+| **UNTESTED BETA** 3 (hack) | Radical Red 4.1 (FireRed hack, CFRU) | Union Room Lv 30 invite/accept check only | IPS + BPS from the plain hack | `hacks/gen3_frlg/radicalred-4.1/` |
+| **UNTESTED BETA** 4 (hack) | Following Renegade Platinum 2.0 (Platinum hack) | Frontier ban list + Species/Item Clause + level and rule caps; Soul Dew in the Frontier; Arceus form-typing; permanent Giratina-O/Sky-Shaymin; AbilityLock | xdelta + BPS + Python from the plain hack | `hacks/gen4_platinum/frp-2.0/` |
+| **UNTESTED BETA** 6 (hack) | Rav-Yin Y (Y hack) | the X/Y set (Maison rules, EV cap, Xerneas Ability, Arceus form-typing, forme persistence) | Azahar load/mods (IPS + BPS) from the plain hack | `hacks/gen6_xy/rav-yin-y/` |
+| **UNTESTED BETA** 6 (hack) | Xtreme-Yang X (X hack) | the X/Y set (Maison rules, EV cap, Xerneas Ability, Arceus form-typing, forme persistence) | Azahar load/mods (IPS + BPS) from the plain hack | `hacks/gen6_xy/xtreme-yang-x/` |
+| **UNTESTED BETA** 7 (hack) | Nova Sun Expanded 1.9 (Sun hack) | the Sun/Moon set; the two new descriptions go into the hack's own text | xdelta + Azahar load/mods (IPS + BPS) from the plain hack | `hacks/gen7_sm/nova-sun-1.9/` |
+| **UNTESTED BETA** 7 (hack) | Umbra Moon Expanded 1.9 (Moon hack) | the Sun/Moon set; the two new descriptions go into the hack's own text | xdelta + Azahar load/mods (IPS + BPS) from the plain hack | `hacks/gen7_sm/umbra-moon-1.9/` |
+| **UNTESTED BETA** 7 (hack) | Supernova Sun Expanded 1.0.5 (Ultra Sun hack) | the complete Ultra Sun / Ultra Moon set; the two new descriptions merged into the hack's own text | Python (3ds) + Azahar load/mods from the plain hack | `hacks/gen7_usum/supernova-sun-1.0.5/` |
+| **UNTESTED BETA** 7 (hack) | Penumbra Moon Expanded 1.0.5 (Ultra Moon hack) | the complete Ultra Sun / Ultra Moon set; the two new descriptions merged into the hack's own text | Python (3ds) + Azahar load/mods from the plain hack | `hacks/gen7_usum/penumbra-moon-1.0.5/` |
+
+### Untested beta folders
+
+The folders marked **UNTESTED BETA** in the table above were built on 2026-10-23 with no in-game test: nobody has
+booted a patched game, entered a facility or fought a battle with them yet. Each was made from static analysis
+(decompilations, reference builds and disassembly), and every check was static: the main one is that every patch
+re-applies to its stated input and gives the expected output byte for byte. Each folder's README says UNTESTED BETA at the top and names the
+exact input dump it needs. Keep a backup of your save before you try one, and please report what misbehaves.
+
+- `gen3_rs/` (Ruby / Sapphire), `gen4_dp/` (Diamond / Pearl), `gen4_hgss/` (HeartGold / SoulSilver),
+  `gen5_bw/` (Black / White), `gen6_xy/` (X / Y), `gen7_sm/` (Sun / Moon)
+- `hacks/gen3_emerald/`: `heart-and-soul-2.0.6/`, `lazarus-2/`, `seaglass-3.0/`, `soulgold-gba-1.1.4/`
+- `hacks/gen3_frlg/`: `gaia-3.2/`, `odyssey-4.1/`, `vega-1.4/`, `ghostgrey-1.03/`, `unbound-2.1.1.1/`, `radicalred-4.1/`
+- `hacks/gen4_platinum/frp-2.0/`
+- `hacks/gen6_xy/`: `rav-yin-y/`, `xtreme-yang-x/`
+- `hacks/gen7_sm/`: `nova-sun-1.9/`, `umbra-moon-1.9/`
+- `hacks/gen7_usum/`: `supernova-sun-1.0.5/`, `penumbra-moon-1.0.5/`
+
+The `hacks/` patches go from the **plain hack** (as its author ships it) to the Un-Nerf build of that hack; they do
+not apply to the vanilla game.
 
 *Please note that lvl 255 is an experimental feature across all games. YMMV.*
 
