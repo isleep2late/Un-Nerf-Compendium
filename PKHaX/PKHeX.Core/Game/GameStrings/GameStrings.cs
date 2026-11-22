@@ -44,7 +44,7 @@ public sealed class GameStrings : IBasicStrings
     public IReadOnlyList<string> Types => types;
     public IReadOnlyList<string> Natures => natures;
 
-    private string[] Get(string ident) => GameLanguage.GetStrings(ident, LanguageFilePrefix);
+    private string[] Get(string ident) => Detached ? GameLanguage.GetStringsDetached(ident, LanguageFilePrefix) : GameLanguage.GetStrings(ident, LanguageFilePrefix);
     private const string NPC = "NPC";
     private const string EmptyIndex = "---";
 
@@ -60,8 +60,15 @@ public sealed class GameStrings : IBasicStrings
         1712, 1713, 1746, 1747, 1748, 1749, 1750, 1771,
     ];
 
-    internal GameStrings(string langFilePrefix)
+    private readonly bool Detached;
+
+    public static GameStrings CreateDetached(string langFilePrefix) => new(langFilePrefix, true);
+
+    internal GameStrings(string langFilePrefix) : this(langFilePrefix, false) { }
+
+    private GameStrings(string langFilePrefix, bool detached)
     {
+        Detached = detached;
         Language = GameLanguage.GetLanguage(LanguageFilePrefix = langFilePrefix);
 
         ribbons = Get("ribbons");
@@ -803,6 +810,25 @@ public sealed class GameStrings : IBasicStrings
         EntityContext.Gen9a => GetItemStrings9a(),
         _ => itemlist,
     };
+
+    public string[] GetItemListForEdit(EntityContext context, GameVersion version = GameVersion.Any)
+    {
+        if (!Detached)
+            throw new InvalidOperationException("Only a detached GameStrings instance hands out its stored item lists for editing.");
+        return context switch
+        {
+            EntityContext.Gen1 => g1items,
+            EntityContext.Gen2 => g2items,
+            EntityContext.Gen3 => version switch
+            {
+                GameVersion.COLO => g3coloitems,
+                GameVersion.XD => g3xditems,
+                _ => g3items,
+            },
+            EntityContext.Gen4 => g4items,
+            _ => itemlist,
+        };
+    }
 
     private string[] GetItemStrings8b()
     {

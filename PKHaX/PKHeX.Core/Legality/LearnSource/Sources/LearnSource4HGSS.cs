@@ -12,7 +12,7 @@ namespace PKHeX.Core;
 public sealed class LearnSource4HGSS : ILearnSource<PersonalInfo4>, IEggSource
 {
     public static readonly LearnSource4HGSS Instance = new();
-    private static readonly PersonalTable4 Personal = PersonalTable.HGSS;
+    private static readonly PersonalTable4 Personal = PersonalTable.StockHGSS;
     private static readonly Learnset[] Learnsets = LearnsetReader.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("lvlmove_hgss.pkl"), "hs"u8));
     private static readonly MoveSource[] EggMoves = MoveSource.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("eggmove_hgss.pkl"), "hs"u8));
     private const int MaxSpecies = Legal.MaxSpeciesID_4;

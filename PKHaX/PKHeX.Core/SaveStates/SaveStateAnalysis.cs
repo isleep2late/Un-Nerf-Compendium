@@ -14,7 +14,9 @@ public sealed class SaveStateAnalysis
 
     public bool HasAnything => EmbeddedSaveFile is not null || GBParty is not null || RamParties.Count > 0;
 
-    public static SaveStateAnalysis? TryAnalyze(ReadOnlySpan<byte> input, string path)
+    public static SaveStateAnalysis? TryAnalyze(ReadOnlySpan<byte> input, string path) => TryAnalyze(input, path, RamScanLimits.Default);
+
+    public static SaveStateAnalysis? TryAnalyze(ReadOnlySpan<byte> input, string path, RamScanLimits limits)
     {
         if (!SaveStateFile.TryParse(input, path, out var container) || container is null)
             return null;
@@ -31,12 +33,12 @@ public sealed class SaveStateAnalysis
         if (container.Console == StateConsole.GBA || (container.Console == StateConsole.GB && container.Kind is SaveStateKind.VbaM or SaveStateKind.RawMemory))
         {
             if (result.GBParty is null)
-                result.RamParties.AddRange(RamPartyScan.FindGen3Parties(container));
+                result.RamParties.AddRange(RamPartyScan.FindGen3Parties(container, limits));
         }
         if (container.Console == StateConsole.NDS)
-            result.RamParties.AddRange(RamPartyScan.FindGen4Parties(container));
+            result.RamParties.AddRange(RamPartyScan.FindGen4Parties(container, limits));
         if (container.Console == StateConsole.N3DS)
-            result.RamParties.AddRange(RamPartyScan.FindGen67Parties(container));
+            result.RamParties.AddRange(RamPartyScan.FindGen67Parties(container, limits));
         result.Battle = RamBattleScan.FindBattle(container, result.RamParties);
         return result;
     }

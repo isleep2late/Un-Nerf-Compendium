@@ -8,6 +8,12 @@ public sealed record SaveBlock3SmallE(Memory<byte> Raw) : ISaveBlock3SmallExpans
 {
     public Span<byte> Data => Raw.Span;
 
+    public int FrontierShift { get; init; }
+
+    public SaveBlock3SmallE(Memory<byte> raw, int frontierShift) : this(raw) => FrontierShift = frontierShift;
+
+    private int Frontier(int offset) => offset > 0xCAA ? offset + FrontierShift : offset;
+
     public Span<byte> OriginalTrainerTrash => Data[..8];
     public byte Gender { get => Data[8]; set => Data[8] = value; }
     public uint ID32 { get => ReadUInt32LittleEndian(Data[0x0A..]); set => WriteUInt32LittleEndian(Data[0x0A..], value); }
@@ -60,8 +66,8 @@ public sealed record SaveBlock3SmallE(Memory<byte> Raw) : ISaveBlock3SmallExpans
     // Battle Frontier: 0x64C
     public Span<byte> EReaderTrainer => Data.Slice(0xBEC, 0xBC);
 
-    public BattleFrontier3 BattleFrontier => new(Data.Slice(0xCDC, BattleFrontier3.SIZE));
+    public BattleFrontier3 BattleFrontier => new(Data.Slice(Frontier(0xCDC), BattleFrontier3.SIZE));
 
-    public ushort BP { get => ReadUInt16LittleEndian(Data[0xEB8..]); set => WriteUInt16LittleEndian(Data[0xEB8..], Math.Min((ushort)9999, value)); }
-    public ushort BPEarned { get => ReadUInt16LittleEndian(Data[0xEBA..]); set => WriteUInt16LittleEndian(Data[0xEBA..], value); }
+    public ushort BP { get => ReadUInt16LittleEndian(Data[Frontier(0xEB8)..]); set => WriteUInt16LittleEndian(Data[Frontier(0xEB8)..], Math.Min((ushort)9999, value)); }
+    public ushort BPEarned { get => ReadUInt16LittleEndian(Data[Frontier(0xEBA)..]); set => WriteUInt16LittleEndian(Data[Frontier(0xEBA)..], value); }
 }

@@ -1,0 +1,48 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "3ds",
+  "base": "ultra-sun-usa",
+  "headerFamily": "3ds:00040000001B5000",
+  "engine": {
+    "family": "ctr-gen7",
+    "version": "usum-1.0",
+    "ramLayout": "base",
+    "romLayout": "base"
+  },
+  "id": "ultra-sun-usa+unnerf-complete",
+  "displayName": "Pokemon Ultra Sun + Un-Nerf (Complete)",
+  "kind": "unnerf",
+  "inherits": "ultra-sun-usa",
+  "parent": "ultra-sun-usa",
+  "match": [
+    {
+      "imageRoot": "54b354d0ee72f4419f8eb01328aab5d0402eaddd599df58462c14062082143e7",
+      "sha1": "647ba68ded5445bd86e1d0325db89f4cc1182b06",
+      "label": "baked"
+    },
+    {
+      "titleId": "00040000001B5000",
+      "codeSha1": "4de1e54a838f68d056c598dcbd82dfccbb6e0578",
+      "modSet": "none",
+      "updateVersion": 0,
+      "label": "code"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV7USUM"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:ultrasun"
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "tools/games/ctr/ctr-defs.json",
+      "note": "ultra-sun-usa+unnerf-complete.3ds: SHA-1, image root (SHA-256 of the NCCH header) and code SHA-1 (.text + .rodata, R1-4) measured read-only by ProfileGen ctr-rows"
+    }
+  ]
+}

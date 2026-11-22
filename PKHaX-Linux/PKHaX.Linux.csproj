@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<AssemblyName>PKHaX</AssemblyName>
+		<RootNamespace>PKHaX.Linux</RootNamespace>
+		<Product>PKHaX</Product>
+		<Description>PKHaX for Linux: save editor for Pokemon games and ROM hacks</Description>
+		<LangVersion>14</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Version Condition="'$(Version)' == ''">26.10.18</Version>
+		<BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+		<IsTrimmable>false</IsTrimmable>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<_PKHaXPatchingInTree>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)..', 'PKHaX', 'PKHaX.Patching'))</_PKHaXPatchingInTree>
+		<_PKHaXPatchingInIs2l>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)..', '..', '..', 'isleep2late-Files', 'src', 'Services'))</_PKHaXPatchingInIs2l>
+		<PKHaXPatchingSource Condition="'$(PKHaXPatchingSource)' == '' AND Exists('$(_PKHaXPatchingInTree)RomPatch.cs')">compendium</PKHaXPatchingSource>
+		<PKHaXPatchingSource Condition="'$(PKHaXPatchingSource)' == '' AND Exists('$(_PKHaXPatchingInIs2l)Patch\RomPatch.cs')">is2l</PKHaXPatchingSource>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(PKHaXPatchingSource)' == 'compendium'">
+		<Compile Include="$(_PKHaXPatchingInTree)*.cs" Link="Patching\%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(PKHaXPatchingSource)' == 'is2l'">
+		<Compile Include="$(_PKHaXPatchingInIs2l)Patch\*.cs" Link="Patching\%(Filename)%(Extension)" />
+		<Compile Include="$(_PKHaXPatchingInIs2l)Pkhax\PkhaxRomPatcher.cs" Link="Patching\PkhaxRomPatcher.cs" />
+	</ItemGroup>
+
+	<Target Name="CheckPKHaXPatchingSource" BeforeTargets="BeforeBuild">
+		<Error Condition="'$(PKHaXPatchingSource)' != 'compendium' AND '$(PKHaXPatchingSource)' != 'is2l'"
+		       Text="The patch decoders were not found: neither $(_PKHaXPatchingInTree)RomPatch.cs (the Compendium's PKHaX/PKHaX.Patching) nor $(_PKHaXPatchingInIs2l)Patch\RomPatch.cs (isleep2late-Files) exists." />
+	</Target>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="12.1.6" />
+		<PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.6" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PKHaX\PKHeX.Core\PKHeX.Core.csproj" />
+		<ProjectReference Include="..\PKHaX\PKHaX.Hacks\PKHaX.Hacks.csproj" />
+	</ItemGroup>
+
+</Project>

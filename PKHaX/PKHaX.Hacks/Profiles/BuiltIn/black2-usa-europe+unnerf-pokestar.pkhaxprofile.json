@@ -1,0 +1,49 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "nds",
+  "base": "black2-usa-europe",
+  "headerFamily": "nds:IREO:0",
+  "engine": {
+    "family": "nds-gen5",
+    "version": "black2-1.0",
+    "ramLayout": "base",
+    "romLayout": "base"
+  },
+  "party": {
+    "codec": "pk5"
+  },
+  "id": "black2-usa-europe+unnerf-pokestar",
+  "displayName": "Pokemon Black 2 + Un-Nerf (Pokestar)",
+  "kind": "unnerf",
+  "inherits": "black2-usa-europe",
+  "parent": "black2-usa-europe",
+  "match": [
+    {
+      "sha1": "ed5b3acc4cd78339d904a0ad8d6d313faa7e6ba7",
+      "crc32": "c8601b65",
+      "label": "plain"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV5B2W2"
+  },
+  "magic": {
+    "catalog": "IREO",
+    "encounters": "catalog:IREO",
+    "manip": "black2"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:black2"
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "src/Services/Mods/UnNerfCatalogData.cs",
+      "note": "result SHA-1 of gen5_bw2/bps/Black2_UnNerf_Pokestar.bps; gen5_bw2/bps/Black2_UnNerf_Pokestar.nocomp.xdelta on the clean base (UnNerfCatalog); owner-base results from logs/impl-S1-0/emerald-ips-results.log"
+    }
+  ]
+}

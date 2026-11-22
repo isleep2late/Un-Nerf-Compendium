@@ -11,7 +11,7 @@ namespace PKHeX.Core;
 public sealed class LearnSource9ZA : ILearnSource<PersonalInfo9ZA>, IHomeSource, ILearnSourceBonus
 {
     public static readonly LearnSource9ZA Instance = new();
-    private static readonly PersonalTable9ZA Personal = PersonalTable.ZA;
+    private static readonly PersonalTable9ZA Personal = PersonalTable.StockZA;
     private static readonly Learnset[] Learnsets = LearnsetReader.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("lvlmove_za.pkl"), "za"u8));
     private static readonly Learnset[] PlusLevels = LearnsetReader.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("plus_za.pkl"), "za"u8));
     private const int MaxSpecies = Legal.MaxSpeciesID_9a;

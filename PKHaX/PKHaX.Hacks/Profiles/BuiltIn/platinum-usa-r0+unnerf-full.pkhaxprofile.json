@@ -1,0 +1,46 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "nds",
+  "base": "platinum-usa-r0",
+  "headerFamily": "nds:CPUE:1",
+  "engine": {
+    "family": "nds-gen4",
+    "version": "platinum-1.0",
+    "ramLayout": "relocated",
+    "romLayout": "relocated"
+  },
+  "party": {
+    "codec": "pk4"
+  },
+  "id": "platinum-usa-r0+unnerf-full",
+  "displayName": "Pokemon Platinum + Un-Nerf (Full)",
+  "kind": "unnerf",
+  "inherits": "platinum-usa-r0",
+  "parent": "platinum-usa-r0",
+  "match": [
+    {
+      "sha1": "15f1441de1a3bcffaf35a63e2f4e98a0a13b7416",
+      "crc32": "c2bc6ca2",
+      "label": "plain"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV4Pt"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:platinum"
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time.",
+    "Companion": "This is Platinum with the Un-Nerf Compendium's full patch (SHA-1 15f1441d...). That patch moves every fixed address in the game's memory, so Magic, the DS live party, the roamer tools, the Trainer ID tools and battle intel are off for it until it has its own profile. The game itself, saving and save states work as usual.",
+    "DsModeParty": "This is Platinum with the Un-Nerf Compendium's full patch (SHA-1 15f1441d...). That patch moves every fixed address in the game's memory, so Magic, the DS live party, the roamer tools, the Trainer ID tools and battle intel are off for it until it has its own profile. The game itself, saving and save states work as usual."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "src/Services/Mods/UnNerfCatalogData.cs",
+      "note": "result SHA-1 of gen4_platinum/bps/Platinum_UnNerf_Full.bps; gen4_platinum/bps/Platinum_UnNerf_Full.nocomp.xdelta on the clean base (UnNerfCatalog); owner-base results from logs/impl-S1-0/emerald-ips-results.log"
+    }
+  ]
+}

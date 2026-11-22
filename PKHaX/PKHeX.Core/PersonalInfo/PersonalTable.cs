@@ -13,117 +13,140 @@ public static class PersonalTable
     /// <summary>
     /// Personal Table used in <see cref="EntityContext.Gen9a"/>.
     /// </summary>
-    public static readonly PersonalTable9ZA ZA = new(GetTable("za"));
+    public static PersonalTable9ZA ZA => PersonalOverride.Current?.ZA ?? StockZA;
+    public static readonly PersonalTable9ZA StockZA = new(GetTable("za"));
 
     /// <summary>
     /// Personal Table used in <see cref="EntityContext.Gen9"/>.
     /// </summary>
-    public static readonly PersonalTable9SV SV = new(GetTable("sv"));
+    public static PersonalTable9SV SV => PersonalOverride.Current?.SV ?? StockSV;
+    public static readonly PersonalTable9SV StockSV = new(GetTable("sv"));
 
     /// <summary>
     /// Personal Table used in <see cref="EntityContext.Gen8a"/>.
     /// </summary>
-    public static readonly PersonalTable8LA LA = new(GetTable("la"));
+    public static PersonalTable8LA LA => PersonalOverride.Current?.LA ?? StockLA;
+    public static readonly PersonalTable8LA StockLA = new(GetTable("la"));
 
     /// <summary>
     /// Personal Table used in <see cref="EntityContext.Gen8b"/>.
     /// </summary>
-    public static readonly PersonalTable8BDSP BDSP = new(GetTable("bdsp"));
+    public static PersonalTable8BDSP BDSP => PersonalOverride.Current?.BDSP ?? StockBDSP;
+    public static readonly PersonalTable8BDSP StockBDSP = new(GetTable("bdsp"));
 
     /// <summary>
     /// Personal Table used in <see cref="EntityContext.Gen8"/>.
     /// </summary>
-    public static readonly PersonalTable8SWSH SWSH = new(GetTable("swsh"));
+    public static PersonalTable8SWSH SWSH => PersonalOverride.Current?.SWSH ?? StockSWSH;
+    public static readonly PersonalTable8SWSH StockSWSH = new(GetTable("swsh"));
 
     /// <summary>
     /// Personal Table used in <see cref="EntityContext.Gen7b"/>.
     /// </summary>
-    public static readonly PersonalTable7GG GG = new(GetTable("gg"));
+    public static PersonalTable7GG GG => PersonalOverride.Current?.GG ?? StockGG;
+    public static readonly PersonalTable7GG StockGG = new(GetTable("gg"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.USUM"/>.
     /// </summary>
-    public static readonly PersonalTable7 USUM = new(GetTable("uu"), Legal.MaxSpeciesID_7_USUM);
+    public static PersonalTable7 USUM => PersonalOverride.Current?.USUM ?? StockUSUM;
+    public static readonly PersonalTable7 StockUSUM = new(GetTable("uu"), Legal.MaxSpeciesID_7_USUM);
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.SM"/>.
     /// </summary>
-    public static readonly PersonalTable7 SM = new(GetTable("sm"), Legal.MaxSpeciesID_7);
+    public static PersonalTable7 SM => PersonalOverride.Current?.SM ?? StockSM;
+    public static readonly PersonalTable7 StockSM = new(GetTable("sm"), Legal.MaxSpeciesID_7);
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.ORAS"/>.
     /// </summary>
-    public static readonly PersonalTable6AO AO = new(GetTable("ao"));
+    public static PersonalTable6AO AO => PersonalOverride.Current?.AO ?? StockAO;
+    public static readonly PersonalTable6AO StockAO = new(GetTable("ao"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.XY"/>.
     /// </summary>
-    public static readonly PersonalTable6XY XY = new(GetTable("xy"));
+    public static PersonalTable6XY XY => PersonalOverride.Current?.XY ?? StockXY;
+    public static readonly PersonalTable6XY StockXY = new(GetTable("xy"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.B2W2"/>.
     /// </summary>
-    public static readonly PersonalTable5B2W2 B2W2 = new(GetTable("b2w2"));
+    public static PersonalTable5B2W2 B2W2 => PersonalOverride.Current?.B2W2 ?? StockB2W2;
+    public static readonly PersonalTable5B2W2 StockB2W2 = new(GetTable("b2w2"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.BW"/>.
     /// </summary>
-    public static readonly PersonalTable5BW BW = new(GetTable("bw"));
+    public static PersonalTable5BW BW => PersonalOverride.Current?.BW ?? StockBW;
+    public static readonly PersonalTable5BW StockBW = new(GetTable("bw"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.HGSS"/>.
     /// </summary>
-    public static readonly PersonalTable4 HGSS = new(GetTable("hgss"));
+    public static PersonalTable4 HGSS => PersonalOverride.Current?.HGSS ?? StockHGSS;
+    public static readonly PersonalTable4 StockHGSS = new(GetTable("hgss"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.Pt"/>.
     /// </summary>
-    public static readonly PersonalTable4 Pt = new(GetTable("pt"));
+    public static PersonalTable4 Pt => PersonalOverride.Current?.Pt ?? StockPt;
+    public static readonly PersonalTable4 StockPt = new(GetTable("pt"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.DP"/>.
     /// </summary>
-    public static readonly PersonalTable4 DP = new(GetTable("dp"));
+    public static PersonalTable4 DP => PersonalOverride.Current?.DP ?? StockDP;
+    public static readonly PersonalTable4 StockDP = new(GetTable("dp"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.LG"/>.
     /// </summary>
-    public static readonly PersonalTable3 LG = new(GetTable("lg"));
+    public static PersonalTable3 LG => PersonalOverride.Current?.LG ?? StockLG;
+    public static readonly PersonalTable3 StockLG = new(GetTable("lg"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.FR"/>.
     /// </summary>
-    public static readonly PersonalTable3 FR = new(GetTable("fr"));
+    public static PersonalTable3 FR => PersonalOverride.Current?.FR ?? StockFR;
+    public static readonly PersonalTable3 StockFR = new(GetTable("fr"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.E"/>.
     /// </summary>
-    public static readonly PersonalTable3 E = new(GetTable("e"));
+    public static PersonalTable3 E => PersonalOverride.Current?.E ?? StockE;
+    public static readonly PersonalTable3 StockE = new(GetTable("e"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.RS"/>.
     /// </summary>
-    public static readonly PersonalTable3 RS = new(GetTable("rs"));
+    public static PersonalTable3 RS => PersonalOverride.Current?.RS ?? StockRS;
+    public static readonly PersonalTable3 StockRS = new(GetTable("rs"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.C"/>.
     /// </summary>
-    public static readonly PersonalTable2 C = new(GetTable("c"));
+    public static PersonalTable2 C => PersonalOverride.Current?.C ?? StockC;
+    public static readonly PersonalTable2 StockC = new(GetTable("c"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.GS"/>.
     /// </summary>
-    public static readonly PersonalTable2 GS = new(GetTable("gs"));
+    public static PersonalTable2 GS => PersonalOverride.Current?.GS ?? StockGS;
+    public static readonly PersonalTable2 StockGS = new(GetTable("gs"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.RB"/>.
     /// </summary>
-    public static readonly PersonalTable1 RB = new(GetTable("rb"));
+    public static PersonalTable1 RB => PersonalOverride.Current?.RB ?? StockRB;
+    public static readonly PersonalTable1 StockRB = new(GetTable("rb"));
 
     /// <summary>
     /// Personal Table used in <see cref="GameVersion.YW"/>.
     /// </summary>
-    public static readonly PersonalTable1 Y = new(GetTable("y"));
+    public static PersonalTable1 Y => PersonalOverride.Current?.Y ?? StockY;
+    public static readonly PersonalTable1 StockY = new(GetTable("y"));
 
     private static Memory<byte> GetTable(string game) => Util.GetBinaryResource($"personal_{game}");
 
@@ -138,20 +161,20 @@ public static class PersonalTable
         // Enable Gen3 data with Emerald's data, FR/LG is a subset of Emerald's compatibility.
         var machine = BinLinkerAccessor.Get(Util.GetBinaryResource("hmtm_g3.pkl"), "g3"u8);
         var tutors = BinLinkerAccessor.Get(Util.GetBinaryResource("tutors_g3.pkl"), "g3"u8);
-        E.LoadTables(machine, tutors);
-        FR.CopyTables(E);
-        LG.CopyTables(E);
+        StockE.LoadTables(machine, tutors);
+        StockFR.CopyTables(StockE);
+        StockLG.CopyTables(StockE);
         // PKHaX: allow Gen-3 Deoxys to use all 4 forms (Normal/Attack/Defense/Speed)
-        RS[(int)Species.Deoxys].FormCount = 4;
-        E[(int)Species.Deoxys].FormCount = 4;
-        FR[(int)Species.Deoxys].FormCount = 4;
-        LG[(int)Species.Deoxys].FormCount = 4;
-        RS.CopyTables(E);
+        StockRS[(int)Species.Deoxys].FormCount = 4;
+        StockE[(int)Species.Deoxys].FormCount = 4;
+        StockFR[(int)Species.Deoxys].FormCount = 4;
+        StockLG[(int)Species.Deoxys].FormCount = 4;
+        StockRS.CopyTables(StockE);
     }
 
     private static void PopulateGen4Tutors()
     {
         var tutors = BinLinkerAccessor.Get(Util.GetBinaryResource("tutors_g4.pkl"), "g4"u8);
-        HGSS.LoadTables(tutors);
+        StockHGSS.LoadTables(tutors);
     }
 }

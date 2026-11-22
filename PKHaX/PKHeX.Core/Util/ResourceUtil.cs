@@ -48,6 +48,9 @@ public static partial class Util
 
     public static string[] GetStringList(string fileName, string lang2char, [ConstantExpected] string type = "text") => GetStringList(GetFullResourceName(fileName, lang2char, type));
 
+    public static string[] GetStringListDetached(string fileName, string lang2char, [ConstantExpected] string type = "text")
+        => ResourceCache.TryGetStringResource(GetFullResourceName(fileName, lang2char, type), out var txt) ? FastSplit(txt) : [];
+
     private static string GetFullResourceName(string fileName, string lang2char, [ConstantExpected] string type) => $"{type}_{fileName}_{lang2char}";
 
     public static byte[] GetBinaryResource(string name)

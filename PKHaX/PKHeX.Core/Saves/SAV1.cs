@@ -46,12 +46,14 @@ public sealed class SAV1 : SaveFile, ILangDeviantSave, IEventFlagArray, IEventWo
         ClearBoxes();
     }
 
-    public SAV1(Memory<byte> data, LanguageID language, GameVersion version = default) : base(data)
+    public SAV1(Memory<byte> data, LanguageID language, GameVersion version = default) : this(data, language, version, null) { }
+
+    public SAV1(Memory<byte> data, LanguageID language, GameVersion version, SAV1Offsets? offsets) : base(data)
     {
         Version = version == default ? GameVersion.RBY : version;
         Japanese = language == LanguageID.Japanese;
         Language = (int)language;
-        Offsets = Japanese ? SAV1Offsets.JPN : SAV1Offsets.INT;
+        Offsets = offsets ?? (Japanese ? SAV1Offsets.JPN : SAV1Offsets.INT);
         Personal = Version == GameVersion.YW ? PersonalTable.Y : PersonalTable.RB;
 
         Initialize();
@@ -214,7 +216,7 @@ public sealed class SAV1 : SaveFile, ILangDeviantSave, IEventFlagArray, IEventWo
     }
 
     // Configuration
-    protected override SAV1 CloneInternal() => new(GetFinalData(), (LanguageID)Language, Version);
+    protected override SAV1 CloneInternal() => new(GetFinalData(), (LanguageID)Language, Version, Offsets);
 
     public override int SIZE_STORED => Japanese ? PokeCrypto.SIZE_1JLIST : PokeCrypto.SIZE_1ULIST;
     public override int SIZE_PARTY => SIZE_STORED;

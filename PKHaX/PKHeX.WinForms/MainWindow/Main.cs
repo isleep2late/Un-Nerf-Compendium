@@ -111,6 +111,7 @@ public partial class Main : Form
         Menu_Tools.DropDownItems.Add(new ToolStripSeparator()); // PKHaX: Gen 1 save corrupter (Any% 2-swap)
         Menu_Tools.DropDownItems.Add(Menu_CorruptGen1); // PKHaX
         Menu_CorruptGen1.Click += ClickCorruptGen1Save; // PKHaX
+        AddHackMenu();
         Menu_Tools.DropDownOpening += (_, _) => Menu_CorruptGen1.Enabled = CanCorruptGen1Save(); // PKHaX: only for a Gen 1 save loaded from a file on disk
 
         // Add translatable extra menu controls.
@@ -559,6 +560,8 @@ public partial class Main : Form
 
     internal void OpenFile(Memory<byte> input, string path, string ext)
     {
+        if (OpenHackFile(input, path))
+            return;
         var obj = FileUtil.GetSupportedFile(input, ext, C_SAV.SAV);
         if (obj is not null && LoadFile(obj, path))
             return;
@@ -755,6 +758,8 @@ public partial class Main : Form
 
     internal bool OpenSAV(SaveFile sav, string path, bool forceOpen = false)
     {
+        if (HackGuardOpen(sav, path))
+            return true;
         if (ModifierKeys == Keys.Alt)
         {
             SaveTypeInfo other = default;
@@ -1270,6 +1275,8 @@ public partial class Main : Form
     {
         if (e?.Data?.GetData(DataFormats.FileDrop) is not string[] { Length: not 0 } files)
             return;
+        if (RouteHackDrop(files[0]))
+            return;
         OpenQuick(files[0]);
         e.Effect = DragDropEffects.Copy;
     }
@@ -1466,7 +1473,7 @@ public partial class Main : Form
             Gen1SaveCorrupter.RouteReminder);
     }
 
-    private void ClickExportSAV(object sender, EventArgs e)
+    private void ClickExportSAV(object? sender, EventArgs e)
     {
         if (!Menu_ExportSAV.Enabled)
             return; // hot-keys can't cheat the system!

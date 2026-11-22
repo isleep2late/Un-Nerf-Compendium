@@ -644,13 +644,16 @@ public sealed partial class EntityEditorPage : ContentPage
 	private void BuildActions()
 	{
 		legality = new Label { FontSize = 12, TextColor = Ui.Muted, Margin = new Thickness(4, 10, 4, 0) };
-		try
+		if (saves.ShowsLegality)
 		{
-			var report = new LegalityAnalysis(pk);
-			legality.Text = report.Valid ? "Legality: legal." : "Legality: illegal — allowed in PKHaX mode.";
+			try
+			{
+				var report = new LegalityAnalysis(pk);
+				legality.Text = report.Valid ? "Legality: legal." : "Legality: illegal — allowed in PKHaX mode.";
+			}
+			catch { legality.Text = ""; }
+			root.Add(legality);
 		}
-		catch { legality.Text = ""; }
-		root.Add(legality);
 
 		// PKHaX: one press = every ribbon, maxed EV/IV, memories, contest stats, Pokerus and shiny.
 		// Deliberately illegal (252 EVs x6 = 1512 vs the 510 cap), so it is gated on illegal mode.

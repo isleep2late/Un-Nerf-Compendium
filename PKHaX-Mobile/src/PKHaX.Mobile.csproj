@@ -17,7 +17,7 @@
 		<ApplicationTitle>PKHaX</ApplicationTitle>
 		<ApplicationId>com.unnerf.pkhax</ApplicationId>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>6</ApplicationVersion>
+		<ApplicationVersion>7</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
@@ -38,6 +38,7 @@
 		<!-- PKHeX.Core enumerates ribbons/marks by reflecting over "Ribbon*" properties, which a trimmed
 		     Release publish would strip. Root the whole assembly so `dotnet publish` (used by CI) keeps it. -->
 		<TrimmerRootAssembly Include="PKHeX.Core" />
+		<TrimmerRootAssembly Include="PKHaX.Hacks" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -55,6 +56,11 @@
 		     because those changes live in PKHeX.Core. Sprites live in PKHeX.Drawing.* (System.Drawing,
 		     desktop-only) and are deliberately NOT referenced; the app fetches sprites over the network. -->
 		<ProjectReference Include="..\..\PKHaX\PKHeX.Core\PKHeX.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\PKHaX\PKHaX.Hacks\PKHaX.Hacks.csproj" />
+		<Compile Include="..\..\PKHaX\PKHaX.Patching\*.cs" Link="Patching\%(Filename)%(Extension)" />
 	</ItemGroup>
 
 </Project>

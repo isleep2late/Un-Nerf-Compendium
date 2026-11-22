@@ -12,7 +12,7 @@ public sealed class PlayerBag1 : PlayerBag
 
     private static InventoryPouchGB[] GetPouches(ItemStorage1 info, SAV1Offsets offsets) =>
     [
-        new(offsets.Items, 20, 99, info, Items),
+        new(offsets.Items, offsets.BagCapacity, 99, info, Items),
         new(offsets.PCItems, 50, 99, info, PCItems),
     ];
 

@@ -167,6 +167,7 @@ namespace PKHeX.WinForms
             Tab_Other = new System.Windows.Forms.TabPage();
             FLP_Other = new System.Windows.Forms.FlowLayoutPanel();
             B_ForceMirageIsland = new System.Windows.Forms.Button();
+            B_EnigmaBerry = new System.Windows.Forms.Button();
             TC_Misc.SuspendLayout();
             TAB_Main.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)NUD_BPEarned).BeginInit();
@@ -1807,6 +1808,7 @@ namespace PKHeX.WinForms
             // FLP_Other
             // 
             FLP_Other.Controls.Add(B_ForceMirageIsland);
+            FLP_Other.Controls.Add(B_EnigmaBerry);
             FLP_Other.Dock = System.Windows.Forms.DockStyle.Fill;
             FLP_Other.Location = new System.Drawing.Point(3, 3);
             FLP_Other.Name = "FLP_Other";
@@ -1823,6 +1825,14 @@ namespace PKHeX.WinForms
             B_ForceMirageIsland.Text = "Mirage Island Appear: Match First Party Member";
             B_ForceMirageIsland.UseVisualStyleBackColor = true;
             B_ForceMirageIsland.Click += B_ForceMirageIsland_Click;
+            B_EnigmaBerry.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            B_EnigmaBerry.Location = new System.Drawing.Point(3, 57);
+            B_EnigmaBerry.Name = "B_EnigmaBerry";
+            B_EnigmaBerry.Size = new System.Drawing.Size(240, 48);
+            B_EnigmaBerry.TabIndex = 1;
+            B_EnigmaBerry.Text = "Enigma Berry (e-Reader berry record)...";
+            B_EnigmaBerry.UseVisualStyleBackColor = true;
+            B_EnigmaBerry.Click += B_EnigmaBerry_Click;
             // 
             // SAV_Misc3
             // 
@@ -2035,5 +2045,6 @@ namespace PKHeX.WinForms
         private System.Windows.Forms.TabPage Tab_Other;
         private System.Windows.Forms.FlowLayoutPanel FLP_Other;
         private System.Windows.Forms.Button B_ForceMirageIsland;
+        private System.Windows.Forms.Button B_EnigmaBerry;
     }
 }

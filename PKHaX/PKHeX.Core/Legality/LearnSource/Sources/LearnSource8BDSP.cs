@@ -12,7 +12,7 @@ namespace PKHeX.Core;
 public sealed class LearnSource8BDSP : ILearnSource<PersonalInfo8BDSP>, IEggSource, IHomeSource
 {
     public static readonly LearnSource8BDSP Instance = new();
-    private static readonly PersonalTable8BDSP Personal = PersonalTable.BDSP;
+    private static readonly PersonalTable8BDSP Personal = PersonalTable.StockBDSP;
     private static readonly Learnset[] Learnsets = LearnsetReader.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("lvlmove_bdsp.pkl"), "bs"u8));
     private static readonly MoveSource[] EggMoves = MoveSource.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("eggmove_bdsp.pkl"), "bs"u8));
     private const int MaxSpecies = Legal.MaxSpeciesID_8b;

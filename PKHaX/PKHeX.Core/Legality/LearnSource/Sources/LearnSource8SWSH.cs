@@ -11,7 +11,7 @@ namespace PKHeX.Core;
 public sealed class LearnSource8SWSH : ILearnSource<PersonalInfo8SWSH>, IEggSource, IHomeSource
 {
     public static readonly LearnSource8SWSH Instance = new();
-    private static readonly PersonalTable8SWSH Personal = PersonalTable.SWSH;
+    private static readonly PersonalTable8SWSH Personal = PersonalTable.StockSWSH;
     private static readonly Learnset[] Learnsets = LearnsetReader.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("lvlmove_swsh.pkl"), "ss"u8));
     private static readonly MoveSource[] EggMoves = MoveSource.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("eggmove_swsh.pkl"), "ss"u8));
     private const int MaxSpecies = Legal.MaxSpeciesID_8_R2;
@@ -179,6 +179,10 @@ public sealed class LearnSource8SWSH : ILearnSource<PersonalInfo8SWSH>, IEggSour
                 result[(int)Move.MoongeistBeam] = true;
         }
     }
+
+    // HOME: orion_personal_total.perbin
+    private static readonly Learnset[] LearnsetsHOME = LearnsetReader.GetArray(BinLinkerAccessor.Get(Util.GetBinaryResource("lvlmove_ho.pkl"), "ho"u8));
+    public Learnset GetLearnsetHOME(ushort species, byte form) => LearnsetsHOME[PersonalTable.SWSH.GetFormIndex(species, form)];
 
     public LearnEnvironment Environment => Game;
     public MoveLearnInfo GetCanLearnHOME(PKM pk, EvoCriteria evo, ushort move, MoveSourceType types = MoveSourceType.All)

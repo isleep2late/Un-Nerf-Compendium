@@ -11,7 +11,7 @@ namespace PKHeX.Core;
 public sealed class LearnSource6XY : ILearnSource<PersonalInfo6XY>, IEggSource
 {
     public static readonly LearnSource6XY Instance = new();
-    private static readonly PersonalTable6XY Personal = PersonalTable.XY;
+    private static readonly PersonalTable6XY Personal = PersonalTable.StockXY;
     private static readonly Learnset[] Learnsets = LearnsetReader.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("lvlmove_xy.pkl"), "xy"u8));
     private static readonly MoveSource[] EggMoves = MoveSource.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("eggmove_xy.pkl"), "xy"u8));
     private const int MaxSpecies = Legal.MaxSpeciesID_6;

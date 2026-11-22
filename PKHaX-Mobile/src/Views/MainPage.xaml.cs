@@ -1,4 +1,5 @@
 using PKHeX.Core;
+using PKHaX.Hacks.Intake;
 using PKHaX.Mobile.Services;
 
 namespace PKHaX.Mobile.Views;
@@ -18,6 +19,8 @@ public partial class MainPage : ContentPage
 		this.updates = updates;
 		this.lists = lists;
 		this.gateway = gateway;
+		HacksTitle.Text = IntakeText.Title;
+		HacksStored.Text = IntakeText.Stored;
 	}
 
 	private readonly ISaveFileGateway gateway;
@@ -30,7 +33,9 @@ public partial class MainPage : ContentPage
 		base.OnAppearing();
 		HaxSwitch.IsToggled = saves.IllegalMode;
 		VersionLabel.Text = $"v{updates.CurrentVersion} (build {updates.CurrentBuild})";
+		saves.CloseOtherOverlay();
 		RefreshSummary();
+		RefreshHacks();
 
 		if (!checkedForUpdate)
 		{
@@ -82,6 +87,12 @@ public partial class MainPage : ContentPage
 		try
 		{
 			var error = await saves.OpenAsync();
+			if (saves.HasPending)
+			{
+				await AskAsync();
+				RefreshSummary();
+				return;
+			}
 			if (saves.Save is not null) lists.Build(saves.Save);
 			StatusLabel.Text = error ?? (saves.IsLoaded ? "Loaded." : "Cancelled.");
 			RefreshSummary();
@@ -134,7 +145,99 @@ public partial class MainPage : ContentPage
 		StatusLabel.Text = "Writing…";
 		var error = await saves.SaveBackAsync();
 		StatusLabel.Text = error ?? "Saved to file.";
-		SaveButton.IsEnabled = true;
+		RefreshSummary();
+	}
+
+	private async Task AskAsync()
+	{
+		var choices = saves.PendingChoices;
+		var labels = choices.Select(k => $"{k.Kit.Name} ({k.Kit.BaseGame ?? k.Kit.Platform}, {k.Kit.Key[..8]})").ToList();
+		var buttons = new List<string>(labels);
+		if (saves.PendingAllowsStock)
+			buttons.Add(HackKits.StockChoice);
+		var question = saves.PendingQuestion ?? IntakeText.Question;
+		if (question != IntakeText.Question)
+		{
+			StatusLabel.Text = question;
+			if (!await DisplayAlertAsync(IntakeText.Title, question, HackKits.ChooseGame, "Cancel"))
+			{
+				saves.CancelPending();
+				StatusLabel.Text = HackKits.Cancelled;
+				return;
+			}
+		}
+		var pick = await DisplayActionSheetAsync(IntakeText.Question, "Cancel", null, [.. buttons]);
+		string? error;
+		if (pick == HackKits.StockChoice)
+		{
+			error = saves.Answer(null);
+		}
+		else if (pick is not null && labels.IndexOf(pick) is >= 0 and var index)
+		{
+			error = saves.Answer(choices[index]);
+		}
+		else
+		{
+			saves.CancelPending();
+			StatusLabel.Text = HackKits.Cancelled;
+			return;
+		}
+		if (saves.Save is not null) lists.Build(saves.Save);
+		StatusLabel.Text = error ?? "Loaded.";
+	}
+
+	private async void OnAddHackClicked(object? sender, EventArgs e)
+	{
+		AddHackButton.IsEnabled = false;
+		HackStatusLabel.IsVisible = true;
+		HackStatusLabel.Text = "Reading…";
+		try
+		{
+			HackStatusLabel.Text = await HackKitFlow.AddAsync(this, saves, new Progress<string>(p => HackStatusLabel.Text = p));
+		}
+		finally
+		{
+			AddHackButton.IsEnabled = true;
+			RefreshHacks();
+		}
+	}
+
+	private async void OnHackKitsClicked(object? sender, EventArgs e) =>
+		await Shell.Current.Navigation.PushAsync(new HackKitsPage(saves, lists));
+
+	private async void OnHackPartyClicked(object? sender, EventArgs e)
+	{
+		if (saves.Hack is null) return;
+		await Shell.Current.Navigation.PushAsync(new HackPartyPage(saves));
+	}
+
+	private void OnConfirmClicked(object? sender, EventArgs e)
+	{
+		StatusLabel.Text = saves.ConfirmUnmodified() ? "Confirmed: this save can now be written." : "Nothing to confirm.";
+		RefreshSummary();
+	}
+
+	private void RefreshHacks()
+	{
+		var count = saves.Kits.Count();
+		HackKitsButton.Text = count == 0 ? HackKits.NoKits : $"Your ROM hacks ({count})";
+		HackKitsButton.IsEnabled = count > 0;
+	}
+
+	private void RefreshWriteState()
+	{
+		var kit = saves.Kit;
+		HackLabel.IsVisible = kit is not null;
+		HackLabel.Text = kit is null ? "" : $"ROM hack: {kit.Kit.Name}{(saves.ShowsLegality ? "" : " · legality checks are off for hacks")}";
+		var question = saves.UnmodifiedQuestion;
+		var refusal = saves.WriteRefusal;
+		var banner = question is not null ? RetailQuestion.Banner(question) : refusal;
+		RefusalLabel.IsVisible = banner is not null;
+		RefusalLabel.Text = banner ?? "";
+		ConfirmButton.IsVisible = question is not null;
+		ConfirmButton.Text = saves.ConfirmLabel ?? "";
+		SaveButton.IsVisible = saves.Hack is null;
+		SaveButton.IsEnabled = saves.CanWrite;
 	}
 
 	private async void OnCorruptGen1Clicked(object? sender, EventArgs e) // PKHaX: Gen 1 save corrupter (Any% 2-swap)
@@ -218,6 +321,18 @@ public partial class MainPage : ContentPage
 		SpaceWorldButton.IsVisible = sw97 is not null;
 		CorruptGen1Button.IsVisible = saves.CanCorruptGen1; // PKHaX: Gen 1 save file only (never a save state)
 		BattleTypingButton.IsVisible = saves.StateSession?.Analysis.Battle is not null;
+		HackPartyButton.IsVisible = saves.Hack is not null;
+		RefreshWriteState();
+
+		if (saves.Hack is { } hack)
+		{
+			SummaryCard.IsVisible = true;
+			GameLabel.Text = $"{saves.Kit?.Kit.Name ?? "ROM hack"} · {hack.Variant}";
+			TrainerLabel.Text = hack.TrainerLine;
+			CountsLabel.Text = $"party {hack.Party.Count(s => s.Mon is not null)} of 6 · read-only";
+			SetSaveFilePagesVisible(false);
+			return;
+		}
 
 		if (sw97 is not null)
 		{

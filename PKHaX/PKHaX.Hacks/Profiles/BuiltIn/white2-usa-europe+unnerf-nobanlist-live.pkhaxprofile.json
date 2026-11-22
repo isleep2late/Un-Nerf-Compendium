@@ -1,0 +1,49 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "nds",
+  "base": "white2-usa-europe",
+  "headerFamily": "nds:IRDO:0",
+  "engine": {
+    "family": "nds-gen5",
+    "version": "white2-1.0",
+    "ramLayout": "base",
+    "romLayout": "base"
+  },
+  "party": {
+    "codec": "pk5"
+  },
+  "id": "white2-usa-europe+unnerf-nobanlist-live",
+  "displayName": "Pokemon White 2 + Un-Nerf (nobanlist-live)",
+  "kind": "unnerf",
+  "inherits": "white2-usa-europe",
+  "parent": "white2-usa-europe",
+  "match": [
+    {
+      "sha1": "d102c97822cd3eeb5ee2d340e907eef76d59b475",
+      "crc32": "71deca57",
+      "label": "plain"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV5B2W2"
+  },
+  "magic": {
+    "catalog": "IRDO",
+    "encounters": "catalog:IRDO",
+    "manip": "white2"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:white2"
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "src/Services/Mods/UnNerfCatalogData.cs",
+      "note": "result SHA-1 of gen5_bw2/live/White2_NoBanList.ips; gen5_bw2/live/White2_NoBanList.bps on the clean base (UnNerfCatalog); owner-base results from logs/impl-S1-0/emerald-ips-results.log"
+    }
+  ]
+}

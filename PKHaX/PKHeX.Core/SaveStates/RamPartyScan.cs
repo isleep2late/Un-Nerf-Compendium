@@ -43,23 +43,27 @@ public sealed class RamParty
 
 public static class RamPartyScan
 {
-    public static List<RamParty> FindGen3Parties(SaveStateFile state)
+    public static List<RamParty> FindGen3Parties(SaveStateFile state) => FindGen3Parties(state, RamScanLimits.Default);
+
+    public static List<RamParty> FindGen3Parties(SaveStateFile state, RamScanLimits limits)
     {
         var results = new List<RamParty>();
         if (state.EwramOffset >= 0)
         {
-            Scan(state, state.EwramOffset, 0x40000, 3, PokeCrypto.SIZE_3PARTY, results);
+            Scan(state, state.EwramOffset, 0x40000, 3, PokeCrypto.SIZE_3PARTY, results, limits);
             if (state.IwramOffset >= 0)
-                Scan(state, state.IwramOffset, 0x8000, 3, PokeCrypto.SIZE_3PARTY, results);
+                Scan(state, state.IwramOffset, 0x8000, 3, PokeCrypto.SIZE_3PARTY, results, limits);
         }
         else if (state.Kind is SaveStateKind.VbaM or SaveStateKind.RawMemory)
         {
-            Scan(state, 0, state.State.Length, 3, PokeCrypto.SIZE_3PARTY, results);
+            Scan(state, 0, state.State.Length, 3, PokeCrypto.SIZE_3PARTY, results, limits);
         }
         return results;
     }
 
-    public static List<RamParty> FindGen67Parties(SaveStateFile state)
+    public static List<RamParty> FindGen67Parties(SaveStateFile state) => FindGen67Parties(state, RamScanLimits.Default);
+
+    public static List<RamParty> FindGen67Parties(SaveStateFile state, RamScanLimits limits)
     {
         var results = new List<RamParty>();
         if (state.Console != StateConsole.N3DS || state.MainRamOffset < 0)
@@ -70,13 +74,13 @@ public static class RamPartyScan
         int pos = 0;
         while (pos <= end)
         {
-            if (!IsValidMon67(data, pos))
+            if (!IsValidMon67(data, pos, limits))
             {
                 pos += 4;
                 continue;
             }
             int count = 1;
-            while (count < 6 && pos + (count * stride) + PokeCrypto.SIZE_6PARTY <= data.Length && IsValidMon67(data, pos + (count * stride)))
+            while (count < 6 && pos + (count * stride) + PokeCrypto.SIZE_6PARTY <= data.Length && IsValidMon67(data, pos + (count * stride), limits))
                 count++;
             byte generation = VersionGeneration67(data, pos);
             results.Add(new RamParty
@@ -95,7 +99,7 @@ public static class RamPartyScan
         return results;
     }
 
-    private static bool IsValidMon67(ReadOnlySpan<byte> data, int offset)
+    private static bool IsValidMon67(ReadOnlySpan<byte> data, int offset, RamScanLimits limits)
     {
         var slice = data[offset..];
         uint pid = BinaryPrimitives.ReadUInt32LittleEndian(slice);
@@ -110,10 +114,10 @@ public static class RamPartyScan
         if (chk != BinaryPrimitives.ReadUInt16LittleEndian(copy[6..]))
             return false;
         ushort species = BinaryPrimitives.ReadUInt16LittleEndian(copy[8..]);
-        if (species is 0 or > 807)
+        if (species == 0 || species > limits.MaxSpecies67)
             return false;
         int level = copy[0xEC];
-        if (level is < 1 or > 100)
+        if (level < limits.MinLevel67 || level > limits.MaxLevel)
             return false;
         ushort maxHP = BinaryPrimitives.ReadUInt16LittleEndian(copy[0xF2..]);
         ushort curHP = BinaryPrimitives.ReadUInt16LittleEndian(copy[0xF0..]);
@@ -129,13 +133,15 @@ public static class RamPartyScan
         return version is >= 30 and <= 33 ? (byte)7 : (byte)6;
     }
 
-    public static List<RamParty> FindGen4Parties(SaveStateFile state)
+    public static List<RamParty> FindGen4Parties(SaveStateFile state) => FindGen4Parties(state, RamScanLimits.Default);
+
+    public static List<RamParty> FindGen4Parties(SaveStateFile state, RamScanLimits limits)
     {
         var results = new List<RamParty>();
         if (state.MainRamOffset < 0)
             return results;
-        Scan(state, state.MainRamOffset, state.MainRamSize, 4, PokeCrypto.SIZE_4PARTY, results);
-        Scan(state, state.MainRamOffset, state.MainRamSize, 5, PokeCrypto.SIZE_5PARTY, results);
+        Scan(state, state.MainRamOffset, state.MainRamSize, 4, PokeCrypto.SIZE_4PARTY, results, limits);
+        Scan(state, state.MainRamOffset, state.MainRamSize, 5, PokeCrypto.SIZE_5PARTY, results, limits);
         results.RemoveAll(p => p.Count == 1 && results.Exists(o => o != p && o.Offset == p.Offset && o.Count > 1));
         results.RemoveAll(p => p.Generation != VersionGeneration(state, p.Offset, p.Generation));
         return results;
@@ -156,20 +162,20 @@ public static class RamPartyScan
         };
     }
 
-    private static void Scan(SaveStateFile state, int start, int length, byte generation, int entrySize, List<RamParty> results)
+    private static void Scan(SaveStateFile state, int start, int length, byte generation, int entrySize, List<RamParty> results, RamScanLimits limits)
     {
         var data = state.State;
         int end = Math.Min(start + length, data.Length) - entrySize;
         int pos = start;
         while (pos <= end)
         {
-            if (!IsValidMon(data, pos, generation))
+            if (!IsValidMon(data, pos, generation, limits))
             {
                 pos += 4;
                 continue;
             }
             int count = 1;
-            while (count < 6 && pos + ((count + 1) * entrySize) <= start + length && IsValidMon(data, pos + (count * entrySize), generation))
+            while (count < 6 && pos + ((count + 1) * entrySize) <= start + length && IsValidMon(data, pos + (count * entrySize), generation, limits))
                 count++;
             results.Add(new RamParty
             {
@@ -184,12 +190,12 @@ public static class RamPartyScan
         }
     }
 
-    private static bool IsValidMon(ReadOnlySpan<byte> data, int offset, byte generation)
+    private static bool IsValidMon(ReadOnlySpan<byte> data, int offset, byte generation, RamScanLimits limits)
     {
-        return generation == 3 ? IsValidMon3(data[offset..]) : IsValidMon45(data[offset..], generation);
+        return generation == 3 ? IsValidMon3(data[offset..], limits) : IsValidMon45(data[offset..], generation, limits);
     }
 
-    private static bool IsValidMon3(ReadOnlySpan<byte> data)
+    private static bool IsValidMon3(ReadOnlySpan<byte> data, RamScanLimits limits)
     {
         uint pid = BinaryPrimitives.ReadUInt32LittleEndian(data);
         uint oid = BinaryPrimitives.ReadUInt32LittleEndian(data[4..]);
@@ -201,20 +207,27 @@ public static class RamPartyScan
         if (PokeCrypto.IsEncrypted3(copy))
             return false;
         ushort species = BinaryPrimitives.ReadUInt16LittleEndian(copy[0x20..]);
-        if (species is 0 or > 440)
+        if (species == 0 || species > limits.MaxSpecies3)
             return false;
         ushort move1 = BinaryPrimitives.ReadUInt16LittleEndian(copy[0x2C..]);
-        if (move1 > 354)
+        if (move1 > limits.MaxMove3)
             return false;
         int level = data[0x54];
-        if (level is < 2 or > 100)
+        if (level < limits.MinLevel || level > limits.MaxLevel)
             return false;
         ushort maxHP = BinaryPrimitives.ReadUInt16LittleEndian(data[0x58..]);
         ushort curHP = BinaryPrimitives.ReadUInt16LittleEndian(data[0x56..]);
-        return maxHP is 1 or (>= 10 and < 1000) && curHP <= maxHP;
+        if (!(maxHP is 1 or (>= 10 and < 1000) && curHP <= maxHP))
+            return false;
+        if (limits.Gen3Validator is not { } validator)
+            return true;
+        var party = new byte[PokeCrypto.SIZE_3PARTY];
+        copy.CopyTo(party);
+        data[PokeCrypto.SIZE_3STORED..PokeCrypto.SIZE_3PARTY].CopyTo(party.AsSpan(PokeCrypto.SIZE_3STORED));
+        return validator(new PK3(party));
     }
 
-    private static bool IsValidMon45(ReadOnlySpan<byte> data, byte generation)
+    private static bool IsValidMon45(ReadOnlySpan<byte> data, byte generation, RamScanLimits limits)
     {
         uint pid = BinaryPrimitives.ReadUInt32LittleEndian(data);
         if (pid == 0)
@@ -229,10 +242,10 @@ public static class RamPartyScan
         if (chk != BinaryPrimitives.ReadUInt16LittleEndian(copy[6..]))
             return false;
         ushort species = BinaryPrimitives.ReadUInt16LittleEndian(copy[8..]);
-        if (species is 0 || species > (generation == 4 ? 507 : 649))
+        if (species == 0 || species > (generation == 4 ? limits.MaxSpecies4 : limits.MaxSpecies5))
             return false;
         int level = copy[0x8C];
-        if (level is < 2 or > 100)
+        if (level < limits.MinLevel || level > limits.MaxLevel)
             return false;
         ushort maxHP = BinaryPrimitives.ReadUInt16LittleEndian(copy[0x90..]);
         ushort curHP = BinaryPrimitives.ReadUInt16LittleEndian(copy[0x8E..]);

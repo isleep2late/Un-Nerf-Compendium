@@ -1,0 +1,188 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "gba",
+  "base": "emerald-usa-europe",
+  "headerFamily": "gba:BPEE:0",
+  "engine": {
+    "family": "gba-vanilla",
+    "version": "emerald-1.0",
+    "ramLayout": "base",
+    "romLayout": "base"
+  },
+  "ram": {
+    "gMain.inBattle": {
+      "fixed": "0x030026F9",
+      "size": 1,
+      "type": "bits:u8:1:1",
+      "evidence": "Inherited"
+    },
+    "gBattleOutcome": {
+      "fixed": "0x0202433A",
+      "size": 1,
+      "type": "u8",
+      "evidence": "Inherited"
+    },
+    "gLastUsedItem": {
+      "fixed": "0x02024208",
+      "size": 2,
+      "type": "u16",
+      "evidence": "Inherited"
+    },
+    "gEnemyParty": {
+      "fixed": "0x02024744",
+      "size": 600,
+      "type": "struct:gen3.party6",
+      "evidence": "Inherited"
+    },
+    "gPlayerParty": {
+      "locator": {
+        "kind": "gen3.findParty",
+        "hint": "0x020244EC"
+      },
+      "size": 600,
+      "type": "struct:gen3.party6",
+      "evidence": "Inherited"
+    },
+    "gPlayerPartyCount": {
+      "fixed": "0x020244E9",
+      "size": 1,
+      "type": "u8",
+      "evidence": "Inherited"
+    },
+    "gRngValue": {
+      "locator": {
+        "kind": "gen3.rngStep",
+        "hint": "0x03005D80"
+      },
+      "size": 4,
+      "type": "u32",
+      "evidence": "Inherited"
+    },
+    "gSaveBlock2Ptr": {
+      "fixed": "0x03005D90",
+      "size": 4,
+      "type": "ptr",
+      "evidence": "Inherited"
+    },
+    "gSaveBlock1Ptr": {
+      "fixed": "0x03005D8C",
+      "size": 4,
+      "type": "ptr",
+      "evidence": "Inherited"
+    },
+    "gBattleTypeFlags": {
+      "fixed": "0x02022FEC",
+      "size": 4,
+      "type": "u32",
+      "evidence": "Inherited"
+    },
+    "gNumSafariBalls": {
+      "fixed": "0x0203A04C",
+      "size": 1,
+      "type": "u8",
+      "evidence": "Inherited"
+    },
+    "gBattlescriptCurrInstr": {
+      "fixed": "0x02024214",
+      "size": 4,
+      "type": "ptr",
+      "evidence": "Inherited"
+    }
+  },
+  "rom": {
+    "catch.caughtScript": {
+      "range": [
+        "0x082DBD84",
+        "0x082DBDCA"
+      ],
+      "evidence": "Inherited",
+      "note": "MagicGame.Gen3BallCaughtScript as the catalog stores it (start, end)"
+    },
+    "catch.shookScript": {
+      "range": [
+        "0x082DBDD4",
+        "0x082DBE02"
+      ],
+      "evidence": "Inherited",
+      "note": "MagicGame.Gen3BallShookScript as the catalog stores it (start, end)"
+    }
+  },
+  "party": {
+    "codec": "pk3",
+    "base": "@ram:gPlayerParty",
+    "count": "@ram:gPlayerPartyCount",
+    "enemy": "@ram:gEnemyParty",
+    "recordSize": 100,
+    "capacity": 6
+  },
+  "id": "emerald-usa-europe+unnerf-frontier-souldew",
+  "displayName": "Pokemon Emerald + Un-Nerf (frontier-souldew)",
+  "kind": "unnerf",
+  "inherits": "emerald-usa-europe",
+  "parent": "emerald-usa-europe",
+  "match": [
+    {
+      "sha1": "46eb985bd609fbc32e9fcd131f1af3b81d7974f0",
+      "crc32": "356a6f4f",
+      "label": "plain"
+    },
+    {
+      "sha1": "dd2000362b7c143698f79d997ddecdc02a96756e",
+      "label": "owner-flash-edit-base"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV3E"
+  },
+  "magic": {
+    "catalog": "BPEE",
+    "fields": {
+      "Gen3InBattleByte": "@ram:gMain.inBattle",
+      "Gen3BattleOutcome": "@ram:gBattleOutcome",
+      "Gen3LastUsedItem": "@ram:gLastUsedItem",
+      "Gen3EnemyParty": "@ram:gEnemyParty",
+      "Gen3PlayerParty": "@ram:gPlayerParty",
+      "Gen3PlayerPartyCount": "@ram:gPlayerPartyCount",
+      "Gen3RngValue": "@ram:gRngValue",
+      "Gen3SaveBlock2Ptr": "@ram:gSaveBlock2Ptr",
+      "Gen3SaveBlock1Ptr": "@ram:gSaveBlock1Ptr",
+      "Gen3BattleTypeFlags": "@ram:gBattleTypeFlags",
+      "Gen3SafariBalls": "@ram:gNumSafariBalls",
+      "Gen3BattlescriptCurrInstr": "@ram:gBattlescriptCurrInstr",
+      "Gen3BallCaughtScript": "@rom:catch.caughtScript",
+      "Gen3BallShookScript": "@rom:catch.shookScript"
+    },
+    "roamerOffset": 12764,
+    "params": {
+      "Gen3InBattleMask": 2,
+      "Gen3WalkOriginOffset": 4,
+      "Gen3WildIvPlacements": [
+        [
+          1,
+          0
+        ]
+      ]
+    },
+    "inBattleCatch": {
+      "mode": "frameTimed",
+      "site": "@ram:gBattlescriptCurrInstr",
+      "frameTimed": true
+    },
+    "encounters": "catalog:BPEE",
+    "manip": "emerald"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:emerald"
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "src/Services/Mods/UnNerfCatalogData.cs",
+      "note": "result SHA-1 of gen3_emerald/1_Emerald_FrontierUnlock_SoulDew.ips on the clean base (UnNerfCatalog); owner-base results from logs/impl-S1-0/emerald-ips-results.log"
+    }
+  ]
+}

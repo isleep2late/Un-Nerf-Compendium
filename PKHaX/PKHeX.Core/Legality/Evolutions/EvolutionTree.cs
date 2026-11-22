@@ -13,19 +13,19 @@ namespace PKHeX.Core;
 public sealed class EvolutionTree : EvolutionNetwork
 {
     public const int MaxEvolutions = 3;
-    public static readonly EvolutionTree Evolves1  = GetViaSpecies (PersonalTable.Y,    Get("g1", "g1"u8));
-    public static readonly EvolutionTree Evolves2  = GetViaSpecies (PersonalTable.C,    Get("g2", "g2"u8));
-    public static readonly EvolutionTree Evolves3  = GetViaSpecies (PersonalTable.RS,   Get("g3", "g3"u8));
-    public static readonly EvolutionTree Evolves4  = GetViaSpecies (PersonalTable.DP,   Get("g4", "g4"u8));
-    public static readonly EvolutionTree Evolves5  = GetViaSpecies (PersonalTable.BW,   Get("g5", "g5"u8));
-    public static readonly EvolutionTree Evolves6  = GetViaSpecies (PersonalTable.AO,   Get("g6", "g6"u8));
-    public static readonly EvolutionTree Evolves7  = GetViaPersonal(PersonalTable.USUM, Get("uu", "uu"u8));
-    public static readonly EvolutionTree Evolves7b = GetViaPersonal(PersonalTable.GG,   Get("gg", "gg"u8));
-    public static readonly EvolutionTree Evolves8  = GetViaPersonal(PersonalTable.SWSH, Get("ss", "ss"u8));
-    public static readonly EvolutionTree Evolves8a = GetViaPersonal(PersonalTable.LA,   Get("la", "la"u8, 0));
-    public static readonly EvolutionTree Evolves8b = GetViaPersonal(PersonalTable.BDSP, Get("bs", "bs"u8));
-    public static readonly EvolutionTree Evolves9  = GetViaPersonal(PersonalTable.SV,   Get("sv", "sv"u8));
-    public static readonly EvolutionTree Evolves9a = GetViaPersonal(PersonalTable.ZA,   Get("za", "za"u8, 0));
+    public static readonly EvolutionTree Evolves1  = GetViaSpecies (PersonalTable.StockY,    Get("g1", "g1"u8));
+    public static readonly EvolutionTree Evolves2  = GetViaSpecies (PersonalTable.StockC,    Get("g2", "g2"u8));
+    public static readonly EvolutionTree Evolves3  = GetViaSpecies (PersonalTable.StockRS,   Get("g3", "g3"u8));
+    public static readonly EvolutionTree Evolves4  = GetViaSpecies (PersonalTable.StockDP,   Get("g4", "g4"u8));
+    public static readonly EvolutionTree Evolves5  = GetViaSpecies (PersonalTable.StockBW,   Get("g5", "g5"u8));
+    public static readonly EvolutionTree Evolves6  = GetViaSpecies (PersonalTable.StockAO,   Get("g6", "g6"u8));
+    public static readonly EvolutionTree Evolves7  = GetViaPersonal(PersonalTable.StockUSUM, Get("uu", "uu"u8));
+    public static readonly EvolutionTree Evolves7b = GetViaPersonal(PersonalTable.StockGG,   Get("gg", "gg"u8));
+    public static readonly EvolutionTree Evolves8  = GetViaPersonal(PersonalTable.StockSWSH, Get("ss", "ss"u8));
+    public static readonly EvolutionTree Evolves8a = GetViaPersonal(PersonalTable.StockLA,   Get("la", "la"u8, 0));
+    public static readonly EvolutionTree Evolves8b = GetViaPersonal(PersonalTable.StockBDSP, Get("bs", "bs"u8));
+    public static readonly EvolutionTree Evolves9  = GetViaPersonal(PersonalTable.StockSV,   Get("sv", "sv"u8));
+    public static readonly EvolutionTree Evolves9a = GetViaPersonal(PersonalTable.StockZA,   Get("za", "za"u8, 0));
 
     private static EvolutionMethod[][] Get([ConstantExpected] string resource, [Length(2, 2)] ReadOnlySpan<byte> identifier, [ConstantExpected] byte levelUp = 1)
     {

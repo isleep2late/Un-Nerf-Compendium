@@ -11,7 +11,7 @@ namespace PKHeX.Core;
 public sealed class LearnSource9SV : ILearnSource<PersonalInfo9SV>, IEggSource, IReminderSource, IHomeSource
 {
     public static readonly LearnSource9SV Instance = new();
-    private static readonly PersonalTable9SV Personal = PersonalTable.SV;
+    private static readonly PersonalTable9SV Personal = PersonalTable.StockSV;
     private static readonly Learnset[] Learnsets = LearnsetReader.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("lvlmove_sv.pkl"), "sv"u8));
     private static readonly MoveSource[] EggMoves = MoveSource.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("eggmove_sv.pkl"), "sv"u8));
     private static readonly MoveSource[] Reminder = MoveSource.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("reminder_sv.pkl"), "sv"u8));

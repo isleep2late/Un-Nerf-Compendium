@@ -62,10 +62,19 @@ public sealed class TransferPage : ContentPage
 		Content = new ScrollView { Content = root };
 	}
 
+	public const string HackNativeRefusal =
+		"Save B is in a ROM hack's own save format, which PKHaX Mobile shows read-only. It was not opened here; open it from the main page to see its party.";
+
 	protected override void OnAppearing()
 	{
 		base.OnAppearing();
 		RebuildPanes();
+	}
+
+	protected override void OnDisappearing()
+	{
+		base.OnDisappearing();
+		savesB.Close();
 	}
 
 	private void RebuildPanes()
@@ -100,11 +109,27 @@ public sealed class TransferPage : ContentPage
 				if (savesB.Save is null)
 				{
 					var err = await savesB.OpenAsync();
+					if (savesB.HasPending)
+					{
+						savesB.CancelPending();
+						err ??= $"Which game is this save from? {HackKits.AnswerOnMainPage}";
+					}
+					else if (savesB.Hack is not null)
+					{
+						savesB.Close();
+						err = HackNativeRefusal;
+					}
 					SetStatus(err ?? (savesB.Save is null ? "" : "Save B open. Drag either way."));
 					RebuildPanes();
 				}
 				else
 				{
+					if (savesB.UnmodifiedQuestion is { } q)
+					{
+						if (!await DisplayAlertAsync("Write back", q, savesB.ConfirmLabel ?? "Yes", "Cancel"))
+							return;
+						savesB.ConfirmUnmodified();
+					}
 					var err = await savesB.SaveBackAsync();
 					SetStatus(err ?? "Save B written back to its file.");
 				}
@@ -112,6 +137,9 @@ public sealed class TransferPage : ContentPage
 			headerRow.Add(open, 1);
 		}
 		pane.Add(headerRow);
+
+		if (isB && sav is not null && savesB.WriteRefusal is { } refusal)
+			pane.Add(new Label { Text = refusal, FontSize = 12, TextColor = Ui.Accent, LineBreakMode = LineBreakMode.WordWrap });
 
 		if (sav is null)
 		{

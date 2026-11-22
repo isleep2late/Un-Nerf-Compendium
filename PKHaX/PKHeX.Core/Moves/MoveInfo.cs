@@ -17,6 +17,8 @@ public static class MoveInfo
     /// <returns>Amount of PP the move has by default (no PP Ups).</returns>
     public static byte GetPP(EntityContext context, ushort move)
     {
+        if (MoveOverride.Current is { } overridden && overridden.TryGetPP(context, move, out var pp))
+            return pp;
         var table = GetPPTable(context);
         if (move >= table.Length)
             return 0;
@@ -226,7 +228,9 @@ public static class MoveInfo
         _ => -1,
     };
 
-    public static byte GetType(ushort move, EntityContext context) => GetType(move, GetTypeTable(context));
+    public static byte GetType(ushort move, EntityContext context) => MoveOverride.Current is { } overridden && overridden.TryGetType(context, move, out var type)
+        ? type
+        : GetType(move, GetTypeTable(context));
 
     public static ReadOnlySpan<byte> GetTypeTable(EntityContext context) => context switch
     {
