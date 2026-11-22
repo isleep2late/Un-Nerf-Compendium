@@ -3,9 +3,10 @@
 A one-stop collection of patches that restore Pokemon games to how a lot of us wish they still played:
 un-nerfed abilities and items, lifted Battle Frontier / Subway / Maison / Tree / Tower ban lists and
 clauses, form-driven typing, and permanent alternate formes, across **Generations 3 through 9 plus
-BDSP**. The included **PKHaX** save editor (desktop and mobile) adds Gen 1-2 save editing, an all-games
-level-255 cap, and **emulator save-state editing for Gens 1-7** — including the Space World '97
-prototype and live in-battle typing edits.
+BDSP**. The included **PKHaX** save editor (desktop and mobile) adds Gen 1-2 save editing, an
+all-games level-255 cap, **emulator save-state editing for Gens 1-7** — including the Space World '97
+prototype and live in-battle typing edits — and now opens **ROM hack saves** (beta, see
+[ROM hack saves](#rom-hack-saves-beta)). A smaller Linux version is new too.
 
 > You supply your own **legally-dumped** games. **Nothing copyrighted is distributed here, so do NOT
 > ask for ROMs, CIAs, or saves** - only small patch tools and patch files.
@@ -22,13 +23,13 @@ Join our Discord: https://discord.gg/hackmons
 | 2 | Gold/Silver/Crystal | **level up to 255** in the save editor;  **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
 | 2 proto | **Space World '97 demo** (Gold/Silver prototype) | **save-state (RAM) editing**: party, level 255, DVs, moves, **persistent disguises**, **volatile battle typing** — the prototype cannot reload its own save, so RAM is the only place edits survive | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
 | 1-7 | Retail games in an emulator | **save-state editing** (mGBA, BGB, SameBoy, VBA-M, melonDS, DeSmuME, Citra/Azahar): the embedded cartridge save opens in the full editor and writes back into the state; the live in-RAM party is editable directly — incl. persistent Gen 1 typing/sprite desyncs and mid-battle typing edits for Gens 2-5 | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
-| 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower | **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
-| 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock | **level up to 255** in the save editor | xdelta + source patches | `gen4_platinum/` |
-| 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)** | **level up to 255** in the save editor | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
-| 6 | Omega Ruby / Alpha Sapphire | Maison ban list + clauses + team-size + 510 EV cap; forme persistence (full Hoopa); Arceus form-typing; **hacked Abilities stay on Xerneas**; **any Pokemon can use Hyperspace Fury** | **level up to 255** in the save editor | Python (cia/3ds) + Azahar load/mods + **one complete patch** | `gen6_oras/`, `gen67_arceus_typefix/` |
-| 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally**; **any Pokemon can use Hyperspace Fury and Dark Void** | **level up to 255** in the save editor | Python (cia; complete patch takes .3ds too) + Azahar load/mods + **one complete patch** | `gen7_usum/`, `gen67_arceus_typefix/` |
-| 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock | **level up to 255** in the save editor | LayeredFS pchtxt + Python | `gen8_swsh/` |
-| Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause | **level up to 255** in the save editor| exefs ips/pchtxt + Python | `bdsp/` |
+| 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower; **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
+| 4 | Platinum | Frontier ban list + Species/Item Clause; permanent Giratina-O/Rotom/Sky-Shaymin; Soul Dew un-nerf; Arceus form-typing (incl. doubles); 6-Pokemon Tower; AbilityLock; **level up to 255** in the save editor | xdelta + source patches | `gen4_platinum/` |
+| 5 | Black 2 / White 2 | Subway + Institute + PWT ban list + Species/Item Clause (legal party size kept, no PWT freeze); Arceus form-typing; **Pokéstar Studios props usable (no Bad Egg)**; **level up to 255** in the save editor | Python + xdelta + PKHaX | `gen5_bw2/`, `gen45_nds_arceus_typefix/` |
+| 6 | Omega Ruby / Alpha Sapphire | Maison ban list + clauses + team-size + 510 EV cap; forme persistence (full Hoopa); Arceus form-typing; **hacked Abilities stay on Xerneas**; **any Pokemon can use Hyperspace Fury**; **level up to 255** in the save editor | Python (cia/3ds) + Azahar load/mods + **one complete patch** | `gen6_oras/`, `gen67_arceus_typefix/` |
+| 7 | Ultra Sun / Ultra Moon | Tree ban list + clauses; Prankster/Gale Wings/Parental Bond/Soul Dew un-nerfs (+ matching text); forme persistence; Arceus+Silvally form-typing; **Protean-Arceus/Silvally**; **any Pokemon can use Hyperspace Fury and Dark Void**; **level up to 255** in the save editor | Python (cia; complete patch takes .3ds too) + Azahar load/mods + **one complete patch** | `gen7_usum/`, `gen67_arceus_typefix/` |
+| 8 | Sword / Shield | Tower Species/Item Clause; Crowned + Eternamax persistence; Dynamax unlock; **level up to 255** in the save editor | LayeredFS pchtxt + Python | `gen8_swsh/` |
+| Switch | Brilliant Diamond / Shining Pearl | Tower ban list + Species/Item Clause; **level up to 255** in the save editor | exefs ips/pchtxt + Python | `bdsp/` |
 | 9 | Scarlet / Violet | **v1.0.0 Treasures of Ruin stats restored** (the day-one 1.0.1 nerf undone), optional Gen 8 Zacian/Zamazenta/Cresselia stats; **level up to 255** in the save editor | Python (extracted romfs personal data) + PKHaX | `gen9_sv/` |
 | **UNTESTED BETA** 3 | Ruby / Sapphire (rev 0) | Battle Tower ban list + Lv 50 limit + Species/Item Clause; Soul Dew Tower gate; any-ability (PK3 byte 0x1E) | IPS + BPS | `gen3_rs/` |
 | **UNTESTED BETA** 4 | Diamond / Pearl (Rev 5) | Battle Tower ban list + Species/Item Clause + level rules; Soul Dew in the Tower; Arceus form-typing | xdelta + BPS + Python | `gen4_dp/` |
@@ -82,8 +83,9 @@ and the Gen 8→9 transition respectively), so `gen9_sv/` restores those. The Ne
 change (SV 3.0.0) is code-side rather than a stat, so the folder documents your options instead of
 pretending to patch it.*
 
-PKHaX (a patched PKHeX save editor) lives in `PKHaX/`; the built `PKHeX.exe` is included and is what
-you attach as a GitHub Release.
+PKHaX (a patched PKHeX save editor) lives in `PKHaX/` (Windows), `PKHaX-Linux/` (Linux) and
+`PKHaX-Mobile/` (Android and iOS). The built programs go on the rolling **PKHaX** GitHub Release; see
+[Where to get PKHaX](#where-to-get-pkhax).
 
 To keep some features and drop others, see **[Features / how to disable each one](#features--how-to-disable-each-one)**
 at the bottom - it lists, per game, exactly which patch / tagged block / byte to omit for each feature.
@@ -114,8 +116,137 @@ count 255, checksum recomputed so CONTINUE loads it, the Trainer ID never touche
 included; byte-identical to the standalone `corrupt-save-gen1.py`); a Gen-3 any-ability dropdown (all 78, written to PK3 0x1E for the patched
 Emerald); **Space World '97 save-state (RAM) editing** (party, disguises, battle typing — desktop and mobile); Deoxys form box icons; status-condition editing in every generation (a dropdown for Gen 1/2,
 a lower-left clickable icon for Gen 3+ — see "Status condition editing" below); and loosened legality
-where the un-nerf ROMs make otherwise-"illegal" mons valid. Source is in `PKHaX/`; rebuild on Windows with `dotnet publish -c Release -r win-x64`. The
-committed `PKHeX.exe` is the current build.
+where the un-nerf ROMs make otherwise-"illegal" mons valid. New: **ROM hack saves** and a Gen 3
+**Enigma Berry editor** (both below). It is built on PKHeX 26.10.18. Source is in `PKHaX/`; how to
+build each version is in `PKHaX/PKHaX_README.md`.
+
+### Where to get PKHaX
+
+There are three versions: Windows, Linux, and the phone app (Android and iOS). They use the same save code and
+the same ROM hack library, but not every version has every page (see the notes).
+
+| Version | Release file (to be attached, see below) | Notes |
+|---|---|---|
+| Windows (x64) | `PKHaX_win-x64_net10.zip` | Unzip and run `PKHaX.exe`. Needs the .NET 10 Desktop Runtime. **NOT VERIFIED:** this version has not been run on Windows. |
+| Linux (x64) | `PKHaX-linux-x64.tar.gz` | The program inside is one self-contained file, no runtime needed: `tar -xzf PKHaX-linux-x64.tar.gz`, then `./PKHaX-linux-x64/PKHaX`. A smaller window: no event flags, mystery gifts, batch editor, box layout tools, legality panel, Enigma Berry page or Export profile. Run only with Unbound, on an earlier build of this version. |
+| Android | `PKHaX.apk` | See "PKHaX Mobile" below. Run in an Android emulator only, not yet on a phone. |
+| iOS | `PKHaX-unsigned.ipa` | See "PKHaX Mobile" below. **NOT VERIFIED:** no iOS build with ROM hack support has been made or run yet. |
+
+The builds with ROM hack support will be attached to the rolling **PKHaX** release:
+https://github.com/isleep2late/Un-Nerf-Compendium/releases/tag/PKHaX. Files on that release dated before
+2026-11-22 are older builds without ROM hack support.
+
+The Windows exe does not work under Wine 9.0 (any menu stops it), so it is not a way to run PKHaX on Linux; use
+the Linux version.
+
+### ROM hack saves (beta)
+
+PKHaX can now read a ROM hack's tables and open its saves, with the hack's own Pokemon, moves, items and abilities.
+For a few hacks it can also write them. **This is a beta.** Read the tables below before you edit, and keep a
+copy of your save.
+
+**How to use it:**
+
+1. Open "ROM hacks": **File > ROM hacks...** on Windows, the left side of the window (or Browse) on Linux,
+   the **ROM hacks** card on Android.
+2. Add the hack: either the hack's ROM, or its patch plus your own clean game. Patches can be IPS, IPS32,
+   UPS, BPS or xdelta. UPS, BPS and xdelta patches name the clean game they need and refuse a wrong one.
+   An IPS patch cannot check its input, so choose the right game yourself. An exported profile
+   (`.pkhaxprofile.json` or `.is2lprofile`) also works.
+3. PKHaX reads the hack's tables (species, moves, items, abilities, level-up moves) and its save format, and
+   says how many species, moves, items and abilities it found.
+4. Open the hack's save. When asked "Which game is this save from?", pick the hack.
+
+**PKHaX downloads no ROM or patch, and no ROM is copied.** PKHaX keeps only the tables it read from your own file, on
+your device: `~/.local/share/pkhax/hacks/` on Linux, a `pkhax/hacks/` folder in your local app data on
+Windows and Android. GB, GBC, GBA and DS ROMs are read. 3DS images are not read; they are refused with a
+message.
+
+**Which hacks' tables were read.** Run over copies of 27 hack ROMs, every table of the hack's generation was
+read on 19 of them, including Inclement Emerald, Scorched Silver, Team Rocket Edition, Super MarioMon,
+Seaglass, Heart & Soul, SoulGold GBA and Crystal Clear. Unbound 2.1.1.1 gives 1294 species, 930 moves, 729
+items and 293 abilities. Some tables are short on Elite Redux, Ghost Grey and Yellow Legacy Plus (move stats)
+and Pokemon Brown (moves and items). PKHaX refuses Lazarus, Star Beasts, Polished Crystal and Prism. This was
+measured with the PKHaX library on the ROM files, not in the app windows, except for Unbound (Linux and an
+Android emulator).
+
+**Which hack saves can be written.** A save in a hack's own format (CFRU or expansion) is written only for the
+exact ROM images below. For each one,
+a save edited with PKHaX's save code was booted in the real game (mGBA), the game showed the edits, saved from
+its own menu, and every listed field came back.
+
+| Hack (exact ROM) | Save format | Fields the game kept | Measured |
+|---|---|---|---|
+| Unbound 2.1.1.1 (SHA-1 `b4776b82...`) | CFRU | Species, Nickname, Moves, IVs, EVs, EXP, Party level, Held item, Ball, Friendship, Hidden ability | In the game. Also end to end in the Linux version (an earlier build of this version): a party nickname and an IV edited and saved there, and real Unbound loaded the save and showed the new nickname. |
+| Radical Red 4.1 (SHA-1 `964f951a...`) | CFRU | the same 11 fields | In the game, with PKHaX's save code; not through an app window. |
+| Emerald Seaglass 3.0 (SHA-1 `b9f4d332...`) | expansion | Nickname, Moves, IVs, EVs, Nature, Ability slot, Held item, Ball, Friendship | In the game, with PKHaX's save code; not through an app window. Species, EXP and level are not in this list. |
+
+- Any field not in the list stays locked. Money was not edited in these runs; PKHaX locks it while it does not
+  know where the hack keeps money. CFRU boxes 23 to 25 are never written.
+- In this version a **party** Pokemon's species, EXP and level stay locked in the app, even on these three ROMs.
+  Boxed Pokemon are not under that lock. (This is what the code does; not seen on a screen.)
+- Every write first makes a dated backup beside the save (`<save>.<date-time>.bak`). PKHaX never overwrites
+  or deletes a backup. If the backup fails, nothing is written. If the file changed since it was opened, nothing
+  is written. After a write in a hack's own format, open the save again before the next edit. (Seen on Linux. On
+  Windows this is what the code does; not seen on a screen.)
+- On **Android, hack saves in a hack's own format are always read-only**: the party is shown, the boxes are
+  only counted.
+
+**Which hack saves open read-only.**
+
+- Unbound with the Z-A Megas 1.2 add-on (its tables are read: 1314 species, 769 items), any other build of
+  Unbound or Radical Red, and other CFRU hacks.
+- Every other expansion hack or version, and Heart & Soul.
+- Hacks that keep the retail save layout when opened in the hack editor.
+- Hacks that open in the normal editor (the save keeps the retail layout) are read-only when the hack has
+  species, moves or items PKHeX cannot hold, when PKHaX cannot tell the save format, or when writing the save
+  back unchanged would change bytes. Otherwise PKHaX allows the write. **NOT VERIFIED:** no save written this
+  way has been loaded in a game.
+- A Gen 3 save that looks like the retail game (Emerald, FireRed/LeafGreen, Ruby/Sapphire) asks whether it is
+  from the unmodified game, and stays read-only until you say yes.
+- If PKHaX tells you to run "Check this hack's saves", that check is not in this version; the save stays
+  read-only.
+
+**What is refused.** 3DS images (a profile exported from isleep2late Files works instead); a file PKHaX does not recognise; a profile with no
+tables; the wrong clean game for a UPS, BPS or xdelta patch; a hack's own save format before its ROM is added.
+On Android also: ROMs and patched results above 64 MiB, and a CFRU save inside a save state.
+
+On Android, an Unbound save can be refused once with "PKHaX noted 0x01121999 for this hack". Add the hack's
+ROM again in ROM hacks, then open the save again; it then opens (seen in an Android emulator).
+
+### Enigma Berry editor (Gen 3)
+
+Edits the e-Reader berry record (what item 175, the Enigma Berry, does) in Ruby, Sapphire, Emerald,
+FireRed and LeafGreen saves, with presets such as "Quick Claw, always first" and "Focus Band, always holds".
+Windows: **Enigma Berry (e-Reader berry record)...** in the Gen 3 Misc editor. Android: a page. The Linux
+version has none. Only the active save slot is edited. Hack saves show the record read-only.
+
+- **Measured in real Emerald:** with the record set this way, Quick Claw at 100 or 101 moved first 20 of 20
+  turns against a faster wild Pokemon (0 of 20 at 0, 3 of 20 at the stock 20), and Focus Band at 100 held at
+  1 HP for 17 turns. Those test saves were written by a script that uses the same layout, not by PKHaX.
+- **NOT VERIFIED:** a save written by PKHaX's Enigma Berry form or page loaded in a game; FireRed, LeafGreen,
+  Ruby and Sapphire in a game; the berry's CHECK TAG text (do not open its tag screen). The Windows form and
+  the Android page have not been seen on a screen.
+
+### PKHaX: NOT VERIFIED
+
+- **Windows:** nothing of the new version was run on Windows. File > ROM hacks..., the hack save editor,
+  Export profile and the Enigma Berry form are built but have not been seen on a screen. Under Wine 9.0 any
+  menu stops the program.
+- **Windows faults known from the code (the last one seen under Wine):** the move legality marks in the Pokemon editor stay on while a hack
+  is active; changing the language with a hack save open shows stock names until you open it again; a save
+  state's live party is not checked against your ROM hacks; a CFRU save inside a `.zip` opens read-only as
+  FireRed instead of being refused; a ROM given as the start argument is ignored.
+- **Linux:** run only with Unbound 2.1.1.1 and its megas build, on an earlier build of the same version.
+  Untested: any other hack, drag and drop from a file manager. Seen and not fixed: an Unbound Beldum's ability
+  line reads "Slot 2: -------". A hard-linked save is split from its other names by a write. After a write that
+  does not read back, the backup is not put back (PKHaX names it and refuses further writes).
+- **Android:** run only in an emulator (API 35, x86_64), never on a phone. The Two saves page cannot open a hack's
+  own-format save as save B, and was not run.
+- **iOS:** no build from this source; no ROM hack feature was run on iOS.
+- Hack saves that keep the retail layout: no written save loaded in a game (for example Renegade Platinum).
+- The six Z-A ability names of the megas add-on.
+- The licence list shipped with the Linux version has not been checked against its contents.
 
 ### Emulator save states — Gens 1-7
 
@@ -209,9 +340,11 @@ dummied out with an unconditional `ret`).
 ### PKHaX Mobile — iOS and Android
 
 PKHaX now runs on your phone. `PKHaX-Mobile/` is a **.NET MAUI** app that references this repo's own
-`PKHaX/PKHeX.Core` directly, so it inherits **every** fork feature above — Gen-3 any-ability, the Gen-1
-sprite/type desync, Deoxys forms, "No Move", level 255 — and picks up each upstream PKHeX sync
-automatically the next time it is built. There is no second copy of the save logic to keep in step.
+`PKHaX/PKHeX.Core` and `PKHaX/PKHaX.Hacks` directly (and compiles the patch readers in `PKHaX/PKHaX.Patching`),
+so it inherits **every** fork feature above — Gen-3 any-ability, the Gen-1 sprite/type desync, Deoxys forms,
+"No Move", level 255, the ROM hacks card and the Enigma Berry page — and picks up each upstream PKHeX sync
+automatically the next time it is built. There is no second copy of the save logic to keep in step. ROM hack
+saves in a hack's own format are read-only on the phone (see [ROM hack saves](#rom-hack-saves-beta) above).
 
 It edits the save **in place**, wherever your emulator keeps it: Android uses the Storage Access
 Framework with a persisted read/write grant, iOS a security-scoped bookmark, so "Save changes to file"
@@ -220,19 +353,24 @@ tap a Pokemon to edit species, level, ability (the full list, so Gen-3 any-abili
 desktop), shiny and moves. **Illegal-edit mode is on by default**, which is the whole point of the `HaX`
 spelling; a legality read-out is shown but never blocks a write.
 
-Grab `PKHaX.apk` (Android) or `PKHaX-unsigned.ipa` (iOS) from the release assets. Android installs
+Grab `PKHaX.apk` (Android) or `PKHaX-unsigned.ipa` (iOS) from the release assets (the copies there dated
+2026-10-05 have no ROM hack support; the new APK will be attached there, and no new iOS build exists yet). Android installs
 directly — enable "install unknown apps" for your browser or file manager. The iOS build is unsigned, so
 sideload it with **AltStore**, **Sideloadly** or **iMazing**, which re-sign it with your own Apple ID; if
 you have a paid Apple Developer account you can instead build an ad-hoc signed copy yourself (see
-`PKHaX-Mobile/docs/ios-cloud-build.md`). The app also checks for newer builds on launch and offers a
-one-tap in-place upgrade that keeps your settings.
+`PKHaX-Mobile/docs/ios-cloud-build.md`). The app also checks for newer builds on launch (it reads
+`https://hackmons.com/downloads/pkhax-latest.json`, not the GitHub release) and offers a one-tap in-place
+upgrade that keeps your settings.
 
 Building it yourself: Android needs only the .NET 10 SDK plus the Android SDK and works on Linux,
 Windows or macOS — run `PKHaX-Mobile/build-android-local.sh`, or
 `dotnet build PKHaX-Mobile/src/PKHaX.Mobile.csproj -c Release -f net10.0-android -p:AndroidPackageFormats=apk`.
+That is fine for your own phone; the release APK is built differently (see `PKHaX/PKHaX_README.md`).
 iOS binaries can only be produced on macOS (Apple's rule), so the included GitHub Actions workflow
 `.github/workflows/build-mobile.yml` builds both platforms on a hosted macOS runner — no Mac of your own
-required. Full notes in `PKHaX-Mobile/README.md`.
+required. It starts on its own only for pushes that change `PKHaX-Mobile/` or `PKHaX/PKHeX.Core/`, not
+`PKHaX/PKHaX.Hacks/` or `PKHaX/PKHaX.Patching/`; start it by hand after those. Full notes in `PKHaX-Mobile/README.md` (it does not
+describe the ROM hack pages yet).
 
 ### Team + PC pop-out, and battle team editing
 

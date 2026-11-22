@@ -1,6 +1,6 @@
-# PKHaX — save editor add-ons (Gen 1 sprite/typing + Gen 3 any-ability)
+# PKHaX — save editor add-ons (Gen 1 sprite/typing, Gen 3 any-ability, ROM hack saves)
 
-PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's projects:
+PKHeX, rebuilt as **PKHaX**, with these hackmons features for this compendium's projects:
 
 - **Gen 1 (RBY):** give any Pokémon any **sprite** (desynced from its real species) and any
   **typing** (mono/dual) — the PikaSav feature, now native to PKHeX and round-trip safe.
@@ -24,17 +24,77 @@ PKHeX, rebuilt as **PKHaX**, with three hackmons features for this compendium's 
   `corrupt-save-gen1.py`): party count 255, valid checksum — the starting point of the Any% 2-swap route.
   The Trainer ID is never touched; unsaved editor changes are not included (export first). Desktop,
   Android and iOS. See below.
+- **ROM hack saves (beta):** add a hack's ROM, or its patch plus your own clean game, under
+  `File > ROM hacks...`; PKHaX reads the hack's tables from your file and opens its saves with the hack's
+  names. Saves of a few exact hack ROMs can be written. PKHaX downloads no ROM or patch, and no ROM is copied. What was
+  measured, what is read-only and what is NOT VERIFIED is in the main README, [ROM hack saves (beta)](../README.md#rom-hack-saves-beta).
+- **Enigma Berry editor (Gen 3):** `Enigma Berry (e-Reader berry record)...` in the Gen 3 Misc editor.
+  The form has not been seen on a screen yet: NOT VERIFIED. See the main README, [Enigma Berry editor (Gen 3)](../README.md#enigma-berry-editor-gen-3).
 
-Built on **upstream PKHeX release `26.10.18` @ `bfe89c74a` (2026-10-18)**. Every PKHaX edit is tagged with
-a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
+Built on **upstream PKHeX release `26.10.18` @ `bfe89c74a` (2026-10-18)** (the commit hash is NOT VERIFIED
+against upstream). The older PKHaX edits are tagged with a `// PKHaX` comment, so `grep -r "// PKHaX"` lists
+those. The edits made to `PKHeX.Core` for the ROM hack library carry no tag: they are listed in
+`PKHAX_HOOKS.txt`. The new folders (`PKHaX.Hacks`, `PKHaX.Patching`, `../PKHaX-Linux`) are PKHaX's own code
+and carry no tag either.
 
 ## What's in this folder
-- `PKHaX_win-x64_net10.zip` — ready-to-run build. Unzip and run **`PKHaX.exe`**. The name ending in
-  `HaX` turns on illegal-edit mode (title bar shows "PKHaX"). Requires the **.NET 10 Desktop
-  Runtime** (https://dotnet.microsoft.com/download/dotnet/10.0). Do not rename the DLLs.
+- `PKHaX_win-x64_net10.zip` — ready-to-run Windows build (`PKHaX.exe` and `PKHeX.exe`, the same file).
+  Unzip and run **`PKHaX.exe`**. The name ending in `HaX` turns on illegal-edit mode (title bar shows
+  "PKHaX"). Requires the **.NET 10 Desktop Runtime** (https://dotnet.microsoft.com/download/dotnet/10.0).
+  Not run on Windows yet: NOT VERIFIED. It does not work under Wine 9.0 (any menu stops it).
 - `PKHEX_PIKASAV_CHANGES.md` — full documentation of every code change and why.
-- Full modified PKHeX source tree — every change is tagged with a `// PKHaX` comment.
-  Build with `build_pkhax.bat` (Windows) or `build_pkhax.sh`.
+- Full modified PKHeX source tree. Build with `build_pkhax.sh` or `build_pkhax.bat` (see "Building").
+- `PKHaX.Hacks/` — the ROM hack library: reads a hack's tables and save format from the ROM, opens hack
+  saves, and holds the write gate (`Saves/WriteGate.cs`) and the list of hack saves that may be written
+  (`Saves/EngineAcceptance.cs`). `PKHaX.Hacks.Tests/` — its tests.
+- `PKHaX.Patching/` — the IPS, UPS, BPS and xdelta readers used when you add a hack as a patch.
+- `PKHAX_SOURCE.txt` — the export manifest: the isleep2late Files commit, the PKHeX version and a sha256
+  for every exported file.
+- `PKHAX_HOOKS.txt` — the places where `PKHeX.Core` was changed for the ROM hack library (one row each:
+  file, symbol, a text the symbol must still contain). `PKHaX.Hacks.Tests/HookAnchorTests.cs` checks them.
+- `RELEASE-ASSETS.txt` — one row per file on the rolling PKHaX release: name, sha256 (or `-` when there is no
+  proven build yet) and how it is made.
+
+## Where the code comes from
+`PKHeX.Core`, `PKHaX.Hacks`, `PKHaX.Hacks.Tests`, `PKHaX.Patching`, `PKHAX_HOOKS.txt` and `../PKHaX-Linux` are
+exported from isleep2late Files, and the export writes `PKHAX_SOURCE.txt`. Do not edit them here: `tools/compendium/check-pkhax.sh` in isleep2late Files (not in this repo) compares them
+byte for byte with `PKHAX_SOURCE.txt` and fails on any change. Change them in isleep2late Files and export
+again.
+
+## Building
+All versions need the **.NET 10 SDK**.
+
+**Windows (`PKHaX.exe`).** From this folder (`PKHaX/`). On Linux: `bash build_pkhax.sh` (it installs a .NET 10 SDK to `~/.dotnet` if
+none is found). On macOS: UNTESTED (no recorded run). On Windows: `build_pkhax.bat` (UNTESTED: no recorded run). Both refuse to
+build unless `PKHAX_SOURCE.txt` names an isleep2late Files commit, and both stamp the build with it
+(`-p:SourceRevisionId=is2l.<commit>`). The output is
+`PKHeX.WinForms/bin/Release/net10.0-windows/win-x64/publish/PKHaX.exe` (and `PKHeX.exe`). It needs the .NET 10
+Desktop Runtime. Neither script makes the zip: zip `PKHaX.exe` and `PKHeX.exe` by hand. On every push to
+`main`, `.github/workflows/update-release.yml` uploads the zip committed in this folder (and the `PKHaX.exe`
+inside it) to the PKHaX release.
+
+**Linux (`PKHaX-linux-x64.tar.gz`).** From the repo root:
+
+```
+dotnet publish PKHaX-Linux/PKHaX.Linux.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o <publish folder>
+bash PKHaX-Linux/packaging/package.sh <publish folder> PKHaX-linux-x64.tar.gz
+```
+
+This was not run from the Compendium: UNTESTED. It passes no `SourceRevisionId`, so the result is fine for
+your own use but is not a release build. The release tarball is made with `./build.sh pkhax-linux` in
+isleep2late Files (stamped, then checked). It is attached to the release by hand.
+
+**Android (`PKHaX.apk`).** From this folder: `bash ../PKHaX-Mobile/build-android-local.sh` (needs `~/.dotnet`, `~/Android/Sdk`
+and Java) gives a debug-signed APK for your own phone. The release APK must also be built with
+`-p:SourceRevisionId=is2l.<commit>` and signed with the existing release key, so phones upgrade in place; it
+is attached to the release by hand.
+
+**iOS (`PKHaX-unsigned.ipa`).** Only on macOS: `.github/workflows/build-mobile.yml` builds it on a hosted
+macOS runner and uploads it as a workflow artifact, not to the release. No iOS build from this source has
+been made yet: NOT VERIFIED.
+
+**Tests.** From this folder: `dotnet test PKHaX.Hacks.Tests/PKHaX.Hacks.Tests.csproj -c Release` (657 of 657
+passed on this library code, in an earlier export of it), plus the Core tests in `Tests/`.
 
 ## Using it
 1. Unzip, run `PKHaX.exe`, open your save (`File > Open`, or drag it in).
@@ -43,6 +103,8 @@ a `// PKHaX` comment, so `grep -r "// PKHaX"` lists every change.
    (equal = mono, different = dual). Hovering a box slot shows the data species, the sprite, and the
    exact typing. Set, then save.
 3. **Gen 3:** the Ability drop-down lists every ability; pick any one and save.
+4. **A ROM hack's save:** add the hack under `File > ROM hacks...` first, then open the save. The steps and
+   what can be written are in the main README, [ROM hack saves (beta)](../README.md#rom-hack-saves-beta).
 
 ## Quick facts
 - Gen-1 idea & data layout credit: **PikaSav**. Gen-1 type bytes use Gen-1's own values (not modern
@@ -101,6 +163,11 @@ international and the Japanese layout:
   OT/money/party edits and a `Write()`, which all land in the aliased array).
 
 ## Re-basing onto a newer upstream PKHeX
+**The re-base is now done in isleep2late Files, then exported here.** `PKHeX.Core` and the ROM hack folders
+come from there, so a re-base done in this tree makes `check-pkhax.sh` fail, and `export-pkhax.sh` (both in `tools/compendium/` of isleep2late Files) refuses any
+PKHeX version other than the one its map names (26.10.18 today). The method and the traps below still apply
+to that copy.
+
 This tree carries `upstream` → `https://github.com/kwsch/PKHeX`, but it shares no git history with
 upstream, so `git merge upstream/master` does not work. The working method is a recorded-base
 diff-apply: take the base commit recorded in the "Built on" line above, then
@@ -129,5 +196,6 @@ If a test fails right after a resource sync, delete `Tests/PKHeX.Core.Tests/{bin
 before believing it.
 
 Afterwards verify every `// PKHaX` tag survived (`git grep -c "// PKHaX" -- '*.cs'` before and
-after should match), run the Core tests, and update the "Built on" line above to the new upstream
+after should match), run the Core tests and `PKHaX.Hacks.Tests` (its `HookAnchorTests` fail if a hook in
+`PKHAX_HOOKS.txt` was lost), and update the "Built on" line above to the new upstream
 commit — future syncs diff from whatever is recorded there.

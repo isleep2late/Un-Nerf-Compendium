@@ -2,7 +2,7 @@ pkhax-release-assets/1
 One row per asset on the rolling PKHaX release: the asset name, then its sha256 (64 lower-case hex digits), then how it is made.
 A row whose second field is - has no proven build yet. tools/compendium/check-release.sh --assets reads the first two fields only.
 
-PKHaX_win-x64_net10.zip - PKHaX/build_pkhax.sh on gyarados from the landing commit; the workflow uploads it and the PKHaX.exe inside it
-PKHaX-linux-x64.tar.gz - ./build.sh pkhax-linux on gyarados, the build the Xvfb check ran; attached by hand with gh release upload PKHaX --clobber
+PKHaX_win-x64_net10.zip 08b26d22e1e18dc74ce9bf1665417e2c4a2f0479f461965cf922141e2571e8af PKHaX/build_pkhax.sh on gyarados from the landing commit; the workflow uploads it and the PKHaX.exe inside it
+PKHaX-linux-x64.tar.gz fb3f46dc868b3e167bc4b33ab77ad3c7decc1013f1a81c76962a62003f61b713 ./build.sh pkhax-linux on gyarados, the build the Xvfb check ran; attached by hand with gh release upload PKHaX --clobber
 PKHaX.apk - the owner's publish script with the existing key; attached by hand
 PKHaX-unsigned.ipa - build-mobile.yml artifact, collected by hand
