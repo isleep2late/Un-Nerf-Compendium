@@ -30,3 +30,23 @@ jobs:
         run: |
           unzip -o PKHaX/PKHaX_win-x64_net10.zip PKHaX.exe -d "$RUNNER_TEMP/pkhax"
           gh release upload PKHaX "$RUNNER_TEMP/pkhax/PKHaX.exe" PKHaX/PKHaX_win-x64_net10.zip --clobber
+
+      # Replacing assets does not move the date GitHub shows on a release: it kept reading
+      # 2026-10-05 after every asset was replaced on 2026-11-22. The date is set when a release
+      # is published, so the release is made a draft and published again. It is addressed by id,
+      # because a draft cannot be looked up by its tag. Publishing is retried: a release left as
+      # a draft has no working download links.
+      - name: Refresh the release date
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ID="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/PKHaX" -q .id)"
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$ID" -F draft=true -q .draft
+          for TRY in 1 2 3 4 5; do
+            if gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$ID" -F draft=false -f make_latest=true -q .published_at; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::the PKHaX release (id $ID) is still a draft - publish it by hand"
+          exit 1
