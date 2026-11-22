@@ -1,0 +1,92 @@
+hook|file|symbol|token
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.ZA|ZA => PersonalOverride.Current?.ZA ?? StockZA;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.SV|SV => PersonalOverride.Current?.SV ?? StockSV;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.LA|LA => PersonalOverride.Current?.LA ?? StockLA;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.BDSP|BDSP => PersonalOverride.Current?.BDSP ?? StockBDSP;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.SWSH|SWSH => PersonalOverride.Current?.SWSH ?? StockSWSH;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.GG|GG => PersonalOverride.Current?.GG ?? StockGG;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.USUM|USUM => PersonalOverride.Current?.USUM ?? StockUSUM;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.SM|SM => PersonalOverride.Current?.SM ?? StockSM;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.AO|AO => PersonalOverride.Current?.AO ?? StockAO;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.XY|XY => PersonalOverride.Current?.XY ?? StockXY;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.B2W2|B2W2 => PersonalOverride.Current?.B2W2 ?? StockB2W2;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.BW|BW => PersonalOverride.Current?.BW ?? StockBW;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.HGSS|HGSS => PersonalOverride.Current?.HGSS ?? StockHGSS;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.Pt|Pt => PersonalOverride.Current?.Pt ?? StockPt;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.DP|DP => PersonalOverride.Current?.DP ?? StockDP;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.LG|LG => PersonalOverride.Current?.LG ?? StockLG;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.FR|FR => PersonalOverride.Current?.FR ?? StockFR;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.E|E => PersonalOverride.Current?.E ?? StockE;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.RS|RS => PersonalOverride.Current?.RS ?? StockRS;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.C|C => PersonalOverride.Current?.C ?? StockC;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.GS|GS => PersonalOverride.Current?.GS ?? StockGS;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.RB|RB => PersonalOverride.Current?.RB ?? StockRB;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.Y|Y => PersonalOverride.Current?.Y ?? StockY;
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.PopulateGen3Tutors|StockE.LoadTables(machine, tutors);
+H1|PKHeX.Core/PersonalInfo/PersonalTable.cs|PersonalTable.PopulateGen4Tutors|StockHGSS.LoadTables(tutors);
+H1|PKHeX.Core/PersonalInfo/PersonalOverride.cs|PersonalOverride.Use|public static IDisposable Use(EntityContext context, IPersonalTable table)
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource1RB.cs|LearnSource1RB.Personal|Personal = PersonalTable.StockRB;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource1YW.cs|LearnSource1YW.Personal|Personal = PersonalTable.StockY;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource2C.cs|LearnSource2C.Personal|Personal = PersonalTable.StockC;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource2GS.cs|LearnSource2GS.Personal|Personal = PersonalTable.StockGS;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource3E.cs|LearnSource3E.Personal|Personal = PersonalTable.StockE;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource3FR.cs|LearnSource3FR.Personal|Personal = PersonalTable.StockFR;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource3LG.cs|LearnSource3LG.Personal|Personal = PersonalTable.StockLG;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource3RS.cs|LearnSource3RS.Personal|Personal = PersonalTable.StockRS;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource4DP.cs|LearnSource4DP.Personal|Personal = PersonalTable.StockDP;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource4HGSS.cs|LearnSource4HGSS.Personal|Personal = PersonalTable.StockHGSS;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource4Pt.cs|LearnSource4Pt.Personal|Personal = PersonalTable.StockPt;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource5B2W2.cs|LearnSource5B2W2.Personal|Personal = PersonalTable.StockB2W2;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource5BW.cs|LearnSource5BW.Personal|Personal = PersonalTable.StockBW;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource6AO.cs|LearnSource6AO.Personal|Personal = PersonalTable.StockAO;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource6XY.cs|LearnSource6XY.Personal|Personal = PersonalTable.StockXY;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource7GG.cs|LearnSource7GG.Personal|Personal = PersonalTable.StockGG;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource7SM.cs|LearnSource7SM.Personal|Personal = PersonalTable.StockSM;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource7USUM.cs|LearnSource7USUM.Personal|Personal = PersonalTable.StockUSUM;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource8BDSP.cs|LearnSource8BDSP.Personal|Personal = PersonalTable.StockBDSP;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource8PLA.cs|LearnSource8PLA.Personal|Personal = PersonalTable.StockLA;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource8SWSH.cs|LearnSource8SWSH.Personal|Personal = PersonalTable.StockSWSH;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource9SV.cs|LearnSource9SV.Personal|Personal = PersonalTable.StockSV;
+H1|PKHeX.Core/Legality/LearnSource/Sources/LearnSource9ZA.cs|LearnSource9ZA.Personal|Personal = PersonalTable.StockZA;
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves1|GetViaSpecies (PersonalTable.StockY,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves2|GetViaSpecies (PersonalTable.StockC,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves3|GetViaSpecies (PersonalTable.StockRS,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves4|GetViaSpecies (PersonalTable.StockDP,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves5|GetViaSpecies (PersonalTable.StockBW,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves6|GetViaSpecies (PersonalTable.StockAO,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves7|GetViaPersonal(PersonalTable.StockUSUM,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves7b|GetViaPersonal(PersonalTable.StockGG,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves8|GetViaPersonal(PersonalTable.StockSWSH,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves8a|GetViaPersonal(PersonalTable.StockLA,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves8b|GetViaPersonal(PersonalTable.StockBDSP,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves9|GetViaPersonal(PersonalTable.StockSV,
+H1|PKHeX.Core/Legality/Evolutions/EvolutionTree.cs|EvolutionTree.Evolves9a|GetViaPersonal(PersonalTable.StockZA,
+H2|PKHeX.Core/Game/GameStrings/GameStrings.cs|GameStrings.CreateDetached|public static GameStrings CreateDetached(string langFilePrefix) => new(langFilePrefix, true);
+H2|PKHeX.Core/Game/GameStrings/GameStrings.cs|GameStrings.Get|Detached ? GameLanguage.GetStringsDetached(ident, LanguageFilePrefix) : GameLanguage.GetStrings(ident, LanguageFilePrefix);
+H2|PKHeX.Core/Game/GameStrings/GameStrings.cs|GameStrings(string, bool)|private GameStrings(string langFilePrefix, bool detached)
+H2|PKHeX.Core/Game/GameStrings/GameLanguage.cs|GameLanguage.GetStringsDetached|public static string[] GetStringsDetached(string ident, string lang, [ConstantExpected] string type = "text")
+H2|PKHeX.Core/Util/ResourceUtil.cs|Util.GetStringListDetached|ResourceCache.TryGetStringResource(GetFullResourceName(fileName, lang2char, type), out var txt) ? FastSplit(txt) : [];
+H2|PKHeX.Core/Game/GameStrings/GameStrings.cs|GameStrings.GetItemListForEdit|public string[] GetItemListForEdit(EntityContext context, GameVersion version = GameVersion.Any)
+H3|PKHeX.Core/Saves/Blocks/Gen3/SaveBlock3SmallE.cs|SaveBlock3SmallE(Memory<byte>, int)|public SaveBlock3SmallE(Memory<byte> raw, int frontierShift)
+H3|PKHeX.Core/Saves/Blocks/Gen3/SaveBlock3SmallE.cs|SaveBlock3SmallE.BattleFrontier|Data.Slice(Frontier(0xCDC), BattleFrontier3.SIZE)
+H3|PKHeX.Core/Saves/Blocks/Gen3/SaveBlock3SmallE.cs|SaveBlock3SmallE.BP|Data[Frontier(0xEB8)..]
+H3|PKHeX.Core/Saves/Blocks/Gen3/SaveBlock3SmallE.cs|SaveBlock3SmallE.BPEarned|Data[Frontier(0xEBA)..]
+H3|PKHeX.Core/Saves/SAV3E.cs|SAV3E(Memory<byte>, int)|new SaveBlock3SmallE(SmallBuffer[..(0xF2C + frontierShift)], frontierShift)
+H3|PKHeX.Core/Saves/SAV3E.cs|SAV3E.CloneInternal|new(GetFinalData(), SmallBlock.FrontierShift)
+H4|PKHeX.Core/Saves/Substructures/Gen12/SAV1Offsets.cs|SAV1Offsets.ShiftedAfter|public SAV1Offsets ShiftedAfter(int boundary, int delta, int bagCapacity)
+H4|PKHeX.Core/Saves/Substructures/Gen12/SAV1Offsets.cs|SAV1Offsets.BagCapacity|public int BagCapacity { get; private init; } = 20;
+H4|PKHeX.Core/Saves/SAV1.cs|SAV1(Memory<byte>, LanguageID, GameVersion, SAV1Offsets?)|Offsets = offsets ?? (Japanese ? SAV1Offsets.JPN : SAV1Offsets.INT);
+H4|PKHeX.Core/Saves/SAV1.cs|SAV1.CloneInternal|new(GetFinalData(), (LanguageID)Language, Version, Offsets)
+H4|PKHeX.Core/Items/Bags/PlayerBag1.cs|PlayerBag1.GetPouches|new(offsets.Items, offsets.BagCapacity, 99, info, Items)
+H5|PKHeX.Core/SaveStates/RamScanLimits.cs|RamScanLimits.Default|public static RamScanLimits Default { get; } = new();
+H5|PKHeX.Core/SaveStates/RamPartyScan.cs|RamPartyScan.FindGen3Parties|public static List<RamParty> FindGen3Parties(SaveStateFile state, RamScanLimits limits)
+H5|PKHeX.Core/SaveStates/RamPartyScan.cs|RamPartyScan.FindGen4Parties|public static List<RamParty> FindGen4Parties(SaveStateFile state, RamScanLimits limits)
+H5|PKHeX.Core/SaveStates/RamPartyScan.cs|RamPartyScan.FindGen67Parties|public static List<RamParty> FindGen67Parties(SaveStateFile state, RamScanLimits limits)
+H5|PKHeX.Core/SaveStates/RamPartyScan.cs|RamPartyScan.IsValidMon3|if (limits.Gen3Validator is not { } validator)
+H5|PKHeX.Core/SaveStates/RamPartyScan.cs|RamPartyScan.IsValidMon45|species > (generation == 4 ? limits.MaxSpecies4 : limits.MaxSpecies5)
+H5|PKHeX.Core/SaveStates/RamPartyScan.cs|RamPartyScan.IsValidMon67|species > limits.MaxSpecies67
+H5|PKHeX.Core/SaveStates/SaveStateAnalysis.cs|SaveStateAnalysis.TryAnalyze|RamPartyScan.FindGen3Parties(container, limits)
+H5|PKHeX.Core/SaveStates/SaveStateBridge.cs|SaveStateSession.CreateRamParty|3 => version3 ?? GameVersion.E,
+H6|PKHeX.Core/Moves/MoveInfo.cs|MoveInfo.GetPP|if (MoveOverride.Current is { } overridden && overridden.TryGetPP(context, move, out var pp))
+H6|PKHeX.Core/Moves/MoveInfo.cs|MoveInfo.GetType|public static byte GetType(ushort move, EntityContext context) => MoveOverride.Current is { } overridden && overridden.TryGetType(context, move, out var type)
+H6|PKHeX.Core/Moves/MoveOverride.cs|MoveOverride.Use|public static IDisposable Use(EntityContext context, ReadOnlyMemory<byte> types, ReadOnlyMemory<byte> pp)

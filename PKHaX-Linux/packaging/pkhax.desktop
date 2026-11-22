@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=PKHaX
+GenericName=Pokemon save editor
+Comment=Edit Pokemon saves, including saves of ROM hacks
+Exec=PKHaX %f
+TryExec=PKHaX
+Icon=pkhax
+Terminal=false
+Categories=Utility;Game;
+StartupNotify=true

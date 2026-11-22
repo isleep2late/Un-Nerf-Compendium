@@ -12,7 +12,7 @@ namespace PKHeX.Core;
 public sealed class LearnSource5B2W2 : LearnSource5, ILearnSource<PersonalInfo5B2W2>, IEggSource
 {
     public static readonly LearnSource5B2W2 Instance = new();
-    private static readonly PersonalTable5B2W2 Personal = PersonalTable.B2W2;
+    private static readonly PersonalTable5B2W2 Personal = PersonalTable.StockB2W2;
     private static readonly Learnset[] Learnsets = LearnsetReader.GetArray(BinLinkerAccessor16.Get(Util.GetBinaryResource("lvlmove_b2w2.pkl"), "52"u8));
     private const int MaxSpecies = Legal.MaxSpeciesID_5;
     private const LearnEnvironment Game = B2W2;

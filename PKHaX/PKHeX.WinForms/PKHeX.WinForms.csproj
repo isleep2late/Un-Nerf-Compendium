@@ -35,6 +35,8 @@
     <ProjectReference Include="..\PKHeX.Drawing.Misc\PKHeX.Drawing.Misc.csproj" />
     <ProjectReference Include="..\PKHeX.Drawing.PokeSprite\PKHeX.Drawing.PokeSprite.csproj" />
     <ProjectReference Include="..\PKHeX.Drawing\PKHeX.Drawing.csproj" />
+    <ProjectReference Include="..\PKHaX.Hacks\PKHaX.Hacks.csproj" />
+    <ProjectReference Include="..\PKHaX.Patching\PKHaX.Patching.csproj" />
   </ItemGroup>
 
   <ItemGroup>

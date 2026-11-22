@@ -1,3 +1,6 @@
+using System.Globalization;
+using PKHaX.Hacks.Editing;
+using PKHaX.Hacks.Intake;
 using PKHeX.Core;
 
 namespace PKHaX.Mobile.Services;
@@ -11,8 +14,104 @@ public sealed class SaveManager
 {
 	private readonly ISaveFileGateway gateway;
 	private byte[]? originalBytes;
+	private OpenResult? opened;
+	private bool overlayAtOpen;
+	private PendingOpen? pending;
 
-	public SaveManager(ISaveFileGateway gateway) => this.gateway = gateway;
+	private sealed record PendingOpen(byte[] Bytes, SaveFileHandle Handle, OpenResult Result, bool NativeContainer);
+
+	public SaveManager(ISaveFileGateway gateway)
+	{
+		this.gateway = gateway;
+		Kits = new HackKits(FileSystem.AppDataDirectory);
+	}
+
+	public HackKits Kits { get; }
+
+	public ISaveFileGateway Gateway => gateway;
+
+	public HackSaveModel? Hack { get; private set; }
+
+	public StoredKit? Kit => opened?.Kit;
+
+	public IReadOnlyList<string> OpenNotes => opened?.Notes ?? [];
+
+	public bool ShowsLegality => !OtherOverlayActive && (opened?.ShowsLegality ?? true);
+
+	public bool OtherOverlayActive => HackOpen.Current is { OverlayActive: true } active && !ReferenceEquals(active, opened);
+
+	public void CloseOtherOverlay()
+	{
+		if (OtherOverlayActive)
+			HackOpen.Close();
+	}
+
+	public void Close()
+	{
+		if (opened is not null && ReferenceEquals(HackOpen.Current, opened))
+			HackOpen.Close();
+		Replace(null);
+		Save = null;
+		Hack = null;
+		SpaceWorld = null;
+		StateSession = null;
+		Handle = null;
+		originalBytes = null;
+		pending = null;
+	}
+
+	public string? WriteRefusal =>
+		Hack is not null ? opened?.WriteRefusal ?? HackKits.NativeReadOnly
+		: OtherOverlayActive ? HackKits.OtherOverlay
+		: opened is null ? null
+		: overlayAtOpen && !opened.OverlayActive ? HackKits.OverlayClosed
+		: opened.WriteRefusal;
+
+	public bool CanWrite => IsLoaded && Hack is null && WriteRefusal is null;
+
+	public string? UnmodifiedQuestion => opened is { AsksUnmodified: true } o ? o.UnmodifiedQuestion : null;
+
+	public string? ConfirmLabel => UnmodifiedQuestion is null ? null : opened?.ConfirmLabel;
+
+	public bool ConfirmUnmodified() => opened?.ConfirmUnmodified() == true;
+
+	public bool HasPending => pending is not null;
+
+	public string? PendingQuestion => pending?.Result.Sentence;
+
+	public IReadOnlyList<StoredKit> PendingChoices => pending?.Result.Choices ?? [];
+
+	public bool PendingAllowsStock => pending is { NativeContainer: false };
+
+	public void CancelPending() => pending = null;
+
+	public string? Answer(StoredKit? kit)
+	{
+		if (pending is not { } p)
+			return "Nothing is waiting for an answer.";
+		pending = null;
+		var hint = kit is null ? new OpenHint { NoKit = true } : new OpenHint { KitKey = kit.Kit.Key, Answered = true };
+		return Load(p.Bytes, p.Handle, hint);
+	}
+
+	public async Task<string?> OpenForKitAsync(StoredKit kit)
+	{
+		var picked = await gateway.PickSaveAsync();
+		if (picked is null)
+			return null;
+		return Load(picked.Value.Bytes, picked.Value.Handle, new OpenHint { KitKey = kit.Kit.Key, Answered = true });
+	}
+
+	private static string PathOf(SaveFileHandle handle) =>
+		handle.PlatformToken.StartsWith("content://", StringComparison.OrdinalIgnoreCase) ? handle.PlatformToken : handle.DisplayName;
+
+	private void Replace(OpenResult? result)
+	{
+		if (!ReferenceEquals(opened, result))
+			opened?.Dispose();
+		opened = result;
+		overlayAtOpen = result?.OverlayActive == true;
+	}
 
 	/// <summary>The loaded save, or null if none is open.</summary>
 	public SaveFile? Save { get; private set; }
@@ -35,9 +134,9 @@ public sealed class SaveManager
 	/// </summary>
 	public bool IllegalMode { get; set; } = true;
 
-	public bool IsLoaded => Save is not null || SpaceWorld is not null;
+	public bool IsLoaded => Save is not null || SpaceWorld is not null || Hack is not null;
 
-	public GameStrings Strings { get; } = GameInfo.GetStrings("en");
+	public GameStrings Strings => GameInfo.Strings;
 
 	/// <summary>Opens whatever the user picked. Returns null on success, or a human-readable error.</summary>
 	public async Task<string?> OpenAsync()
@@ -46,59 +145,129 @@ public sealed class SaveManager
 		if (picked is null)
 			return null; // user cancelled — not an error
 
-		return Load(picked.Value.Bytes, picked.Value.Handle);
+		var error = Load(picked.Value.Bytes, picked.Value.Handle);
+		return error ?? (HasPending ? $"{PendingQuestion} {HackKits.AnswerOnMainPage}" : null);
 	}
 
-	public string? Load(byte[] bytes, SaveFileHandle handle)
+	public string? Load(byte[] bytes, SaveFileHandle handle) => Load(bytes, handle, null);
+
+	public string? Load(byte[] bytes, SaveFileHandle handle, OpenHint? hint)
+	{
+		var asOpened = bytes.ToArray();
+		pending = null;
+		OpenResult result;
+		try
+		{
+			result = HackOpen.Open(asOpened, PathOf(handle), Kits.Store, null, hint);
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			return $"{HackKits.CheckFailed} {ex.Message}";
+		}
+		switch (result.Kind)
+		{
+			case OpenKind.Ask:
+				pending = new PendingOpen(asOpened, handle, result, HackOpen.CfruContainer(asOpened) is not null);
+				return null;
+			case OpenKind.Refused:
+				result.Dispose();
+				if (result.Kit is null && result.Sentence == IntakeText.NotASave)
+					return LoadOther(bytes, handle);
+				return result.Sentence ?? IntakeText.NotASave;
+			case OpenKind.Native:
+				Replace(result);
+				Save = null;
+				StateSession = null;
+				SpaceWorld = null;
+				Hack = result.Native;
+				Handle = handle;
+				originalBytes = asOpened;
+				return null;
+			default:
+				if (result.Stock is not { } stock)
+				{
+					result.Dispose();
+					return IntakeText.NotASave;
+				}
+				Replace(result);
+				SpaceWorld = null;
+				StateSession = null;
+				Hack = null;
+				Save = stock;
+				Handle = handle;
+				originalBytes = asOpened;
+				stock.State.Edited = false;
+				return null;
+		}
+	}
+
+	private string? LoadOther(byte[] bytes, SaveFileHandle handle)
 	{
 		// PKHaX: SaveFile wraps the array it is given WITHOUT copying (SaveFile.Buffer = data), so every edit and every
 		// Write() would leak into a backup taken from the same array. Keep a private copy of the bytes exactly as opened
 		// before anything else gets hold of the array.
 		var asOpened = bytes.ToArray(); // PKHaX: private copy, the only backup / corruption source
-		var sav = SaveUtil.GetSaveFile(bytes, handle.DisplayName);
-		if (sav is null)
+		if (SW97Save.TryLoad(bytes, handle.DisplayName, out var sw97) && sw97 is not null)
 		{
-			if (SW97Save.TryLoad(bytes, handle.DisplayName, out var sw97) && sw97 is not null)
+			Replace(null);
+			Hack = null;
+			Save = null;
+			StateSession = null;
+			SpaceWorld = sw97;
+			Handle = handle;
+			originalBytes = asOpened;
+			return null;
+		}
+		if (SaveStateAnalysis.TryAnalyze(bytes, handle.DisplayName) is { HasAnything: true } analysis)
+		{
+			if (analysis.Container.EmbeddedSave is { } embedded)
 			{
-				Save = null;
-				StateSession = null;
-				SpaceWorld = sw97;
+				try
+				{
+					if (HackOpen.CfruContainer(embedded) is not null)
+						return HackKits.StateHack;
+				}
+				catch (Exception ex) when (ex is not OutOfMemoryException)
+				{
+					return $"{HackKits.CheckFailed} {ex.Message}";
+				}
+			}
+			var session = SaveStateSession.CreateEmbedded(analysis)
+				?? SaveStateSession.CreateGBParty(analysis)
+				?? (analysis.RamParties.Count > 0 ? SaveStateSession.CreateRamParty(analysis, analysis.RamParties[0]) : null);
+			if (session is not null)
+			{
+				Replace(null);
+				Hack = null;
+				SpaceWorld = null;
+				StateSession = session;
+				Save = session.Save;
 				Handle = handle;
 				originalBytes = asOpened; // PKHaX: never the array the SaveFile aliases
 				return null;
 			}
-			if (SaveStateAnalysis.TryAnalyze(bytes, handle.DisplayName) is { HasAnything: true } analysis)
-			{
-				var session = SaveStateSession.CreateEmbedded(analysis)
-					?? SaveStateSession.CreateGBParty(analysis)
-					?? (analysis.RamParties.Count > 0 ? SaveStateSession.CreateRamParty(analysis, analysis.RamParties[0]) : null);
-				if (session is not null)
-				{
-					SpaceWorld = null;
-					StateSession = session;
-					Save = session.Save;
-					Handle = handle;
-					originalBytes = asOpened; // PKHaX: never the array the SaveFile aliases
-					return null;
-				}
-			}
-			return "That file was not recognised as a supported save (Gen 1-9, main-series), an emulator save state with Pokémon data, or a Space World '97 save state.";
 		}
-
-		SpaceWorld = null;
-		StateSession = null;
-		Save = sav;
-		Handle = handle;
-		originalBytes = asOpened; // PKHaX: never the array the SaveFile aliases
-		sav.State.Edited = false; // PKHaX: nothing edited yet (same reset as the desktop editor after a load)
-		return null;
+		return "That file was not recognised as a supported save (Gen 1-9, main-series), an emulator save state with Pokémon data, or a Space World '97 save state.";
 	}
 
 	/// <summary>Serialises the save through PKHeX.Core and writes it back to its original location.</summary>
 	public async Task<string?> SaveBackAsync()
 	{
-		if ((Save is null && SpaceWorld is null) || Handle is null)
+		if ((Save is null && SpaceWorld is null && Hack is null) || Handle is null)
 			return "No save is open.";
+		if (WriteRefusal is { } refusal)
+			return refusal;
+		if (opened?.Kit is not null)
+		{
+			try
+			{
+				await WriteHackBackupAsync();
+			}
+			catch (Exception ex)
+			{
+				return $"{HackKits.BackupFailed} {ex.Message}";
+			}
+		}
 
 		try
 		{
@@ -115,6 +284,28 @@ public sealed class SaveManager
 		{
 			return $"Could not write the save: {ex.Message}";
 		}
+	}
+
+	public async Task<string> WriteHackBackupAsync()
+	{
+		if (Handle is not { } handle || originalBytes is not { } bytes)
+			throw new InvalidOperationException("No save is open.");
+		var dir = Path.Combine(FileSystem.AppDataDirectory, "backups");
+		Directory.CreateDirectory(dir);
+		var name = string.IsNullOrWhiteSpace(handle.DisplayName) ? "save" : Path.GetFileName(handle.DisplayName);
+		var stamp = DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+		for (var n = 1; n <= 1000; n++)
+		{
+			var path = Path.Combine(dir, n == 1 ? $"{name}.{stamp}.bak" : $"{name}.{stamp}-{n}.bak");
+			if (File.Exists(path))
+				continue;
+			await using (var file = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+				await file.WriteAsync(bytes);
+			if (!(await File.ReadAllBytesAsync(path)).AsSpan().SequenceEqual(bytes))
+				throw new IOException($"the backup {path} did not read back equal to the save");
+			return path;
+		}
+		throw new IOException($"no free backup name for {name} at {stamp}");
 	}
 
 	/// <summary>
@@ -147,7 +338,7 @@ public sealed class SaveManager
 
 	/// <summary>PKHaX: the Gen 1 corrupter needs a plain raw 32 KiB Gen 1 save file - not one living inside an emulator save state.</summary>
 	public bool CanCorruptGen1 => Save is SAV1 && StateSession is null && SpaceWorld is null && Handle is not null
-		&& originalBytes is { Length: Gen1SaveCorrupter.ExpectedSize }; // PKHaX
+		&& originalBytes is { Length: Gen1SaveCorrupter.ExpectedSize } && WriteRefusal is null;
 
 	/// <summary>
 	/// PKHaX: writes the bytes exactly as the file was opened (or last written back) to an app-local backup file and

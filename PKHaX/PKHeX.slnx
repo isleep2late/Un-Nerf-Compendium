@@ -5,8 +5,11 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/Tests/">
+    <Project Path="PKHaX.Hacks.Tests/PKHaX.Hacks.Tests.csproj" />
     <Project Path="Tests/PKHeX.Core.Tests/PKHeX.Core.Tests.csproj" />
   </Folder>
+  <Project Path="PKHaX.Hacks/PKHaX.Hacks.csproj" />
+  <Project Path="PKHaX.Patching/PKHaX.Patching.csproj" />
   <Project Path="PKHeX.Core/PKHeX.Core.csproj" />
   <Project Path="PKHeX.Drawing.Misc/PKHeX.Drawing.Misc.csproj" />
   <Project Path="PKHeX.Drawing.PokeSprite/PKHeX.Drawing.PokeSprite.csproj" />

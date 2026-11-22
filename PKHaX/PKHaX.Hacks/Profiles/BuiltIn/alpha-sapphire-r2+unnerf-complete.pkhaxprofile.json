@@ -1,0 +1,48 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "3ds",
+  "base": "alpha-sapphire-r2",
+  "headerFamily": "3ds:000400000011C500",
+  "engine": {
+    "family": "ctr-gen6",
+    "version": "oras-1.0-rev2",
+    "ramLayout": "base",
+    "romLayout": "base"
+  },
+  "id": "alpha-sapphire-r2+unnerf-complete",
+  "displayName": "Pokemon Alpha Sapphire + Un-Nerf (Complete)",
+  "kind": "unnerf",
+  "inherits": "alpha-sapphire-r2",
+  "parent": "alpha-sapphire-r2",
+  "match": [
+    {
+      "imageRoot": "7f0b5440678b1112ec677559267f8129dbf34db239f226d18037b778ed92fa22",
+      "sha1": "5b8f3da3f64efd56f4263f4c789b6929effffca0",
+      "label": "baked"
+    },
+    {
+      "titleId": "000400000011C500",
+      "codeSha1": "840d54b3d688cf9d3372d8ab971c3be009d64e99",
+      "modSet": "none",
+      "updateVersion": 0,
+      "label": "code"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV6AO"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:alphasapphire"
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "tools/games/ctr/ctr-defs.json",
+      "note": "alpha-sapphire-r2+unnerf-complete.3ds: SHA-1, image root (SHA-256 of the NCCH header) and code SHA-1 (.text + .rodata, R1-4) measured read-only by ProfileGen ctr-rows"
+    }
+  ]
+}

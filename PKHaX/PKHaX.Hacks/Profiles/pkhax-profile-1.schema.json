@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pkhax-profile-1.schema.json",
+  "title": "pkhax-profile/1",
+  "description": "The PKHaX profile file (DESIGN-5 6.4 with amendment R5-5): an isleep2late GameProfile's identity, save, data, ram, unNerf, editor and codes blocks under DESIGN-1 key names, with schema \"pkhax-profile/1\". Unknown keys are allowed and kept on re-export, so a full GameProfile round-trips. PkhaxProfileReader enforces the same rules; CheatProof ProveProfileMatch:SchemaAgrees runs both on one corpus.",
+  "type": "object",
+  "required": ["schema", "id", "displayName", "kind", "platform", "base", "match"],
+  "not": { "required": ["unnerf"] },
+  "properties": {
+    "schema": { "const": "pkhax-profile/1" },
+    "id": { "$ref": "#/definitions/profileId" },
+    "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "kind": { "enum": ["vanilla", "unnerf", "hack", "hack+unnerf", "owner-build", "imported"] },
+    "platform": { "enum": ["gb", "gbc", "gba", "nds", "3ds", "switch"] },
+    "base": { "$ref": "#/definitions/profileId" },
+    "parent": { "anyOf": [ { "$ref": "#/definitions/profileId" }, { "type": "null" } ] },
+    "match": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["label"], "properties": { "label": { "$ref": "#/definitions/profileId" } } } },
+    "engine": { "type": "object" },
+    "save": { "$ref": "#/definitions/save" },
+    "data": { "$ref": "#/definitions/data" },
+    "ram": { "type": "object" },
+    "unNerf": { "$ref": "#/definitions/unNerf" },
+    "editor": { "type": "object" },
+    "codes": { "type": "array" },
+    "evidence": { "type": "object" },
+    "sources": { "type": "array" }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": { "properties": { "platform": { "enum": ["gb", "gbc", "gba", "nds"] } }, "required": ["platform"] },
+      "then": { "properties": { "match": { "items": { "$ref": "#/definitions/romMatch" } } } }
+    },
+    {
+      "if": { "properties": { "platform": { "const": "3ds" } }, "required": ["platform"] },
+      "then": { "properties": { "match": { "items": { "anyOf": [ { "$ref": "#/definitions/ctrModsMatch" }, { "$ref": "#/definitions/ctrBakedMatch" } ] } } } }
+    },
+    {
+      "if": { "properties": { "platform": { "const": "switch" } }, "required": ["platform"] },
+      "then": { "properties": { "match": { "items": { "$ref": "#/definitions/nxMatch" } } } }
+    }
+  ],
+  "definitions": {
+    "profileId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.+-]*$", "maxLength": 96 },
+    "sha1": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "titleId": { "type": "string", "pattern": "^[0-9A-F]{16}$" },
+    "modSet": { "type": "string", "pattern": "^(none|[0-9a-fA-F]{64})$" },
+    "romMatch": {
+      "type": "object",
+      "required": ["sha1", "label"],
+      "properties": {
+        "sha1": { "$ref": "#/definitions/sha1" },
+        "crc32": { "type": "string", "pattern": "^[0-9a-f]{8}$" },
+        "size": { "type": "integer", "minimum": 1 },
+        "label": { "$ref": "#/definitions/profileId" }
+      },
+      "not": { "anyOf": [ { "required": ["titleId"] }, { "required": ["codeSha1"] }, { "required": ["mainBuildId"] }, { "required": ["imageRoot"] } ] }
+    },
+    "ctrModsMatch": {
+      "type": "object",
+      "required": ["titleId", "codeSha1", "modSet", "updateVersion", "label"],
+      "properties": {
+        "titleId": { "$ref": "#/definitions/titleId" },
+        "codeSha1": { "$ref": "#/definitions/sha1" },
+        "modSet": { "$ref": "#/definitions/modSet" },
+        "updateVersion": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "label": { "$ref": "#/definitions/profileId" }
+      },
+      "not": { "required": ["imageRoot"] }
+    },
+    "ctrBakedMatch": {
+      "type": "object",
+      "required": ["imageRoot", "label"],
+      "properties": {
+        "imageRoot": { "$ref": "#/definitions/sha256" },
+        "label": { "$ref": "#/definitions/profileId" }
+      }
+    },
+    "nxMatch": {
+      "type": "object",
+      "required": ["titleId", "mainBuildId", "updateVersion", "modSet", "label"],
+      "properties": {
+        "titleId": { "$ref": "#/definitions/titleId" },
+        "mainBuildId": { "type": "string", "pattern": "^([0-9A-Fa-f]{32}|[0-9A-Fa-f]{40}(00)*)$" },
+        "updateVersion": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "modSet": { "$ref": "#/definitions/modSet" },
+        "label": { "$ref": "#/definitions/profileId" }
+      }
+    },
+    "evidence": { "enum": ["Unproven", "RoundTrip", "Confined", "GameAccepted"] },
+    "save": {
+      "type": "object",
+      "required": ["variant"],
+      "properties": {
+        "variant": { "type": "string", "pattern": "^[a-z0-9][A-Za-z0-9.:+/_-]*$" },
+        "writeEvidence": { "$ref": "#/definitions/evidence" },
+        "container": { "type": ["object", "null"] },
+        "party": { "type": ["object", "null"] },
+        "boxes": { "type": ["object", "null"] },
+        "trainer": { "type": ["object", "null"] },
+        "money": { "type": ["object", "null"] },
+        "bag": { "type": ["object", "null"] },
+        "preserve": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "source": { "enum": ["rom", "embedded", "pkhex"] },
+        "reader": { "type": "string" },
+        "readerVersion": { "type": "integer", "minimum": 1 },
+        "romSha1": { "anyOf": [ { "$ref": "#/definitions/sha1" }, { "type": "null" } ] },
+        "embedded": { "anyOf": [ { "type": "null" }, { "type": "object", "required": ["schema"], "properties": { "schema": { "const": "hackdata/1" } } } ] }
+      },
+      "additionalProperties": true
+    },
+    "abilityStorage": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": { "kind": { "enum": ["none", "pk3-u16-0x1E", "bits"] } },
+      "if": { "properties": { "kind": { "const": "bits" } } },
+      "then": { "required": ["fields"], "properties": { "fields": { "type": "array", "minItems": 1 } } }
+    },
+    "unNerf": {
+      "type": "object",
+      "properties": {
+        "anyAbility": { "$ref": "#/definitions/abilityStorage" },
+        "deoxysForm": { "$ref": "#/definitions/abilityStorage" },
+        "frontierShift": { "enum": [0, 4] }
+      },
+      "additionalProperties": true
+    }
+  }
+}

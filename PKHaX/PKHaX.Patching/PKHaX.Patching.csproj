@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>PKHaX.Patching</AssemblyName>
+    <RootNamespace>Isleep2late.Files.Services.Patch</RootNamespace>
+    <Description>ROM patch decoders for PKHaX (IPS, IPS32, UPS, BPS, xdelta)</Description>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsTrimmable>false</IsTrimmable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PKHaX.Hacks\PKHaX.Hacks.csproj" />
+  </ItemGroup>
+
+</Project>

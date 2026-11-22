@@ -10,15 +10,17 @@ namespace PKHeX.Core;
 public sealed class SAV3E : SAV3, IDaycareRandomState<uint>
 {
     // Configuration
-    protected override SAV3E CloneInternal() => new(GetFinalData()) { Language = Language };
+    protected override SAV3E CloneInternal() => new(GetFinalData(), SmallBlock.FrontierShift) { Language = Language };
     public override SaveBlock3SmallE SmallBlock { get; }
     public override SaveBlock3LargeE LargeBlock { get; }
     public override GameVersion Version { get => GameVersion.E; set { } }
     public override PersonalTable3 Personal => PersonalTable.E;
 
-    public SAV3E(Memory<byte> data) : base(data)
+    public SAV3E(Memory<byte> data) : this(data, 0) { }
+
+    public SAV3E(Memory<byte> data, int frontierShift) : base(data)
     {
-        SmallBlock = new SaveBlock3SmallE(SmallBuffer[..0xF2C]);
+        SmallBlock = new SaveBlock3SmallE(SmallBuffer[..(0xF2C + frontierShift)], frontierShift);
         LargeBlock = new SaveBlock3LargeE(LargeBuffer[..0x3D88]);
     }
     public SAV3E(bool japanese = false) : base(japanese)

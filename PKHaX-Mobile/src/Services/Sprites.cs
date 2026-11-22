@@ -14,7 +14,9 @@ public static class Sprites
 
 	public static string Url(PKM pk)
 	{
-		var species = GameInfo.Strings.Species[pk.Species].ToLowerInvariant();
+		var english = GameInfo.GetStrings("en").Species;
+		var names = pk.Species < english.Count ? english : GameInfo.Strings.Species;
+		var species = pk.Species < names.Count ? names[pk.Species].ToLowerInvariant() : $"{pk.Species}";
 		var id = ToShowdownId(species);
 		var dir = pk.IsShiny ? "gen5-shiny" : "gen5";
 		return $"{Base}/{dir}/{id}.png";

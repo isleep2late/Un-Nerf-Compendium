@@ -20,9 +20,22 @@ else
   DOTNET="$HOME/.dotnet/dotnet"; export DOTNET_ROOT="$HOME/.dotnet"; export PATH="$HOME/.dotnet:$PATH"
 fi
 
-echo "=== Building PKHaX with: $DOTNET (Release, win-x64). Takes a minute or two... ==="
+SRC_COMMIT="$(sed -n 's/^is2l-commit=//p' PKHAX_SOURCE.txt 2>/dev/null | head -n 1)"
+SRC_STATE="$(sed -n 's/^state=//p' PKHAX_SOURCE.txt 2>/dev/null | head -n 1)"
+if ! printf '%s' "$SRC_COMMIT" | grep -Eq '^[0-9a-f]{40}$'; then
+  echo "[X] PKHAX_SOURCE.txt names no is2l commit, so the build cannot be stamped with its source."
+  echo "    Run ./build.sh pkhax-export <this clone> from the is2l worktree first."
+  exit 1
+fi
+STAMP="is2l.$SRC_COMMIT"
+if [ "$SRC_STATE" != "clean" ]; then
+  STAMP="$STAMP.dirty"
+fi
+
+echo "=== Building PKHaX with: $DOTNET (Release, win-x64, source $STAMP). Takes a minute or two... ==="
 "$DOTNET" publish PKHeX.WinForms -c Release -r win-x64 \
-  -p:PublishSingleFile=true --self-contained false -p:EnableWindowsTargeting=true
+  -p:PublishSingleFile=true --self-contained false -p:EnableWindowsTargeting=true \
+  "-p:SourceRevisionId=$STAMP"
 
 OUTDIR="PKHeX.WinForms/bin/Release/net10.0-windows/win-x64/publish"
 if [ ! -f "$OUTDIR/PKHeX.exe" ]; then

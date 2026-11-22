@@ -1,0 +1,48 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "3ds",
+  "base": "ultra-moon-usa",
+  "headerFamily": "3ds:00040000001B5100",
+  "engine": {
+    "family": "ctr-gen7",
+    "version": "usum-1.0",
+    "ramLayout": "base",
+    "romLayout": "base"
+  },
+  "id": "ultra-moon-usa+unnerf-complete",
+  "displayName": "Pokemon Ultra Moon + Un-Nerf (Complete)",
+  "kind": "unnerf",
+  "inherits": "ultra-moon-usa",
+  "parent": "ultra-moon-usa",
+  "match": [
+    {
+      "imageRoot": "c7739d26b009bd5c18c485cc534cd07f71d501b14ae32a97e47b76c2f69d6582",
+      "sha1": "ec087efe9144519e0b82209d26f5bdc82756745b",
+      "label": "baked"
+    },
+    {
+      "titleId": "00040000001B5100",
+      "codeSha1": "431f7eb997dac96f842eaeda53baac1203fd9d06",
+      "modSet": "none",
+      "updateVersion": 0,
+      "label": "code"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV7USUM"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:ultramoon"
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "tools/games/ctr/ctr-defs.json",
+      "note": "ultra-moon-usa+unnerf-complete.3ds: SHA-1, image root (SHA-256 of the NCCH header) and code SHA-1 (.text + .rodata, R1-4) measured read-only by ProfileGen ctr-rows"
+    }
+  ]
+}

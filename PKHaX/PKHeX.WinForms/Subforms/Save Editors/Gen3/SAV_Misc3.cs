@@ -114,7 +114,23 @@ public partial class SAV_Misc3 : Form
         SAV.Coin = (ushort)NUD_Coins.Value;
 
         Origin.CopyChangesFrom(SAV);
+        if (EnigmaBerryWritten && Origin is SAV3 saved)
+            EReaderBerrySettings.LoadFrom(saved);
         Close();
+    }
+
+    private bool EnigmaBerryWritten;
+
+    private void B_EnigmaBerry_Click(object sender, EventArgs e)
+    {
+        if (SAV_EnigmaBerry3.Unavailable(SAV, Main.CurrentStateFacet) is { } reason)
+        {
+            WinFormsUtil.Alert(reason);
+            return;
+        }
+        using var form = new SAV_EnigmaBerry3(SAV, Main.CurrentWriteRefusal, Main.CurrentKit);
+        form.ShowDialog(this);
+        EnigmaBerryWritten |= form.Written;
     }
 
     private void B_Cancel_Click(object sender, EventArgs e) => Close();

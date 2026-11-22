@@ -71,6 +71,15 @@ public static class GameLanguage
 
         return data;
     }
+
+    public static string[] GetStringsDetached(string ident, string lang, [ConstantExpected] string type = "text")
+    {
+        string[] data = Util.GetStringListDetached(ident, lang, type);
+        if (data.Length == 0)
+            data = Util.GetStringListDetached(ident, DefaultLanguage, type);
+
+        return data;
+    }
 }
 
 /// <summary>

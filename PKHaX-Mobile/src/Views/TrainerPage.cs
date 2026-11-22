@@ -128,5 +128,16 @@ public sealed class TrainerPage : ContentPage
 		info.Add(Ui.ReadOnlyRow("Boxes", sav.BoxCount.ToString()));
 		info.Add(Ui.ReadOnlyRow("Party", sav.PartyCount.ToString()));
 		root.Add(Ui.Card(info));
+
+		if (sav is SAV3)
+		{
+			root.Add(Ui.SectionHeader("Enigma Berry"));
+			var berry = new VerticalStackLayout { Spacing = 0 };
+			berry.Add(Ui.Caption("The e-Reader berry record: what item 175 does when held or used, with presets such as Quick Claw and Focus Band at 100."));
+			var open = Ui.Action("Edit the Enigma Berry");
+			open.Clicked += async (_, _) => await Shell.Current.Navigation.PushAsync(new EnigmaBerryPage(saves));
+			berry.Add(open);
+			root.Add(Ui.Card(berry));
+		}
 	}
 }

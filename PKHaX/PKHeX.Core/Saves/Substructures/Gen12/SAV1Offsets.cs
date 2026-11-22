@@ -86,4 +86,36 @@ public sealed class SAV1Offsets
     public int CurrentBox { get; private init; }
     public int ChecksumOfs { get; private init; }
     public int HallOfFameCount { get; private init; }
+    public int BagCapacity { get; private init; } = 20;
+
+    public SAV1Offsets ShiftedAfter(int boundary, int delta, int bagCapacity) => new()
+    {
+        DexCaught = Shift(DexCaught, boundary, delta),
+        DexSeen = Shift(DexSeen, boundary, delta),
+        Items = Shift(Items, boundary, delta),
+        Money = Shift(Money, boundary, delta),
+        Rival = Shift(Rival, boundary, delta),
+        Options = Shift(Options, boundary, delta),
+        Badges = Shift(Badges, boundary, delta),
+        TID16 = Shift(TID16, boundary, delta),
+        PikaFriendship = Shift(PikaFriendship, boundary, delta),
+        PikaBeachScore = Shift(PikaBeachScore, boundary, delta),
+        PrinterBrightness = Shift(PrinterBrightness, boundary, delta),
+        PCItems = Shift(PCItems, boundary, delta),
+        CurrentBoxIndex = Shift(CurrentBoxIndex, boundary, delta),
+        HallOfFameCount = Shift(HallOfFameCount, boundary, delta),
+        Coin = Shift(Coin, boundary, delta),
+        ObjectSpawnFlags = Shift(ObjectSpawnFlags, boundary, delta),
+        EventWork = Shift(EventWork, boundary, delta),
+        Starter = Shift(Starter, boundary, delta),
+        EventFlag = Shift(EventFlag, boundary, delta),
+        PlayTime = Shift(PlayTime, boundary, delta),
+        Daycare = Shift(Daycare, boundary, delta),
+        Party = Shift(Party, boundary, delta),
+        CurrentBox = Shift(CurrentBox, boundary, delta),
+        ChecksumOfs = Shift(ChecksumOfs, boundary, delta),
+        BagCapacity = bagCapacity,
+    };
+
+    private static int Shift(int offset, int boundary, int delta) => offset > boundary ? offset + delta : offset;
 }

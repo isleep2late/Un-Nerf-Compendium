@@ -45,11 +45,13 @@ public sealed class SaveStateSession
         return new SaveStateSession { Analysis = analysis, Facet = SaveStateFacet.GBParty, Save = sav };
     }
 
-    public static SaveStateSession? CreateRamParty(SaveStateAnalysis analysis, RamParty party)
+    public static SaveStateSession? CreateRamParty(SaveStateAnalysis analysis, RamParty party) => CreateRamParty(analysis, party, null);
+
+    public static SaveStateSession? CreateRamParty(SaveStateAnalysis analysis, RamParty party, GameVersion? version3)
     {
         var version = party.Generation switch
         {
-            3 => GameVersion.E,
+            3 => version3 ?? GameVersion.E,
             5 => GameVersion.B2,
             6 or 7 => VersionFor67(party),
             _ => GameVersion.Pt,

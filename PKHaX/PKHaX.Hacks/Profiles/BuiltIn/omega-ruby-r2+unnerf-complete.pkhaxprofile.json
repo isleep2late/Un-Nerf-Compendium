@@ -1,0 +1,48 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "3ds",
+  "base": "omega-ruby-r2",
+  "headerFamily": "3ds:000400000011C400",
+  "engine": {
+    "family": "ctr-gen6",
+    "version": "oras-1.0-rev2",
+    "ramLayout": "base",
+    "romLayout": "base"
+  },
+  "id": "omega-ruby-r2+unnerf-complete",
+  "displayName": "Pokemon Omega Ruby + Un-Nerf (Complete)",
+  "kind": "unnerf",
+  "inherits": "omega-ruby-r2",
+  "parent": "omega-ruby-r2",
+  "match": [
+    {
+      "imageRoot": "b5342525ce2d205eb1cdff1ee2ff66e78ea0ed98599e7883cdee2374d0e60277",
+      "sha1": "41cc92b82ce395f03a8991cf469ed27ad7b0cc10",
+      "label": "baked"
+    },
+    {
+      "titleId": "000400000011C400",
+      "codeSha1": "e6a1822987ae37b6a22a2e8a9bab0577fb6461ef",
+      "modSet": "none",
+      "updateVersion": 0,
+      "label": "code"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV6AO"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:omegaruby"
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "tools/games/ctr/ctr-defs.json",
+      "note": "omega-ruby-r2+unnerf-complete.3ds: SHA-1, image root (SHA-256 of the NCCH header) and code SHA-1 (.text + .rodata, R1-4) measured read-only by ProfileGen ctr-rows"
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "schema": "pkhax-profile/1",
+  "platform": "gba",
+  "base": "emerald-usa-europe",
+  "headerFamily": "gba:BPEE:0",
+  "engine": {
+    "family": "gba-vanilla",
+    "version": "emerald-1.0",
+    "ramLayout": "base",
+    "romLayout": "relocated"
+  },
+  "ram": {
+    "gMain.inBattle": {
+      "fixed": "0x030026F9",
+      "size": 1,
+      "type": "bits:u8:1:1",
+      "evidence": "Inherited"
+    },
+    "gBattleOutcome": {
+      "fixed": "0x0202433A",
+      "size": 1,
+      "type": "u8",
+      "evidence": "Inherited"
+    },
+    "gLastUsedItem": {
+      "fixed": "0x02024208",
+      "size": 2,
+      "type": "u16",
+      "evidence": "Inherited"
+    },
+    "gEnemyParty": {
+      "fixed": "0x02024744",
+      "size": 600,
+      "type": "struct:gen3.party6",
+      "evidence": "Inherited"
+    },
+    "gPlayerParty": {
+      "locator": {
+        "kind": "gen3.findParty",
+        "hint": "0x020244EC"
+      },
+      "size": 600,
+      "type": "struct:gen3.party6",
+      "evidence": "Inherited"
+    },
+    "gPlayerPartyCount": {
+      "fixed": "0x020244E9",
+      "size": 1,
+      "type": "u8",
+      "evidence": "Inherited"
+    },
+    "gRngValue": {
+      "locator": {
+        "kind": "gen3.rngStep",
+        "hint": "0x03005D80"
+      },
+      "size": 4,
+      "type": "u32",
+      "evidence": "Inherited"
+    },
+    "gSaveBlock2Ptr": {
+      "fixed": "0x03005D90",
+      "size": 4,
+      "type": "ptr",
+      "evidence": "Inherited"
+    },
+    "gSaveBlock1Ptr": {
+      "fixed": "0x03005D8C",
+      "size": 4,
+      "type": "ptr",
+      "evidence": "Inherited"
+    },
+    "gBattleTypeFlags": {
+      "fixed": "0x02022FEC",
+      "size": 4,
+      "type": "u32",
+      "evidence": "Inherited"
+    },
+    "gNumSafariBalls": {
+      "fixed": "0x0203A04C",
+      "size": 1,
+      "type": "u8",
+      "evidence": "Inherited"
+    },
+    "gBattlescriptCurrInstr": {
+      "fixed": "0x02024214",
+      "size": 4,
+      "type": "ptr",
+      "evidence": "Inherited"
+    }
+  },
+  "rom": {
+    "catch.caughtScript": {
+      "absent": "This Un-Nerf build is relinked, so the battle scripts the catch patch needs moved; they are not measured on it yet."
+    },
+    "catch.shookScript": {
+      "absent": "This Un-Nerf build is relinked, so the battle scripts the catch patch needs moved; they are not measured on it yet."
+    }
+  },
+  "party": {
+    "codec": "pk3",
+    "base": "@ram:gPlayerParty",
+    "count": "@ram:gPlayerPartyCount",
+    "enemy": "@ram:gEnemyParty",
+    "recordSize": 100,
+    "capacity": 6
+  },
+  "id": "emerald-usa-europe+unnerf-full",
+  "displayName": "Pokemon Emerald + Un-Nerf (Full)",
+  "kind": "unnerf",
+  "inherits": "emerald-usa-europe",
+  "parent": "emerald-usa-europe",
+  "match": [
+    {
+      "sha1": "3c3efe151cd2d7935505038704ec47ddfc54a231",
+      "crc32": "54b752e3",
+      "label": "plain"
+    }
+  ],
+  "save": {
+    "variant": "vanilla:SAV3E"
+  },
+  "magic": {
+    "catalog": "BPEE",
+    "fields": {
+      "Gen3InBattleByte": "@ram:gMain.inBattle",
+      "Gen3BattleOutcome": "@ram:gBattleOutcome",
+      "Gen3LastUsedItem": "@ram:gLastUsedItem",
+      "Gen3EnemyParty": "@ram:gEnemyParty",
+      "Gen3PlayerParty": "@ram:gPlayerParty",
+      "Gen3PlayerPartyCount": "@ram:gPlayerPartyCount",
+      "Gen3RngValue": "@ram:gRngValue",
+      "Gen3SaveBlock2Ptr": "@ram:gSaveBlock2Ptr",
+      "Gen3SaveBlock1Ptr": "@ram:gSaveBlock1Ptr",
+      "Gen3BattleTypeFlags": "@ram:gBattleTypeFlags",
+      "Gen3SafariBalls": "@ram:gNumSafariBalls",
+      "Gen3BattlescriptCurrInstr": "@ram:gBattlescriptCurrInstr",
+      "Gen3BallCaughtScript": "@rom:catch.caughtScript",
+      "Gen3BallShookScript": "@rom:catch.shookScript"
+    },
+    "roamerOffset": 12764,
+    "params": {
+      "Gen3InBattleMask": 2,
+      "Gen3WalkOriginOffset": 4,
+      "Gen3WildIvPlacements": [
+        [
+          1,
+          0
+        ]
+      ]
+    },
+    "encounters": "catalog:BPEE",
+    "manip": "emerald"
+  },
+  "unNerf": {
+    "alreadyApplied": true,
+    "set": "compendium:emerald",
+    "frontierShift": 4
+  },
+  "refusals": {
+    "UnNerfToggle": "Un-Nerf is already applied to this image, so it is not offered a second time.",
+    "InBattleCatch": "This Un-Nerf build is relinked, so the battle scripts the catch patch needs moved; the in-battle catch is off on it until they are measured."
+  },
+  "sources": [
+    {
+      "kind": "measurement",
+      "path": "src/Services/Mods/UnNerfCatalogData.cs",
+      "note": "result SHA-1 of gen3_emerald/bps/Emerald_UnNerf_Full.bps; gen3_emerald/bps/Emerald_UnNerf_Full.nocomp.xdelta on the clean base (UnNerfCatalog); owner-base results from logs/impl-S1-0/emerald-ips-results.log"
+    },
+    {
+      "kind": "map",
+      "path": "docs/project/understand/05-unnerf-patch-content.md",
+      "note": "item 8 (DESIGN-5 4.8): the Full build's 6-Pokemon change (gen3_emerald/emerald_6pokemon_full.patch:17-18) moves every SaveBlock2 frontier field after 0xCAA by +4; M13 (a game-written save from this ROM) has not been run yet"
+    }
+  ]
+}

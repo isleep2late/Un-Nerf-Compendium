@@ -15,9 +15,10 @@ public readonly record struct NamedValue(int Value, string Name)
 /// </summary>
 public sealed class GameLists
 {
-	private readonly GameStrings s;
+	private readonly SaveManager saves;
+	private GameStrings s => saves.Strings;
 
-	public GameLists(SaveManager saves) => s = saves.Strings;
+	public GameLists(SaveManager saves) => this.saves = saves;
 
 	public IReadOnlyList<NamedValue> Species { get; private set; } = [];
 	public IReadOnlyList<NamedValue> Abilities { get; private set; } = [];
