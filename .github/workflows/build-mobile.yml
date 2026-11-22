@@ -79,15 +79,23 @@ jobs:
           java-version: '21'
 
       - name: Set up .NET 10 SDK
+        # The exact SDK of the proven local build, in a directory of its own. The macos-26 image now
+        # ships newer SDKs (10.0.404, 11.0.100) in ~/.dotnet: '10.0.x' installed nothing, the newest
+        # SDK ran, and the pinned workload set below collided with the image's 11.0.100 manifests
+        # ("Workload pack ... conflicts with manifest", run 45045989913, 2026-11-22).
         uses: actions/setup-dotnet@v4
+        env:
+          DOTNET_INSTALL_DIR: ${{ runner.temp }}/dotnet
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.302'
 
       - name: Install MAUI workloads (adds the ios and android build packs)
         # Pinned to the workload set the proven local build uses (dotnet 10.0.302, "Workload version: 10.0.303.1").
         # An unpinned install took the newest MAUI (10.0.101) and its Resizetizer crashed on the app icon
         # (MAUIR0001, SkiaSharp MissingMethodException) on every run since 2026-09-07 20:52 UTC.
-        run: dotnet workload install maui --version 10.0.303.1
+        run: |
+          dotnet --version
+          dotnet workload install maui --version 10.0.303.1
 
       - name: Stamp the build number (only when one was given)
         run: |
