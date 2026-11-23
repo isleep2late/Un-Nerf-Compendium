@@ -21,6 +21,10 @@ Join our Discord: https://discord.gg/hackmons
 |-----|---------|----------------------------|--------------|--------|
 | 1 | Red/Blue/Yellow | RBY sprite/type "desync" combos; **level up to 255**; **"No Move" glitch move (0x00)**; **Any% 2-swap save corrupter** (patches the save file exactly as it is on disk: party count 255 + valid checksum, timestamped backup first, Trainer ID untouched, unsaved editor changes not included — desktop and mobile) | PKHaX | `PKHaX/` |
 | 2 | Gold/Silver/Crystal | **level up to 255** in the save editor;  **"No Move" glitch move (0x00)** | PKHaX | `PKHaX/` |
+| **UNTESTED BETA** 1 | Red / Blue | **Pikachu learns Surf and Fly**; **Mew behind the truck** at the Vermilion dock (return after the S.S. Anne has left, STRENGTH, press A on the truck); **Pokemon Center New York moves** on wild and gift Pokemon (1 in 2) | IPS + BPS | `gen1_rb/` |
+| **UNTESTED BETA** 1 | Yellow | the Red / Blue set, plus **the starter Pikachu can evolve** and the Raichu still follows you with its friendship kept | IPS + BPS | `gen1_yellow/` |
+| **UNTESTED BETA** 2 | Gold / Silver | **Pikachu learns Surf and Fly**; **Pokemon Center New York moves** on wild Pokemon and hatching eggs (1 in 2) | IPS + BPS | `gen2_gs/` |
+| **UNTESTED BETA** 2 | Crystal (1.0 and 1.1) | **Battle Tower** ban list (Mewtwo, Mew, Lugia, Ho-Oh, Celebi) + Species/Item Clause + level limit removed, **auto-level to the room's level**; **Pikachu learns Surf and Fly**; **Pokemon Center New York moves** on wild Pokemon and hatching eggs (1 in 2) | IPS + BPS | `gen2_crystal/` |
 | 2 proto | **Space World '97 demo** (Gold/Silver prototype) | **save-state (RAM) editing**: party, level 255, DVs, moves, **persistent disguises**, **volatile battle typing** — the prototype cannot reload its own save, so RAM is the only place edits survive | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
 | 1-7 | Retail games in an emulator | **save-state editing** (mGBA, BGB, SameBoy, VBA-M, melonDS, DeSmuME, Citra/Azahar): the embedded cartridge save opens in the full editor and writes back into the state; the live in-RAM party is editable directly — incl. persistent Gen 1 typing/sprite desyncs and mid-battle typing edits for Gens 2-5 | PKHaX + PKHaX Mobile | `PKHaX/`, `PKHaX-Mobile/` |
 | 3 | Emerald | Frontier ban list + level cap + Species/Item Clause; Soul Dew un-nerf; any-ability; Deoxys forms; 6-Pokemon Tower; **level up to 255** in the save editor | IPS + source patch + PKHaX | `gen3_emerald/`, `PKHaX/` |
@@ -63,6 +67,9 @@ booted a patched game, entered a facility or fought a battle with them yet. Each
 re-applies to its stated input and gives the expected output byte for byte. Each folder's README says UNTESTED BETA at the top and names the
 exact input dump it needs. Keep a backup of your save before you try one, and please report what misbehaves.
 
+- `gen1_rb/` (Red / Blue), `gen1_yellow/` (Yellow), `gen2_gs/` (Gold / Silver), `gen2_crystal/` (Crystal): built on
+  2026-11-23 from the pret disassemblies; the new routines were run in an emulator with test inputs, the games
+  themselves were not played
 - `gen3_rs/` (Ruby / Sapphire), `gen4_dp/` (Diamond / Pearl), `gen4_hgss/` (HeartGold / SoulSilver),
   `gen5_bw/` (Black / White), `gen6_xy/` (X / Y), `gen7_sm/` (Sun / Moon)
 - `hacks/gen3_emerald/`: `heart-and-soul-2.0.6/`, `lazarus-2/`, `seaglass-3.0/`, `soulgold-gba-1.1.4/`
