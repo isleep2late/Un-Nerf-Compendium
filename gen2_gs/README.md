@@ -1,14 +1,11 @@
 # Gen 2 - Pokemon Gold / Silver: Pikachu Surf and Fly, New York moves
-**UNTESTED BETA (built 2026-11-23; nobody has played a patched game yet).**
+**UNTESTED BETA (build 4, 2026-11-23; no person has played a patched game yet).**
 
-Status: **untested in play**. These patches were built from the pret disassembly (pret/pokegold): the unmodified build
+Status: **not yet played by a person**. These patches were built from the pret disassembly (pret/pokegold): the unmodified build
 reproduces the clean dump byte for byte, the changes were made in the source, and the patch is the difference between
 the two builds. What was checked: every patch re-applies to its stated input and gives the stated output byte for
 byte; no existing code or data moved (new code sits in unused space at the end of a bank); the RAM and save layout are
-identical to the clean game; each new routine (the New York move pick on wild, caught and hatched Pokemon, and in
-Crystal the Battle Tower auto-level) was run in place in an emulator with test inputs and gave the expected
-result. Everything else, including every map script and a full Battle Tower run, has not been run. Keep a backup of your save before you try them, and please report
-what misbehaves.
+identical to the clean game. An automated tester then played Gold and Crystal 1.0 in an emulator by key presses (Silver and Crystal 1.1 were only booted): saves both ways, Surf and Fly, the New York moves on wild Pokemon and hatched eggs, and in Crystal Battle Tower runs with legendaries, levelled to the room and restored after a win, a loss and quitting. Not played: link play. Keep a backup of your save before you try them, and please report what misbehaves.
 
 - **Pikachu and Raichu can learn Surf and Fly** from HM03 and HM02 (two bits in each one's TM/HM compatibility data).
   The clean game already shows the surfing Pikachu sprite when a Pikachu uses Surf.
